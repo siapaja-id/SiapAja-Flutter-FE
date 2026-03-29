@@ -3,24 +3,35 @@ import 'package:flutter/material.dart';
 import '../../app_theme.dart';
 
 /// Rich text widget — matches React `RichText` + `SpoilerText` + `RichLinkAnchor` + `LinkPreviewNode`
-class RichTextWidget extends StatelessWidget {
+class RichTextWidget extends StatefulWidget {
   final String text;
   final TextStyle? baseStyle;
 
   const RichTextWidget({super.key, required this.text, this.baseStyle});
 
   @override
+  State<RichTextWidget> createState() => _RichTextWidgetState();
+}
+
+class _RichTextWidgetState extends State<RichTextWidget> {
+  List<InlineSpan>? _cachedSpans;
+  String? _cachedText;
+
+  @override
   Widget build(BuildContext context) {
-    final spans = _parseText(text);
+    if (_cachedSpans == null || _cachedText != widget.text) {
+      _cachedText = widget.text;
+      _cachedSpans = _parseText(widget.text);
+    }
     return RichText(
       text: TextSpan(
         style:
-            baseStyle ??
+            widget.baseStyle ??
             Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.onSurface,
               height: 1.5,
             ),
-        children: spans,
+        children: _cachedSpans!,
       ),
     );
   }
@@ -212,9 +223,7 @@ class _SpoilerTextState extends State<_SpoilerText> {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-          color: _revealed
-              ? Colors.transparent
-              : const Color(0x0DFFFFFF), // bg-white/5
+          color: _revealed ? Colors.transparent : AppColors.borderSubtle,
           borderRadius: BorderRadius.circular(4),
         ),
         child: AnimatedDefaultTextStyle(

@@ -44,7 +44,7 @@ class EditorialCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHigh.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0x1AFFFFFF)),
+                border: Border.all(color: AppColors.border),
               ),
               child: const Center(
                 child: Text(

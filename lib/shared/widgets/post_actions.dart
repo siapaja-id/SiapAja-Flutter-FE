@@ -11,7 +11,6 @@ class PostActions extends ConsumerWidget {
   final int replies;
   final int reposts;
   final int shares;
-  final String? className;
 
   const PostActions({
     super.key,
@@ -20,14 +19,14 @@ class PostActions extends ConsumerWidget {
     required this.replies,
     required this.reposts,
     required this.shares,
-    this.className,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appNotifierProvider);
-    final voteValue = appState.userVotes[id] ?? 0;
-    final isReposted = appState.userReposts.contains(id);
+    final voteValue = ref.watch(userVotesProvider.select((s) => s[id] ?? 0));
+    final isReposted = ref.watch(
+      userRepostsProvider.select((s) => s.contains(id)),
+    );
     final currentVotes = votes + voteValue;
 
     return Row(
@@ -50,7 +49,7 @@ class PostActions extends ConsumerWidget {
               activeColor: const Color(0xFF10B981), // emerald-500
               hoverColor: const Color(0xFF10B981),
               onTap: () {
-                ref.read(appNotifierProvider.notifier).toggleRepost(id);
+                ref.read(userRepostsProvider.notifier).toggle(id);
               },
             ),
             const SizedBox(width: 2),
@@ -67,10 +66,10 @@ class PostActions extends ConsumerWidget {
           votes: currentVotes,
           voteValue: voteValue,
           onUpvote: () {
-            ref.read(appNotifierProvider.notifier).toggleVote(id, true);
+            ref.read(userVotesProvider.notifier).toggle(id, true);
           },
           onDownvote: () {
-            ref.read(appNotifierProvider.notifier).toggleVote(id, false);
+            ref.read(userVotesProvider.notifier).toggle(id, false);
           },
         ),
       ],
@@ -159,9 +158,9 @@ class _VotePill extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0x0DFFFFFF), // bg-white/5 (matches React)
+        color: AppColors.borderSubtle,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x1AFFFFFF)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [

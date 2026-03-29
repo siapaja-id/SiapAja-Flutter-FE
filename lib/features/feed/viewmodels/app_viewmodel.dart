@@ -2,53 +2,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/author.dart';
 
-/// App state for managing global UI state (tab, votes, reposts, follows)
-class AppState {
+// ---------------------------------------------------------------------------
+// UI State — active tab, current user, bar visibility
+// ---------------------------------------------------------------------------
+
+class UiState {
   final int activeTab;
   final Author? currentUser;
-  final Map<String, int>
-  userVotes; // feedItemId -> vote value (1 for up, -1 for down)
-  final Set<String> userReposts; // feedItemIds that user has reposted
-  final Set<String> followedHandles; // author handles that user follows
   final bool headerVisible;
   final bool bottomNavVisible;
 
-  const AppState({
+  const UiState({
     this.activeTab = 0,
     this.currentUser,
-    this.userVotes = const {},
-    this.userReposts = const {},
-    this.followedHandles = const {},
     this.headerVisible = true,
     this.bottomNavVisible = true,
   });
 
-  AppState copyWith({
+  UiState copyWith({
     int? activeTab,
     Author? currentUser,
-    Map<String, int>? userVotes,
-    Set<String>? userReposts,
-    Set<String>? followedHandles,
     bool? headerVisible,
     bool? bottomNavVisible,
   }) {
-    return AppState(
+    return UiState(
       activeTab: activeTab ?? this.activeTab,
       currentUser: currentUser ?? this.currentUser,
-      userVotes: userVotes ?? this.userVotes,
-      userReposts: userReposts ?? this.userReposts,
-      followedHandles: followedHandles ?? this.followedHandles,
       headerVisible: headerVisible ?? this.headerVisible,
       bottomNavVisible: bottomNavVisible ?? this.bottomNavVisible,
     );
   }
 }
 
-/// App Notifier - manages global app state
-class AppNotifier extends Notifier<AppState> {
+class UiStateNotifier extends Notifier<UiState> {
   @override
-  AppState build() {
-    return const AppState(
+  UiState build() {
+    return const UiState(
       activeTab: 0,
       currentUser: null,
       headerVisible: true,
@@ -56,15 +45,29 @@ class AppNotifier extends Notifier<AppState> {
     );
   }
 
-  /// Set the active tab index
   void setActiveTab(int index) {
     state = state.copyWith(activeTab: index);
   }
 
-  /// Toggle vote on a feed item
-  /// Returns the new vote value (0 = no vote, 1 = upvote, -1 = downvote)
-  int toggleVote(String feedItemId, bool isUpvote) {
-    final currentVote = state.userVotes[feedItemId] ?? 0;
+  void setBarsVisible({required bool header, required bool bottomNav}) {
+    state = state.copyWith(headerVisible: header, bottomNavVisible: bottomNav);
+  }
+}
+
+final uiStateProvider = NotifierProvider<UiStateNotifier, UiState>(
+  () => UiStateNotifier(),
+);
+
+// ---------------------------------------------------------------------------
+// User Votes — feedItemId -> vote value (1 for up, -1 for down)
+// ---------------------------------------------------------------------------
+
+class UserVotesNotifier extends Notifier<Map<String, int>> {
+  @override
+  Map<String, int> build() => {};
+
+  int toggle(String feedItemId, bool isUpvote) {
+    final currentVote = state[feedItemId] ?? 0;
     int newVote;
 
     if (isUpvote) {
@@ -73,61 +76,68 @@ class AppNotifier extends Notifier<AppState> {
       newVote = currentVote == -1 ? 0 : -1;
     }
 
-    final newVotes = Map<String, int>.from(state.userVotes);
+    final newVotes = Map<String, int>.from(state);
     if (newVote == 0) {
       newVotes.remove(feedItemId);
     } else {
       newVotes[feedItemId] = newVote;
     }
-
-    state = state.copyWith(userVotes: newVotes);
+    state = newVotes;
     return newVote;
   }
+}
 
-  /// Toggle repost on a feed item
-  void toggleRepost(String feedItemId) {
-    final newReposts = Set<String>.from(state.userReposts);
+final userVotesProvider = NotifierProvider<UserVotesNotifier, Map<String, int>>(
+  () => UserVotesNotifier(),
+);
+
+// ---------------------------------------------------------------------------
+// User Reposts — set of feedItemIds that user has reposted
+// ---------------------------------------------------------------------------
+
+class UserRepostsNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => {};
+
+  void toggle(String feedItemId) {
+    final newReposts = Set<String>.from(state);
     if (newReposts.contains(feedItemId)) {
       newReposts.remove(feedItemId);
     } else {
       newReposts.add(feedItemId);
     }
-    state = state.copyWith(userReposts: newReposts);
+    state = newReposts;
   }
 
-  /// Check if user has reposted a feed item
-  bool hasReposted(String feedItemId) {
-    return state.userReposts.contains(feedItemId);
-  }
+  bool hasReposted(String feedItemId) => state.contains(feedItemId);
+}
 
-  /// Get user's vote on a feed item
-  int getUserVote(String feedItemId) {
-    return state.userVotes[feedItemId] ?? 0;
-  }
+final userRepostsProvider = NotifierProvider<UserRepostsNotifier, Set<String>>(
+  () => UserRepostsNotifier(),
+);
 
-  /// Toggle follow on an author
-  void toggleFollow(String handle) {
-    final newFollowed = Set<String>.from(state.followedHandles);
+// ---------------------------------------------------------------------------
+// Followed Handles — set of author handles that user follows
+// ---------------------------------------------------------------------------
+
+class FollowedHandlesNotifier extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => {};
+
+  void toggle(String handle) {
+    final newFollowed = Set<String>.from(state);
     if (newFollowed.contains(handle)) {
       newFollowed.remove(handle);
     } else {
       newFollowed.add(handle);
     }
-    state = state.copyWith(followedHandles: newFollowed);
+    state = newFollowed;
   }
 
-  /// Check if user is following an author
-  bool isFollowing(String handle) {
-    return state.followedHandles.contains(handle);
-  }
-
-  /// Set header and bottom nav visibility (for scroll-to-hide behavior)
-  void setBarsVisible({required bool header, required bool bottomNav}) {
-    state = state.copyWith(headerVisible: header, bottomNavVisible: bottomNav);
-  }
+  bool isFollowing(String handle) => state.contains(handle);
 }
 
-/// App notifier provider
-final appNotifierProvider = NotifierProvider<AppNotifier, AppState>(
-  () => AppNotifier(),
-);
+final followedHandlesProvider =
+    NotifierProvider<FollowedHandlesNotifier, Set<String>>(
+      () => FollowedHandlesNotifier(),
+    );

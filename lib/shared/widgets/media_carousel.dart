@@ -8,14 +8,8 @@ import '../../app_theme.dart';
 class MediaCarousel extends StatefulWidget {
   final List<String> images;
   final String? aspect; // e.g., "16/9", "4/3", "1/1"
-  final String? className;
 
-  const MediaCarousel({
-    super.key,
-    required this.images,
-    this.aspect = '16/9',
-    this.className,
-  });
+  const MediaCarousel({super.key, required this.images, this.aspect = '16/9'});
 
   @override
   State<MediaCarousel> createState() => _MediaCarouselState();
@@ -55,7 +49,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0x0DFFFFFF)),
+          border: Border.all(color: AppColors.borderSubtle),
           boxShadow: [
             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
           ],

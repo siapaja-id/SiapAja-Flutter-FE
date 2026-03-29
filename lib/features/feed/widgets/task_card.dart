@@ -44,8 +44,10 @@ class TaskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appNotifierProvider);
-    final isAuthor = appState.currentUser?.handle == data.author.handle;
+    final currentUserHandle = ref.watch(
+      uiStateProvider.select((s) => s.currentUser?.handle),
+    );
+    final isAuthor = currentUserHandle == data.author.handle;
     final isThread = isMain || isParent || hasLineBelow;
 
     return BaseFeedCard(
@@ -57,11 +59,11 @@ class TaskCard extends ConsumerWidget {
       onClick: onClick,
       avatarContent: UserAvatar(
         src: data.author.avatar,
-        size: isQuote || isParent
-            ? AvatarSize.sm
-            : isMain
-            ? AvatarSize.lg
-            : AvatarSize.md,
+        size: AvatarSize.forCard(
+          isMain: isMain,
+          isParent: isParent,
+          isQuote: isQuote,
+        ),
         isOnline: data.author.isOnline,
       ),
       bottomWidget: !isThread && !isQuote
@@ -71,7 +73,7 @@ class TaskCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHigh.withOpacity(0.9),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x1AFFFFFF)),
+                border: Border.all(color: AppColors.border),
               ),
               child: Center(
                 child: Icon(
@@ -265,7 +267,7 @@ class TaskCard extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(9999),
-                    border: Border.all(color: const Color(0x1AFFFFFF)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,

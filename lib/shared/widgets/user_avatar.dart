@@ -12,6 +12,17 @@ enum AvatarSize {
 
   final double size;
   const AvatarSize(this.size);
+
+  /// Returns the appropriate avatar size based on card context.
+  static AvatarSize forCard({
+    required bool isMain,
+    required bool isParent,
+    required bool isQuote,
+  }) => isQuote || isParent
+      ? sm
+      : isMain
+      ? lg
+      : md;
 }
 
 /// User avatar widget with online indicator
@@ -20,7 +31,6 @@ class UserAvatar extends StatelessWidget {
   final String? alt;
   final AvatarSize size;
   final bool isOnline;
-  final String? className;
 
   const UserAvatar({
     super.key,
@@ -28,7 +38,6 @@ class UserAvatar extends StatelessWidget {
     this.alt,
     this.size = AvatarSize.md,
     this.isOnline = false,
-    this.className,
   });
 
   @override
@@ -47,11 +56,19 @@ class UserAvatar extends StatelessWidget {
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 color: AppColors.surfaceContainer,
-                child: Icon(Icons.person, size: size.size * 0.5, color: AppColors.onSurfaceVariant),
+                child: Icon(
+                  Icons.person,
+                  size: size.size * 0.5,
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
               errorWidget: (context, url, error) => Container(
                 color: AppColors.surfaceContainer,
-                child: Icon(Icons.person, size: size.size * 0.5, color: AppColors.onSurfaceVariant),
+                child: Icon(
+                  Icons.person,
+                  size: size.size * 0.5,
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
             ),
           ),
@@ -60,7 +77,7 @@ class UserAvatar extends StatelessWidget {
             child: ClipOval(
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0x1AFFFFFF), width: 1),
+                  border: Border.all(color: AppColors.border, width: 1),
                 ),
               ),
             ),

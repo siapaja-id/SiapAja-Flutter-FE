@@ -32,8 +32,10 @@ class SocialPostCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appNotifierProvider);
-    final isAuthor = appState.currentUser?.handle == data.author.handle;
+    final currentUserHandle = ref.watch(
+      uiStateProvider.select((s) => s.currentUser?.handle),
+    );
+    final isAuthor = currentUserHandle == data.author.handle;
     final isThreadContext = isMain || isParent || hasLineBelow;
     final canAcceptBid =
         data.isBid == true && data.bidStatus != BidStatus.accepted && !isAuthor;
@@ -47,11 +49,11 @@ class SocialPostCard extends ConsumerWidget {
       onClick: onClick,
       avatarContent: UserAvatar(
         src: data.author.avatar,
-        size: isParent || isQuote
-            ? AvatarSize.sm
-            : isMain
-            ? AvatarSize.lg
-            : AvatarSize.md,
+        size: AvatarSize.forCard(
+          isMain: isMain,
+          isParent: isParent,
+          isQuote: isQuote,
+        ),
         isOnline: data.author.isOnline,
       ),
       bottomWidget:
@@ -155,7 +157,7 @@ class SocialPostCard extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.black,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0x1AFFFFFF)),
+              border: Border.all(color: AppColors.border),
             ),
             child: const Center(
               child: Column(
@@ -183,7 +185,7 @@ class SocialPostCard extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0x1AFFFFFF)),
+              border: Border.all(color: AppColors.border),
             ),
             child: Row(
               children: [
@@ -208,7 +210,7 @@ class SocialPostCard extends ConsumerWidget {
                       Container(
                         height: 6,
                         decoration: BoxDecoration(
-                          color: const Color(0x1AFFFFFF),
+                          color: AppColors.border,
                           borderRadius: BorderRadius.circular(3),
                         ),
                         child: const FractionallySizedBox(

@@ -16,6 +16,19 @@ class AppColors {
   static const Color onSurfaceVariant = Color(0xFFA1A1AA);
   static const Color outlineVariant = Color(0xFF27272A);
 
+  // Shared border / divider opacities (ported from React CSS)
+  static const Color border = Color(0x1AFFFFFF); // 10% white — default border
+  static const Color borderSubtle = Color(
+    0x0DFFFFFF,
+  ); // 5% white — subtle divider
+  static const Color borderHover = Color(0x0AFFFFFF); // 4% white — quote hover
+  static const Color borderQuote = Color(
+    0x05FFFFFF,
+  ); // 2% white — quote bg / thread
+  static const Color overlayDark = Color(
+    0x66121212,
+  ); // 40% dark — feed card hover
+
   static const Color primary = Color(0xFFDC2626);
   static const Color primaryForeground = Color(0xFFFFFFFF);
 
@@ -31,6 +44,11 @@ class AppColors {
   static const Color zinc500 = Color(0xFF71717A);
   static const Color zinc400 = Color(0xFFA1A1AA);
   static const Color zinc300 = Color(0xFFD4D4D8);
+
+  // Glassmorphism tokens
+  static const Color glassTint = Color(0x401F1F1F);
+  static const Color glassBorder = Color(0x29FFFFFF);
+  static const Color glassGlow = Color(0x15FFFFFF);
 }
 
 class AppTheme {
@@ -70,7 +88,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0x1AFFFFFF)),
+          side: const BorderSide(color: AppColors.border),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

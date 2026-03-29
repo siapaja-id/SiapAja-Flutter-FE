@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -45,12 +47,12 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     if (delta > _scrollThreshold) {
       // Scrolling down - hide bars
       ref
-          .read(appNotifierProvider.notifier)
+          .read(uiStateProvider.notifier)
           .setBarsVisible(header: false, bottomNav: false);
     } else if (delta < -_scrollThreshold) {
       // Scrolling up - show bars
       ref
-          .read(appNotifierProvider.notifier)
+          .read(uiStateProvider.notifier)
           .setBarsVisible(header: true, bottomNav: true);
     }
 
@@ -67,26 +69,14 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   @override
   Widget build(BuildContext context) {
     final feedState = ref.watch(feedNotifierProvider);
-    final appState = ref.watch(appNotifierProvider);
+    final headerVisible = ref.watch(
+      uiStateProvider.select((s) => s.headerVisible),
+    );
 
-    return Column(
+    return Stack(
       children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          height: appState.headerVisible ? 64 : 0,
-          child: ClipRect(
-            child: AnimatedSlide(
-              offset: appState.headerVisible
-                  ? Offset.zero
-                  : const Offset(0, -1),
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              child: const FeedHeader(),
-            ),
-          ),
-        ),
-        Expanded(
+        // Feed content fills the full area so it scrolls behind the header
+        Positioned.fill(
           child: RefreshIndicator(
             color: AppColors.primary,
             backgroundColor: AppColors.surfaceContainerHigh,
@@ -99,7 +89,7 @@ class _FeedPageState extends ConsumerState<FeedPage> {
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.only(top: 64, bottom: 24),
               itemCount: feedState.feedItems.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
@@ -109,6 +99,18 @@ class _FeedPageState extends ConsumerState<FeedPage> {
                 return FeedItemCard(item: item);
               },
             ),
+          ),
+        ),
+        // Glassmorphism header floats over the feed content
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: AnimatedSlide(
+            offset: headerVisible ? Offset.zero : const Offset(0, -1),
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            child: const FeedHeader(),
           ),
         ),
       ],
@@ -131,7 +133,7 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
   @override
   void initState() {
     super.initState();
-    final activeTab = ref.read(appNotifierProvider).activeTab;
+    final activeTab = ref.read(uiStateProvider).activeTab;
     _tabController = TabController(
       length: 2,
       vsync: this,
@@ -142,15 +144,14 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
-      ref.read(appNotifierProvider.notifier).setActiveTab(_tabController.index);
-      setState(() {});
+      ref.read(uiStateProvider.notifier).setActiveTab(_tabController.index);
     }
   }
 
   @override
   void didUpdateWidget(FeedHeader oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final activeTab = ref.read(appNotifierProvider).activeTab;
+    final activeTab = ref.read(uiStateProvider).activeTab;
     if (_tabController.index != activeTab) {
       _tabController.index = activeTab;
     }
@@ -165,60 +166,85 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
 
   @override
   Widget build(BuildContext context) {
-    final appState = ref.watch(appNotifierProvider);
+    final activeTab = ref.watch(uiStateProvider.select((s) => s.activeTab));
+    final karma = ref.watch(
+      uiStateProvider.select((s) => s.currentUser?.karma),
+    );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return SizedBox(
       height: 64,
-      decoration: const BoxDecoration(
-        color: Color(0xF21F1F1F),
-        border: Border(bottom: BorderSide(color: Color(0x0DFFFFFF))),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () {},
-            child: const UserAvatar(
-              src: 'https://picsum.photos/seed/user/100/100',
-              size: AvatarSize.md,
-              isOnline: true,
-            ),
-          ),
-          _TabRow(
-            controller: _tabController,
-            activeTab: _tabController.index,
-            onTabChanged: (i) => _tabController.animateTo(i),
-          ),
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0x1AFFFFFF)),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppColors.glassTint,
+              border: const Border(
+                bottom: BorderSide(color: AppColors.glassBorder),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${appState.currentUser?.karma ?? 98}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFF34D399),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [AppColors.glassGlow, AppColors.glassTint],
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {},
+                  child: const UserAvatar(
+                    src: 'https://picsum.photos/seed/user/100/100',
+                    size: AvatarSize.md,
+                    isOnline: true,
+                  ),
+                ),
+                _TabRow(
+                  controller: _tabController,
+                  activeTab: activeTab,
+                  onTabChanged: (i) => _tabController.animateTo(i),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.glassTint,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.glassBorder),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${karma ?? 98}',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(color: const Color(0xFF34D399)),
+                            ),
+                            const SizedBox(width: 2),
+                            const Icon(
+                              PhosphorIconsRegular.caretUp,
+                              size: 14,
+                              color: Color(0xFF34D399),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 2),
-                  const Icon(
-                    PhosphorIconsRegular.caretUp,
-                    size: 14,
-                    color: Color(0xFF34D399),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

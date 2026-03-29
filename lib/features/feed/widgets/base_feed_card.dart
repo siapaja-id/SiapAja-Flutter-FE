@@ -89,7 +89,7 @@ class BaseFeedCard extends ConsumerWidget {
               margin: const EdgeInsets.only(top: 8),
               constraints: BoxConstraints(minHeight: isParent ? 20 : 40),
               decoration: BoxDecoration(
-                color: const Color(0x1AFFFFFF),
+                color: AppColors.border,
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -101,15 +101,16 @@ class BaseFeedCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appNotifierProvider);
-    final currentUser = appState.currentUser;
-    final isAuthor = currentUser?.handle == data.author.handle;
+    final currentUserHandle = ref.watch(
+      uiStateProvider.select((s) => s.currentUser?.handle),
+    );
+    final isAuthor = currentUserHandle == data.author.handle;
     final isClickable = !isQuote && !isParent;
     final hoverColor = isQuote
-        ? const Color(0x0AFFFFFF)
+        ? AppColors.borderHover
         : _isThreadContext
-        ? const Color(0x05FFFFFF)
-        : const Color(0x66121212);
+        ? AppColors.borderQuote
+        : AppColors.overlayDark;
 
     return HoverWrapper(
       hoverColor: hoverColor,
@@ -146,9 +147,9 @@ class BaseFeedCard extends ConsumerWidget {
             right: 20,
           ),
           decoration: BoxDecoration(
-            color: isQuote ? const Color(0x05FFFFFF) : null,
+            color: isQuote ? AppColors.borderQuote : null,
             borderRadius: isQuote ? BorderRadius.circular(16) : null,
-            border: isQuote ? Border.all(color: const Color(0x1AFFFFFF)) : null,
+            border: isQuote ? Border.all(color: AppColors.border) : null,
           ),
           child: Column(
             children: [
@@ -160,11 +161,11 @@ class BaseFeedCard extends ConsumerWidget {
                       avatarContent ??
                           UserAvatar(
                             src: data.author.avatar,
-                            size: isQuote || isParent
-                                ? AvatarSize.sm
-                                : isMain
-                                ? AvatarSize.lg
-                                : AvatarSize.md,
+                            size: AvatarSize.forCard(
+                              isMain: isMain,
+                              isParent: isParent,
+                              isQuote: isQuote,
+                            ),
                             isOnline: data.author.isOnline,
                           ),
                     ),
@@ -279,12 +280,22 @@ class BaseFeedCard extends ConsumerWidget {
                               (data as SocialPostData).isFirstPost == true &&
                               !isQuote &&
                               !isParent)
-                            const FirstPostBadge(),
+                            const FirstItemBadge(
+                              label: 'First Post',
+                              bgColor: Color(0xFF10B981),
+                              fgColor: Colors.black,
+                              dotColor: Colors.black,
+                            ),
                           if (data is TaskData &&
                               (data as TaskData).isFirstTask == true &&
                               !isQuote &&
                               !isParent)
-                            const FirstTaskBadge(),
+                            const FirstItemBadge(
+                              label: 'First Task',
+                              bgColor: AppColors.primary,
+                              fgColor: AppColors.primaryForeground,
+                              dotColor: AppColors.primaryForeground,
+                            ),
                           ...children,
                           if (!isParent && !isQuote) ...[
                             const SizedBox(height: 8),
@@ -330,7 +341,7 @@ class BaseFeedCard extends ConsumerWidget {
                 Container(
                   margin: const EdgeInsets.only(top: 8),
                   height: 0.5,
-                  color: const Color(0x0DFFFFFF),
+                  color: AppColors.borderSubtle,
                 ),
             ],
           ),
@@ -350,12 +361,11 @@ class FollowButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isFollowing = ref
-        .watch(appNotifierProvider)
-        .followedHandles
-        .contains(handle);
+    final isFollowing = ref.watch(
+      followedHandlesProvider.select((s) => s.contains(handle)),
+    );
     return GestureDetector(
-      onTap: () => ref.read(appNotifierProvider.notifier).toggleFollow(handle),
+      onTap: () => ref.read(followedHandlesProvider.notifier).toggle(handle),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(right: 8),
@@ -365,9 +375,7 @@ class FollowButton extends ConsumerWidget {
               ? Colors.white.withOpacity(0.1)
               : AppColors.primary,
           borderRadius: BorderRadius.circular(20),
-          border: isFollowing
-              ? Border.all(color: const Color(0x1AFFFFFF))
-              : null,
+          border: isFollowing ? Border.all(color: AppColors.border) : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -401,17 +409,29 @@ class FollowButton extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// FirstPostBadge
+// FirstItemBadge — unified badge for "First Post" / "First Task" etc.
 // ---------------------------------------------------------------------------
 
-class FirstPostBadge extends StatelessWidget {
-  const FirstPostBadge({super.key});
+class FirstItemBadge extends StatelessWidget {
+  final String label;
+  final Color bgColor;
+  final Color fgColor;
+  final Color dotColor;
+
+  const FirstItemBadge({
+    super.key,
+    required this.label,
+    required this.bgColor,
+    required this.fgColor,
+    required this.dotColor,
+  });
+
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(top: 4, bottom: 4),
     child: Badge(
-      backgroundColor: const Color(0xFF10B981),
-      textColor: Colors.black,
+      backgroundColor: bgColor,
+      textColor: fgColor,
       textStyle: const TextStyle(
         fontSize: 9,
         fontWeight: FontWeight.w900,
@@ -419,7 +439,7 @@ class FirstPostBadge extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       largeSize: 18,
-      label: const Row(
+      label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
@@ -427,53 +447,13 @@ class FirstPostBadge extends StatelessWidget {
             height: 6,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: dotColor,
                 shape: BoxShape.circle,
               ),
             ),
           ),
-          SizedBox(width: 6),
-          Text('First Post'),
-        ],
-      ),
-    ),
-  );
-}
-
-// ---------------------------------------------------------------------------
-// FirstTaskBadge
-// ---------------------------------------------------------------------------
-
-class FirstTaskBadge extends StatelessWidget {
-  const FirstTaskBadge({super.key});
-  @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(top: 4, bottom: 4),
-    child: Badge(
-      backgroundColor: AppColors.primary,
-      textColor: AppColors.primaryForeground,
-      textStyle: const TextStyle(
-        fontSize: 9,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 2,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      largeSize: 18,
-      label: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 6,
-            height: 6,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.primaryForeground,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          SizedBox(width: 6),
-          Text('First Task'),
+          const SizedBox(width: 6),
+          Text(label),
         ],
       ),
     ),

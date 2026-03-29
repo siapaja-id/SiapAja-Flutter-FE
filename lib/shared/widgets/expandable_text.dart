@@ -6,8 +6,6 @@ import '../../app_theme.dart';
 class ExpandableText extends StatefulWidget {
   final String text;
   final int limit;
-  final String? className;
-  final String? buttonClassName;
   final TextStyle? style;
   final TextStyle? buttonStyle;
   final Widget? suffix;
@@ -16,8 +14,6 @@ class ExpandableText extends StatefulWidget {
     super.key,
     required this.text,
     this.limit = 160,
-    this.className,
-    this.buttonClassName,
     this.style,
     this.buttonStyle,
     this.suffix,
@@ -33,21 +29,22 @@ class _ExpandableTextState extends State<ExpandableText> {
   @override
   Widget build(BuildContext context) {
     final isLong = widget.text.length > widget.limit;
-    final displayText = (!isLong || isExpanded) ? widget.text : widget.text.substring(0, widget.limit);
+    final displayText = (!isLong || isExpanded)
+        ? widget.text
+        : widget.text.substring(0, widget.limit);
     final needsEllipsis = isLong && !isExpanded;
 
     return RichText(
       text: TextSpan(
-        style: widget.style ?? Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: AppColors.onSurface,
-          height: 1.5,
-        ),
+        style:
+            widget.style ??
+            Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.onSurface,
+              height: 1.5,
+            ),
         children: [
-          TextSpan(
-            text: displayText,
-          ),
-          if (needsEllipsis)
-            const TextSpan(text: '...'),
+          TextSpan(text: displayText),
+          if (needsEllipsis) const TextSpan(text: '...'),
           if (widget.suffix != null)
             WidgetSpan(
               child: Padding(
@@ -61,10 +58,12 @@ class _ExpandableTextState extends State<ExpandableText> {
                 onTap: () => setState(() => isExpanded = !isExpanded),
                 child: Text(
                   isExpanded ? ' show less' : ' read more',
-                  style: widget.buttonStyle ?? Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
+                  style:
+                      widget.buttonStyle ??
+                      Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                      ),
                 ),
               ),
             ),
