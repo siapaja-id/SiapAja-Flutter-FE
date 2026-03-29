@@ -8,7 +8,7 @@ A Flutter application targeting Linux desktop and Web (with WASM support).
 - Python 3 (for WASM serving with CORS headers)
 - Linux desktop dependencies:
   ```bash
-  sudo apt install clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev
+  sudo apt install clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev lld
   ```
 
 ## Getting Started
