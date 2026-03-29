@@ -88,7 +88,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         hintStyle: const TextStyle(color: AppColors.onSurfaceVariant),
       ),
       textTheme: const TextTheme(
@@ -137,18 +140,9 @@ class AppTheme {
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: AppColors.onSurface,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: AppColors.onSurface,
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: AppColors.onSurfaceVariant,
-        ),
+        bodyLarge: TextStyle(fontSize: 16, color: AppColors.onSurface),
+        bodyMedium: TextStyle(fontSize: 14, color: AppColors.onSurface),
+        bodySmall: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
         labelLarge: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -165,10 +159,7 @@ class AppTheme {
           color: AppColors.onSurfaceVariant,
         ),
       ),
-      iconTheme: const IconThemeData(
-        color: AppColors.onSurface,
-        size: 20,
-      ),
+      iconTheme: const IconThemeData(color: AppColors.onSurface, size: 20),
       dividerTheme: const DividerThemeData(
         color: AppColors.outlineVariant,
         thickness: 1,
@@ -183,4 +174,17 @@ class AppTheme {
       ),
     );
   }
+
+  // Custom text styles for very small text (used in badges, status labels)
+  static const TextStyle labelTiny = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    color: AppColors.onSurfaceVariant,
+  );
+
+  static const TextStyle labelMicro = TextStyle(
+    fontSize: 9,
+    fontWeight: FontWeight.w800,
+    color: AppColors.onSurface,
+  );
 }

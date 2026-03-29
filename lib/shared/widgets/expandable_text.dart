@@ -38,9 +38,8 @@ class _ExpandableTextState extends State<ExpandableText> {
 
     return RichText(
       text: TextSpan(
-        style: widget.style ?? const TextStyle(
+        style: widget.style ?? Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: AppColors.onSurface,
-          fontSize: 14,
           height: 1.5,
         ),
         children: [
@@ -62,10 +61,8 @@ class _ExpandableTextState extends State<ExpandableText> {
                 onTap: () => setState(() => isExpanded = !isExpanded),
                 child: Text(
                   isExpanded ? ' show less' : ' read more',
-                  style: widget.buttonStyle ?? const TextStyle(
+                  style: widget.buttonStyle ?? Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
                 ),

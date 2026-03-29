@@ -140,10 +140,8 @@ class _NavButton extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(
+            style: AppTheme.labelTiny.copyWith(
               color: color,
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
             ),
           ),

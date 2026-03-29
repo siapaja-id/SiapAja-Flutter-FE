@@ -22,15 +22,19 @@ class FeedPage extends ConsumerWidget {
       children: [
         // Sticky feed header (matches React App.tsx header)
         const FeedHeader(),
-        // Feed composer
-        const FeedComposer(),
-        // Feed list
+        // Scrollable area: composer + feed list
         Expanded(
           child: ListView.builder(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             padding: const EdgeInsets.only(bottom: 16),
-            itemCount: feedState.feedItems.length,
+            itemCount: feedState.feedItems.length + 1,
             itemBuilder: (context, index) {
-              final item = feedState.feedItems[index];
+              if (index == 0) {
+                return const FeedComposer();
+              }
+              final item = feedState.feedItems[index - 1];
               return FeedItemCard(item: item);
             },
           ),
@@ -97,10 +101,8 @@ class FeedHeader extends ConsumerWidget {
                 children: [
                   Text(
                     '${appState.currentUser?.karma ?? 98}',
-                    style: const TextStyle(
-                      color: Color(0xFF34D399), // emerald-400
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFF34D399),
                     ),
                   ),
                   const SizedBox(width: 2),
@@ -207,10 +209,8 @@ class _TabItem extends StatelessWidget {
       child: AnimatedDefaultTextStyle(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.titleMedium!.copyWith(
           color: isActive ? AppColors.onSurface : AppColors.onSurfaceVariant,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),

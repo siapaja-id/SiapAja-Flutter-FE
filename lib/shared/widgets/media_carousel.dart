@@ -45,8 +45,12 @@ class _MediaCarouselState extends State<MediaCarousel> {
     if (widget.images.isEmpty) return const SizedBox.shrink();
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
+      onEnter: (_) {
+        if (mounted) setState(() => _isHovering = true);
+      },
+      onExit: (_) {
+        if (mounted) setState(() => _isHovering = false);
+      },
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -58,19 +62,19 @@ class _MediaCarouselState extends State<MediaCarousel> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            children: [
-              // PageView for images
-              SizedBox(
-                height: MediaQuery.of(context).size.width * _aspectRatio * 0.9,
-                child: PageView.builder(
+          child: AspectRatio(
+            aspectRatio: _aspectRatio,
+            child: Stack(
+              children: [
+                // PageView for images
+                PageView.builder(
                   controller: _pageController,
                   itemCount: widget.images.length,
                   scrollBehavior: const MaterialScrollBehavior().copyWith(
                     scrollbars: false,
                   ),
                   onPageChanged: (index) {
-                    setState(() => activeIndex = index);
+                    if (mounted) setState(() => activeIndex = index);
                   },
                   itemBuilder: (context, index) {
                     return CachedNetworkImage(
@@ -95,86 +99,86 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     );
                   },
                 ),
-              ),
-              // Dot indicators
-              if (widget.images.length > 1)
-                Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      widget.images.length,
-                      (index) => GestureDetector(
-                        onTap: () {
-                          _pageController.animateToPage(
-                            index,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          height: 4,
-                          width: index == activeIndex ? 8 : 4,
-                          decoration: BoxDecoration(
-                            color: index == activeIndex
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(2),
+                // Dot indicators
+                if (widget.images.length > 1)
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        widget.images.length,
+                        (index) => GestureDetector(
+                          onTap: () {
+                            _pageController.animateToPage(
+                              index,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            height: 4,
+                            width: index == activeIndex ? 8 : 4,
+                            decoration: BoxDecoration(
+                              color: index == activeIndex
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              // Left arrow — hidden by default, visible on hover (matches React group-hover)
-              if (widget.images.length > 1 && activeIndex > 0)
-                Positioned(
-                  left: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: AnimatedOpacity(
-                      opacity: _isHovering ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: _ArrowButton(
-                        icon: PhosphorIconsRegular.caretLeft,
-                        onTap: () {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
+                // Left arrow — hidden by default, visible on hover (matches React group-hover)
+                if (widget.images.length > 1 && activeIndex > 0)
+                  Positioned(
+                    left: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: AnimatedOpacity(
+                        opacity: _isHovering ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: _ArrowButton(
+                          icon: PhosphorIconsRegular.caretLeft,
+                          onTap: () {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-              // Right arrow — hidden by default, visible on hover (matches React group-hover)
-              if (widget.images.length > 1 &&
-                  activeIndex < widget.images.length - 1)
-                Positioned(
-                  right: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: AnimatedOpacity(
-                      opacity: _isHovering ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: _ArrowButton(
-                        icon: PhosphorIconsRegular.caretRight,
-                        onTap: () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
+                // Right arrow — hidden by default, visible on hover (matches React group-hover)
+                if (widget.images.length > 1 &&
+                    activeIndex < widget.images.length - 1)
+                  Positioned(
+                    right: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: AnimatedOpacity(
+                        opacity: _isHovering ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: _ArrowButton(
+                          icon: PhosphorIconsRegular.caretRight,
+                          onTap: () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -202,8 +206,12 @@ class _ArrowButtonState extends State<_ArrowButton> {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) {
+        if (mounted) setState(() => _hovered = true);
+      },
+      onExit: (_) {
+        if (mounted) setState(() => _hovered = false);
+      },
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(

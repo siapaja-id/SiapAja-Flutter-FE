@@ -123,14 +123,13 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                   color: AppColors.onSurfaceVariant,
                                 ),
                               ),
-                              const Text(
+                              Text(
                                 'CREATE TASK',
-                                style: TextStyle(
-                                  color: AppColors.onSurface,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2,
-                                ),
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      color: AppColors.onSurface,
+                                      letterSpacing: 2,
+                                    ),
                               ),
                               ElevatedButton(
                                 onPressed: _textController.text.isEmpty
@@ -147,12 +146,12 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                     vertical: 8,
                                   ),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Continue',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        color: AppColors.primaryForeground,
+                                      ),
                                 ),
                               ),
                             ],
@@ -193,13 +192,10 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                   size: AvatarSize.md,
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
+                                Text(
                                   'Current User',
-                                  style: TextStyle(
-                                    color: AppColors.onSurface,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(color: AppColors.onSurface),
                                 ),
                               ],
                             ),
@@ -213,20 +209,23 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                               hintText: _isFullscreen
                                   ? 'What do you need help with? Describe your task in detail...'
                                   : '',
-                              hintStyle: TextStyle(
-                                color: AppColors.onSurfaceVariant.withOpacity(
-                                  0.4,
-                                ),
-                                fontSize: _isFullscreen ? 20 : 15,
-                              ),
+                              hintStyle: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: AppColors.onSurfaceVariant
+                                        .withOpacity(0.4),
+                                  )
+                                  .copyWith(
+                                    fontSize: _isFullscreen ? 20 : null,
+                                  ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.zero,
                             ),
-                            style: TextStyle(
-                              color: AppColors.onSurface,
-                              fontSize: _isFullscreen ? 20 : 15,
-                              height: _isFullscreen ? 1.8 : 1.5,
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  color: AppColors.onSurface,
+                                  height: _isFullscreen ? 1.8 : 1.5,
+                                )
+                                .copyWith(fontSize: _isFullscreen ? 20 : null),
                             onTap: () => setState(() => _isFocused = true),
                           ),
                           // Attachment previews — AnimatedOpacity + Slide matches React AnimatePresence
@@ -320,7 +319,7 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                               ),
-                                              child: const Column(
+                                              child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
@@ -329,14 +328,14 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                                     color: AppColors
                                                         .onSurfaceVariant,
                                                   ),
-                                                  SizedBox(height: 4),
+                                                  const SizedBox(height: 4),
                                                   Text(
                                                     'Add More',
-                                                    style: TextStyle(
-                                                      color: AppColors
-                                                          .onSurfaceVariant,
-                                                      fontSize: 10,
-                                                    ),
+                                                    style: AppTheme.labelTiny
+                                                        .copyWith(
+                                                          color: AppColors
+                                                              .onSurfaceVariant,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -434,15 +433,18 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                                     ),
                                     elevation: 0,
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         'Next',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              color:
+                                                  AppColors.primaryForeground,
+                                            ),
                                       ),
                                       SizedBox(width: 4),
                                       Icon(

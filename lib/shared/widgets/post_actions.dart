@@ -124,10 +124,8 @@ class _ActionButton extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 _formatCount(count!),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -209,10 +207,8 @@ class _VotePill extends StatelessWidget {
               votes >= 1000
                   ? '${(votes / 1000).toStringAsFixed(1)}k'
                   : votes.toString(),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: voteColor,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ),

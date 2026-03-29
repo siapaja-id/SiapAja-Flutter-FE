@@ -147,7 +147,7 @@ class _BaseFeedCard extends ConsumerWidget {
   final FeedItem data;
   final bool isMain, isParent, isQuote, hasLineBelow;
   final VoidCallback? onClick;
-  final Widget? avatarContent, headerMeta;
+  final Widget? avatarContent, headerMeta, bottomWidget;
   final List<Widget> children;
 
   const _BaseFeedCard({
@@ -159,19 +159,44 @@ class _BaseFeedCard extends ConsumerWidget {
     this.onClick,
     this.avatarContent,
     this.headerMeta,
+    this.bottomWidget,
     required this.children,
   });
+
+  bool get _isThreadContext => isMain || isParent || hasLineBelow;
+
+  Widget _buildAvatarColumn(Widget avatar) {
+    final showThreadLine = (hasLineBelow && !isQuote) || bottomWidget != null;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        avatar,
+        if (showThreadLine)
+          Expanded(
+            child: Container(
+              width: 1.5,
+              margin: const EdgeInsets.only(top: 8),
+              constraints: BoxConstraints(minHeight: isParent ? 20 : 40),
+              decoration: BoxDecoration(
+                color: const Color(0x1AFFFFFF),
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+          ),
+        if (bottomWidget != null) bottomWidget!,
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appNotifierProvider);
     final currentUser = appState.currentUser;
     final isAuthor = currentUser?.handle == data.author.handle;
-    final isThreadContext = isMain || isParent || hasLineBelow;
     final isClickable = !isQuote && !isParent;
     final hoverColor = isQuote
         ? const Color(0x0AFFFFFF)
-        : isThreadContext
+        : _isThreadContext
         ? const Color(0x05FFFFFF)
         : const Color(0x66121212);
 
@@ -220,37 +245,17 @@ class _BaseFeedCard extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        avatarContent ??
-                            UserAvatar(
-                              src: data.author.avatar,
-                              size: isQuote || isParent
-                                  ? AvatarSize.sm
-                                  : isMain
-                                  ? AvatarSize.lg
-                                  : AvatarSize.md,
-                              isOnline: data.author.isOnline,
-                            ),
-                        if (hasLineBelow && !isQuote)
-                          Expanded(
-                            child: Container(
-                              width: 1.5,
-                              margin: const EdgeInsets.only(
-                                top: 8,
-                                bottom: -16,
-                              ),
-                              constraints: BoxConstraints(
-                                minHeight: isParent ? 20 : 40,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0x1AFFFFFF),
-                                borderRadius: BorderRadius.circular(1),
-                              ),
-                            ),
+                    _buildAvatarColumn(
+                      avatarContent ??
+                          UserAvatar(
+                            src: data.author.avatar,
+                            size: isQuote || isParent
+                                ? AvatarSize.sm
+                                : isMain
+                                ? AvatarSize.lg
+                                : AvatarSize.md,
+                            isOnline: data.author.isOnline,
                           ),
-                      ],
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -267,7 +272,7 @@ class _BaseFeedCard extends ConsumerWidget {
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Text(
-                                      isThreadContext || isQuote
+                                      _isThreadContext || isQuote
                                           ? data.author.name
                                           : data.author.handle,
                                       style: TextStyle(
@@ -286,7 +291,7 @@ class _BaseFeedCard extends ConsumerWidget {
                                         size: isParent || isQuote ? 12 : 14,
                                         color: AppColors.primary,
                                       ),
-                                    if ((isThreadContext || isQuote) &&
+                                    if ((_isThreadContext || isQuote) &&
                                         !isParent)
                                       Text(
                                         '@${data.author.handle}',
@@ -373,7 +378,7 @@ class _BaseFeedCard extends ConsumerWidget {
                   reposts: data.reposts,
                   shares: data.shares,
                 ),
-                if (isThreadContext && data.replies > 0 && !isMain)
+                if (_isThreadContext && data.replies > 0 && !isMain)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Row(

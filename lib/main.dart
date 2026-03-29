@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
 import 'app_theme.dart';
+import 'shared/zoom_wrapper.dart';
 
 void main() {
   runApp(
@@ -21,6 +22,9 @@ class SiapAjaApp extends StatelessWidget {
       title: 'SiapAja',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      builder: (context, child) {
+        return ZoomWrapper(child: child!);
+      },
       routerConfig: AppRouter.router,
     );
   }

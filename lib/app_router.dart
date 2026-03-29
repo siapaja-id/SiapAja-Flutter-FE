@@ -71,10 +71,8 @@ class ScaffoldPageStub extends StatelessWidget {
       body: Center(
         child: Text(
           title,
-          style: const TextStyle(
-            color: Color(0xFFA1A1AA),
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: const Color(0xFFA1A1AA),
             letterSpacing: 2,
           ),
         ),

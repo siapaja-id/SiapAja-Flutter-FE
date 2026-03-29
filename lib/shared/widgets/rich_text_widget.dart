@@ -16,9 +16,8 @@ class RichTextWidget extends StatelessWidget {
       text: TextSpan(
         style:
             baseStyle ??
-            const TextStyle(
+            Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.onSurface,
-              fontSize: 14,
               height: 1.5,
             ),
         children: spans,
@@ -112,9 +111,9 @@ class RichTextWidget extends StatelessWidget {
               Text(
                 displayUrl,
                 style: const TextStyle(
-                  color: AppColors.primary,
                   fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary,
                 ),
               ),
             ],
@@ -175,10 +174,8 @@ class RichTextWidget extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               'Redacted',
-              style: TextStyle(
+              style: AppTheme.labelMicro.copyWith(
                 color: Colors.red.shade400,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
                 letterSpacing: 0.5,
               ),
             ),
@@ -223,13 +220,11 @@ class _SpoilerTextState extends State<_SpoilerText> {
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 700),
           curve: Curves.easeInOut,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
             color: _revealed
                 ? AppColors
                       .onSurface // revealed → text-on-surface
                 : AppColors.onSurfaceVariant, // hidden → muted
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
             letterSpacing: _revealed ? 0 : 1.5,
           ),
           child: Text(
