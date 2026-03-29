@@ -1,13 +1,29 @@
 # Siapaja Flutter FE
 
-A Flutter web application with WebAssembly (WASM) support.
+A Flutter application targeting Linux desktop and Web (with WASM support).
 
 ## Prerequisites
 
 - Flutter 3.41+ / Dart 3.11+
 - Python 3 (for WASM serving with CORS headers)
+- Linux desktop dependencies:
+  ```bash
+  sudo apt install clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev
+  ```
 
 ## Getting Started
+
+### Linux Desktop
+
+```bash
+# Run in debug mode
+flutter run -d linux
+
+# Build for production
+flutter build linux
+```
+
+Output: `build/linux/x64/release/bundle/`
 
 ### Standard Web Build
 
@@ -65,8 +81,10 @@ Incompatible browsers automatically fall back to the JavaScript build.
 ```
 lib/
   main.dart          # App entry point
+linux/               # Linux desktop platform files
 build/
-  web/               # Build output
+  linux/             # Linux desktop build output
+  web/               # Web build output
     main.dart.wasm   # WASM binary
     main.dart.js     # JavaScript fallback
 serve_wasm.py        # HTTP server with CORS headers
