@@ -10,32 +10,146 @@ import '../../../shared/widgets/post_actions.dart';
 import '../providers.dart';
 
 // ---------------------------------------------------------------------------
-// HoverWrapper — adds hover background
+// InteractiveFeedCard — multi-input hover / press effects
 // ---------------------------------------------------------------------------
 
-class HoverWrapper extends StatefulWidget {
+class InteractiveFeedCard extends StatefulWidget {
   final Widget child;
   final Color hoverColor;
-  const HoverWrapper({
+  final VoidCallback? onTap;
+  const InteractiveFeedCard({
     super.key,
     required this.child,
     required this.hoverColor,
+    this.onTap,
   });
   @override
-  State<HoverWrapper> createState() => _HoverWrapperState();
+  State<InteractiveFeedCard> createState() => _InteractiveFeedCardState();
 }
 
-class _HoverWrapperState extends State<HoverWrapper> {
+class _InteractiveFeedCardState extends State<InteractiveFeedCard>
+    with SingleTickerProviderStateMixin {
   bool _isHovering = false;
+  bool _isPressed = false;
+  late final AnimationController _glowCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _glowCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    );
+  }
+
+  @override
+  void dispose() {
+    _glowCtrl.dispose();
+    super.dispose();
+  }
+
+  void _setHovering(bool v) {
+    if (_isHovering == v) return;
+    setState(() => _isHovering = v);
+    if (v) {
+      _glowCtrl.repeat();
+    } else {
+      _glowCtrl.reset();
+    }
+  }
+
+  void _setPressed(bool v) {
+    if (_isPressed == v) return;
+    setState(() => _isPressed = v);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final active = _isHovering || _isPressed;
+    final scale = _isPressed ? 0.985 : (_isHovering ? 1.008 : 1.0);
+
+    final glowColor = _isPressed
+        ? AppColors.primary.withOpacity(0.06)
+        : AppColors.primary.withOpacity(0.03);
+    final glowColorEnd = _isPressed
+        ? AppColors.primary.withOpacity(0.02)
+        : Colors.transparent;
+
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        color: _isHovering ? widget.hoverColor : Colors.transparent,
-        child: widget.child,
+      onEnter: (_) => _setHovering(true),
+      onExit: (_) {
+        _setHovering(false);
+        _setPressed(false);
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => _setPressed(true),
+        onTapCancel: () => _setPressed(false),
+        onTapUp: (_) {
+          _setPressed(false);
+          widget.onTap?.call();
+        },
+        child: AnimatedScale(
+          scale: scale,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: active ? widget.hoverColor : Colors.transparent,
+              border: active
+                  ? Border(
+                      left: BorderSide(
+                        color: AppColors.primary.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    )
+                  : const Border(
+                      left: BorderSide(color: Colors.transparent, width: 2),
+                    ),
+              gradient: active
+                  ? LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [glowColor, glowColorEnd],
+                    )
+                  : null,
+            ),
+            child: Stack(
+              children: [
+                if (active)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 1,
+                    child: AnimatedBuilder(
+                      animation: _glowCtrl,
+                      builder: (context, _) {
+                        final t = _glowCtrl.value;
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment(-1 + 2 * t, 0),
+                              end: Alignment(1 + 2 * t, 0),
+                              colors: [
+                                Colors.transparent,
+                                AppColors.primary.withOpacity(0.6),
+                                AppColors.primary.withOpacity(0.0),
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                widget.child,
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -112,239 +226,234 @@ class BaseFeedCard extends ConsumerWidget {
         ? AppColors.borderQuote
         : AppColors.overlayDark;
 
-    return HoverWrapper(
+    return InteractiveFeedCard(
       hoverColor: hoverColor,
-      child: GestureDetector(
-        onTap: () {
-          if (onClick != null) {
-            onClick!();
-            return;
-          }
-          if (!isClickable) return;
-          if (data is TaskData) {
-            context.go('/task/${data.id}');
-          } else {
-            context.go('/post/${data.id}');
-          }
-        },
-        child: Container(
-          padding: EdgeInsets.only(
-            top: isQuote
-                ? 16
-                : isMain
-                ? 12
-                : isParent
-                ? 16
-                : 12,
-            bottom: isQuote
-                ? 16
-                : isMain
-                ? 12
-                : isParent
-                ? 16
-                : 0,
-            left: 20,
-            right: 20,
-          ),
-          decoration: BoxDecoration(
-            color: isQuote ? AppColors.borderQuote : null,
-            borderRadius: isQuote ? BorderRadius.circular(16) : null,
-            border: isQuote ? Border.all(color: AppColors.border) : null,
-          ),
-          child: Column(
-            children: [
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildAvatarColumn(
-                      avatarContent ??
-                          UserAvatar(
-                            src: data.author.avatar,
-                            size: AvatarSize.forCard(
-                              isMain: isMain,
-                              isParent: isParent,
-                              isQuote: isQuote,
-                            ),
-                            isOnline: data.author.isOnline,
+      onTap: () {
+        if (onClick != null) {
+          onClick!();
+          return;
+        }
+        if (!isClickable) return;
+        if (data is TaskData) {
+          context.go('/task/${data.id}');
+        } else {
+          context.go('/post/${data.id}');
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.only(
+          top: isQuote
+              ? 16
+              : isMain
+              ? 12
+              : isParent
+              ? 16
+              : 12,
+          bottom: isQuote
+              ? 16
+              : isMain
+              ? 12
+              : isParent
+              ? 16
+              : 0,
+          left: 20,
+          right: 20,
+        ),
+        decoration: BoxDecoration(
+          color: isQuote ? AppColors.borderQuote : null,
+          borderRadius: isQuote ? BorderRadius.circular(16) : null,
+          border: isQuote ? Border.all(color: AppColors.border) : null,
+        ),
+        child: Column(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildAvatarColumn(
+                    avatarContent ??
+                        UserAvatar(
+                          src: data.author.avatar,
+                          size: AvatarSize.forCard(
+                            isMain: isMain,
+                            isParent: isParent,
+                            isQuote: isQuote,
                           ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Wrap(
-                                  spacing: 6,
-                                  runSpacing: 4,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
+                          isOnline: data.author.isOnline,
+                        ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    _isThreadContext || isQuote
+                                        ? data.author.name
+                                        : data.author.handle,
+                                    style: TextStyle(
+                                      color: AppColors.onSurface,
+                                      fontSize: isParent || isQuote
+                                          ? 12
+                                          : isMain
+                                          ? 15
+                                          : 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (data.author.verified)
+                                    Icon(
+                                      PhosphorIconsRegular.sealCheck,
+                                      size: isParent || isQuote ? 12 : 14,
+                                      color: AppColors.primary,
+                                    ),
+                                  if ((_isThreadContext || isQuote) &&
+                                      !isParent)
                                     Text(
-                                      _isThreadContext || isQuote
-                                          ? data.author.name
-                                          : data.author.handle,
-                                      style: TextStyle(
-                                        color: AppColors.onSurface,
-                                        fontSize: isParent || isQuote
-                                            ? 12
-                                            : isMain
-                                            ? 15
-                                            : 13,
-                                        fontWeight: FontWeight.w600,
+                                      '@${data.author.handle}',
+                                      style: const TextStyle(
+                                        color: AppColors.onSurfaceVariant,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                    if (data.author.verified)
-                                      Icon(
-                                        PhosphorIconsRegular.sealCheck,
-                                        size: isParent || isQuote ? 12 : 14,
-                                        color: AppColors.primary,
+                                  if (isAuthor && !isParent && !isQuote)
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
                                       ),
-                                    if ((_isThreadContext || isQuote) &&
-                                        !isParent)
-                                      Text(
-                                        '@${data.author.handle}',
-                                        style: const TextStyle(
-                                          color: AppColors.onSurfaceVariant,
-                                          fontSize: 12,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withOpacity(
+                                          0.2,
                                         ),
-                                      ),
-                                    if (isAuthor && !isParent && !isQuote)
-                                      Container(
-                                        margin: const EdgeInsets.only(left: 4),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
                                           color: AppColors.primary.withOpacity(
                                             0.2,
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                          border: Border.all(
-                                            color: AppColors.primary
-                                                .withOpacity(0.2),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'You',
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.w900,
-                                            letterSpacing: 2,
-                                          ),
                                         ),
                                       ),
-                                    if (headerMeta != null) headerMeta!,
-                                  ],
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  if (isMain &&
-                                      !isAuthor &&
-                                      !isParent &&
-                                      !isQuote)
-                                    FollowButton(handle: data.author.handle),
-                                  Text(
-                                    data.timestamp,
-                                    style: TextStyle(
-                                      color: AppColors.onSurfaceVariant
-                                          .withOpacity(0.6),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  if (!isParent && !isQuote) ...[
-                                    const SizedBox(width: 4),
-                                    const IconButton(
-                                      icon: Icon(
-                                        PhosphorIconsRegular.dotsThree,
-                                        size: 18,
+                                      child: const Text(
+                                        'You',
+                                        style: TextStyle(
+                                          color: AppColors.primary,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 2,
+                                        ),
                                       ),
-                                      onPressed: null,
-                                      padding: EdgeInsets.zero,
-                                      constraints: BoxConstraints(),
                                     ),
-                                  ],
+                                  if (headerMeta != null) headerMeta!,
                                 ],
                               ),
-                            ],
-                          ),
-                          if (data is SocialPostData &&
-                              (data as SocialPostData).isFirstPost == true &&
-                              !isQuote &&
-                              !isParent)
-                            const FirstItemBadge(
-                              label: 'First Post',
-                              bgColor: Color(0xFF10B981),
-                              fgColor: Colors.black,
-                              dotColor: Colors.black,
                             ),
-                          if (data is TaskData &&
-                              (data as TaskData).isFirstTask == true &&
-                              !isQuote &&
-                              !isParent)
-                            const FirstItemBadge(
-                              label: 'First Task',
-                              bgColor: AppColors.primary,
-                              fgColor: AppColors.primaryForeground,
-                              dotColor: AppColors.primaryForeground,
-                            ),
-                          ...children,
-                          if (!isParent && !isQuote) ...[
-                            const SizedBox(height: 8),
-                            PostActions(
-                              id: data.id,
-                              votes: data.votes,
-                              replies: data.replies,
-                              reposts: data.reposts,
-                              shares: data.shares,
-                            ),
-                            if (_isThreadContext && data.replies > 0 && !isMain)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      PhosphorIconsRegular.chatCircle,
-                                      size: 12,
-                                      color: AppColors.primary.withOpacity(0.8),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
-                                      style: TextStyle(
-                                        color: AppColors.primary.withOpacity(
-                                          0.8,
-                                        ),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                            Row(
+                              children: [
+                                if (isMain &&
+                                    !isAuthor &&
+                                    !isParent &&
+                                    !isQuote)
+                                  FollowButton(handle: data.author.handle),
+                                Text(
+                                  data.timestamp,
+                                  style: TextStyle(
+                                    color: AppColors.onSurfaceVariant
+                                        .withOpacity(0.6),
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
+                                if (!isParent && !isQuote) ...[
+                                  const SizedBox(width: 4),
+                                  const IconButton(
+                                    icon: Icon(
+                                      PhosphorIconsRegular.dotsThree,
+                                      size: 18,
+                                    ),
+                                    onPressed: null,
+                                    padding: EdgeInsets.zero,
+                                    constraints: BoxConstraints(),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ],
+                        ),
+                        if (data is SocialPostData &&
+                            (data as SocialPostData).isFirstPost == true &&
+                            !isQuote &&
+                            !isParent)
+                          const FirstItemBadge(
+                            label: 'First Post',
+                            bgColor: Color(0xFF10B981),
+                            fgColor: Colors.black,
+                            dotColor: Colors.black,
+                          ),
+                        if (data is TaskData &&
+                            (data as TaskData).isFirstTask == true &&
+                            !isQuote &&
+                            !isParent)
+                          const FirstItemBadge(
+                            label: 'First Task',
+                            bgColor: AppColors.primary,
+                            fgColor: AppColors.primaryForeground,
+                            dotColor: AppColors.primaryForeground,
+                          ),
+                        ...children,
+                        if (!isParent && !isQuote) ...[
+                          const SizedBox(height: 8),
+                          PostActions(
+                            id: data.id,
+                            votes: data.votes,
+                            replies: data.replies,
+                            reposts: data.reposts,
+                            shares: data.shares,
+                          ),
+                          if (_isThreadContext && data.replies > 0 && !isMain)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    PhosphorIconsRegular.chatCircle,
+                                    size: 12,
+                                    color: AppColors.primary.withOpacity(0.8),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
+                                    style: TextStyle(
+                                      color: AppColors.primary.withOpacity(0.8),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              if (!isQuote && !isParent && !isMain)
-                Container(
-                  margin: const EdgeInsets.only(top: 8),
-                  height: 0.5,
-                  color: AppColors.borderSubtle,
-                ),
-            ],
-          ),
+            ),
+            if (!isQuote && !isParent && !isMain)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                height: 0.5,
+                color: AppColors.borderSubtle,
+              ),
+          ],
         ),
       ),
     );
