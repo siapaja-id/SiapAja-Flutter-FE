@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
+import '../viewmodels/app_viewmodel.dart';
 
 /// Main shell with bottom navigation bar
 class MainShell extends ConsumerStatefulWidget {
@@ -18,131 +17,101 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
+  int _getSelectedIndex(String path) {
+    if (path == '/' ||
+        path.startsWith('/feed') ||
+        path.startsWith('/post') ||
+        path.startsWith('/task'))
+      return 0;
+    if (path == '/explore') return 1;
+    if (path == '/messages') return 2;
+    if (path == '/orders') return 3;
+    return 0;
+  }
+
+  void _onDestinationSelected(int index) {
+    switch (index) {
+      case 0:
+        context.go('/');
+      case 1:
+        context.go('/explore');
+      case 2:
+        context.go('/messages');
+      case 3:
+        context.go('/orders');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
+    final selectedIndex = _getSelectedIndex(location);
+    final appState = ref.watch(appNotifierProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBody: true,
       body: Stack(
         children: [
-          Positioned.fill(child: widget.child),
+          widget.child,
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: _BottomNavBar(currentPath: location),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomNavBar extends ConsumerWidget {
-  final String currentPath;
-
-  const _BottomNavBar({required this.currentPath});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceContainerHigh.withOpacity(0.95),
-            border: const Border(
-              top: BorderSide(color: Color(0x0DFFFFFF)),
-            ), // border-white/5
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavButton(
-                icon: PhosphorIconsRegular.house,
-                label: 'Home',
-                isActive: currentPath == '/' || currentPath == '/feed',
-                onTap: () => context.go('/'),
-              ),
-              _NavButton(
-                icon: PhosphorIconsRegular.magnifyingGlass,
-                label: 'Explore',
-                isActive: currentPath == '/explore',
-                onTap: () => context.go('/explore'),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    PhosphorIconsRegular.plus,
-                    color: AppColors.primaryForeground,
-                    size: 20,
-                  ),
+            child: AnimatedSlide(
+              offset: appState.bottomNavVisible
+                  ? Offset.zero
+                  : const Offset(0, 1),
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: NavigationBar(
+                selectedIndex: selectedIndex,
+                onDestinationSelected: _onDestinationSelected,
+                backgroundColor: AppColors.surfaceContainerHigh.withOpacity(
+                  0.95,
                 ),
+                indicatorColor: AppColors.primary.withOpacity(0.2),
+                height: 64,
+                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                destinations: const [
+                  NavigationDestination(
+                    icon: Icon(PhosphorIconsRegular.house, size: 22),
+                    selectedIcon: Icon(
+                      PhosphorIconsRegular.house,
+                      size: 22,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Home',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(PhosphorIconsRegular.magnifyingGlass, size: 22),
+                    selectedIcon: Icon(
+                      PhosphorIconsRegular.magnifyingGlass,
+                      size: 22,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Explore',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(PhosphorIconsRegular.chatCircle, size: 22),
+                    selectedIcon: Icon(
+                      PhosphorIconsRegular.chatCircle,
+                      size: 22,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Messages',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(PhosphorIconsRegular.clipboardText, size: 22),
+                    selectedIcon: Icon(
+                      PhosphorIconsRegular.clipboardText,
+                      size: 22,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Orders',
+                  ),
+                ],
               ),
-              _NavButton(
-                icon: PhosphorIconsRegular.chatCircle,
-                label: 'Messages',
-                isActive: currentPath == '/messages',
-                onTap: () => context.go('/messages'),
-              ),
-              _NavButton(
-                icon: PhosphorIconsRegular.clipboardText,
-                label: 'Orders',
-                isActive: currentPath == '/orders',
-                onTap: () => context.go('/orders'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavButton({
-    required this.icon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primary : AppColors.onSurfaceVariant;
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: AppTheme.labelTiny.copyWith(
-              color: color,
-              letterSpacing: 0.5,
             ),
           ),
         ],

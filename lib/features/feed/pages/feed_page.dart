@@ -9,34 +9,106 @@ import '../widgets/feed_item_card.dart';
 import '../providers.dart';
 
 /// Feed page with header, composer, and feed list
-class FeedPage extends ConsumerWidget {
-  final String tab; // 'for-you' or 'around-you'
+class FeedPage extends ConsumerStatefulWidget {
+  final String tab;
 
   const FeedPage({super.key, this.tab = 'for-you'});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FeedPage> createState() => _FeedPageState();
+}
+
+class _FeedPageState extends ConsumerState<FeedPage> {
+  late ScrollController _scrollController;
+  double _lastScrollOffset = 0;
+  static const double _scrollThreshold = 8;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final offset = _scrollController.offset;
+    final delta = offset - _lastScrollOffset;
+
+    // Don't toggle if at the very top
+    if (offset <= 0) {
+      _lastScrollOffset = offset;
+      return;
+    }
+
+    if (delta > _scrollThreshold) {
+      // Scrolling down - hide bars
+      ref
+          .read(appNotifierProvider.notifier)
+          .setBarsVisible(header: false, bottomNav: false);
+    } else if (delta < -_scrollThreshold) {
+      // Scrolling up - show bars
+      ref
+          .read(appNotifierProvider.notifier)
+          .setBarsVisible(header: true, bottomNav: true);
+    }
+
+    _lastScrollOffset = offset;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final feedState = ref.watch(feedNotifierProvider);
+    final appState = ref.watch(appNotifierProvider);
 
     return Column(
       children: [
-        // Sticky feed header (matches React App.tsx header)
-        const FeedHeader(),
-        // Scrollable area: composer + feed list
-        Expanded(
-          child: ListView.builder(
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          height: appState.headerVisible ? 64 : 0,
+          child: ClipRect(
+            child: AnimatedSlide(
+              offset: appState.headerVisible
+                  ? Offset.zero
+                  : const Offset(0, -1),
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: const FeedHeader(),
             ),
-            padding: const EdgeInsets.only(bottom: 16),
-            itemCount: feedState.feedItems.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return const FeedComposer();
-              }
-              final item = feedState.feedItems[index - 1];
-              return FeedItemCard(item: item);
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            color: AppColors.primary,
+            backgroundColor: AppColors.surfaceContainerHigh,
+            onRefresh: () async {
+              ref.read(feedNotifierProvider.notifier).refreshFeed();
+              await Future.delayed(const Duration(milliseconds: 500));
             },
+            child: ListView.builder(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              padding: const EdgeInsets.only(bottom: 24),
+              itemCount: feedState.feedItems.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const FeedComposer();
+                }
+                final item = feedState.feedItems[index - 1];
+                return FeedItemCard(item: item);
+              },
+            ),
           ),
         ),
       ],
@@ -44,51 +116,82 @@ class FeedPage extends ConsumerWidget {
   }
 }
 
-/// Feed header widget (sticky header) - matches React App.tsx header
-class FeedHeader extends ConsumerWidget {
+/// Feed header widget (sticky header) with TabBar
+class FeedHeader extends ConsumerStatefulWidget {
   const FeedHeader({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FeedHeader> createState() => _FeedHeaderState();
+}
+
+class _FeedHeaderState extends ConsumerState<FeedHeader>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    final activeTab = ref.read(appNotifierProvider).activeTab;
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: activeTab,
+    );
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) {
+      ref.read(appNotifierProvider.notifier).setActiveTab(_tabController.index);
+      setState(() {});
+    }
+  }
+
+  @override
+  void didUpdateWidget(FeedHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final activeTab = ref.read(appNotifierProvider).activeTab;
+    if (_tabController.index != activeTab) {
+      _tabController.index = activeTab;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final appState = ref.watch(appNotifierProvider);
-    final activeTab = appState.activeTab;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 64,
       decoration: const BoxDecoration(
-        color: Color(
-          0xF21F1F1F,
-        ), // surface-container-high/95 (matches React glass)
-        border: Border(
-          bottom: BorderSide(color: Color(0x0DFFFFFF)),
-        ), // border-white/5
+        color: Color(0xF21F1F1F),
+        border: Border(bottom: BorderSide(color: Color(0x0DFFFFFF))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // User avatar (left)
           GestureDetector(
-            onTap: () {
-              // Navigate to profile
-            },
+            onTap: () {},
             child: const UserAvatar(
               src: 'https://picsum.photos/seed/user/100/100',
               size: AvatarSize.md,
               isOnline: true,
             ),
           ),
-          // Tabs (center) — animated underline matches React layoutId="tab"
           _TabRow(
-            activeTab: activeTab,
-            onTabChanged: (i) =>
-                ref.read(appNotifierProvider.notifier).setActiveTab(i),
+            controller: _tabController,
+            activeTab: _tabController.index,
+            onTabChanged: (i) => _tabController.animateTo(i),
           ),
-          // Karma badge (right)
           GestureDetector(
-            onTap: () {
-              // Navigate to profile
-            },
+            onTap: () {},
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -109,7 +212,7 @@ class FeedHeader extends ConsumerWidget {
                   const Icon(
                     PhosphorIconsRegular.caretUp,
                     size: 14,
-                    color: Color(0xFF34D399), // emerald-400
+                    color: Color(0xFF34D399),
                   ),
                 ],
               ),
@@ -121,11 +224,16 @@ class FeedHeader extends ConsumerWidget {
   }
 }
 
-/// Animated tab row — single sliding underline matches React `layoutId="tab"`
+/// Animated tab row with sliding underline
 class _TabRow extends StatelessWidget {
+  final TabController controller;
   final int activeTab;
   final ValueChanged<int> onTabChanged;
-  const _TabRow({required this.activeTab, required this.onTabChanged});
+  const _TabRow({
+    required this.controller,
+    required this.activeTab,
+    required this.onTabChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +258,6 @@ class _TabRow extends StatelessWidget {
               ),
             ],
           ),
-          // Single sliding underline — AnimatedContainer interpolates
-          // alignment between tab centres (like Framer Motion layoutId).
           Positioned(
             bottom: 0,
             left: 0,
@@ -177,7 +283,6 @@ class _TabRow extends StatelessWidget {
                       BoxShadow(
                         color: AppColors.primary.withOpacity(0.4),
                         blurRadius: 6,
-                        offset: const Offset(0, 0),
                       ),
                     ],
                   ),

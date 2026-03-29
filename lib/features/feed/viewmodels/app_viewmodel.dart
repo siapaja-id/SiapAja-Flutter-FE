@@ -6,9 +6,12 @@ import '../../../models/author.dart';
 class AppState {
   final int activeTab;
   final Author? currentUser;
-  final Map<String, int> userVotes; // feedItemId -> vote value (1 for up, -1 for down)
+  final Map<String, int>
+  userVotes; // feedItemId -> vote value (1 for up, -1 for down)
   final Set<String> userReposts; // feedItemIds that user has reposted
   final Set<String> followedHandles; // author handles that user follows
+  final bool headerVisible;
+  final bool bottomNavVisible;
 
   const AppState({
     this.activeTab = 0,
@@ -16,6 +19,8 @@ class AppState {
     this.userVotes = const {},
     this.userReposts = const {},
     this.followedHandles = const {},
+    this.headerVisible = true,
+    this.bottomNavVisible = true,
   });
 
   AppState copyWith({
@@ -24,6 +29,8 @@ class AppState {
     Map<String, int>? userVotes,
     Set<String>? userReposts,
     Set<String>? followedHandles,
+    bool? headerVisible,
+    bool? bottomNavVisible,
   }) {
     return AppState(
       activeTab: activeTab ?? this.activeTab,
@@ -31,6 +38,8 @@ class AppState {
       userVotes: userVotes ?? this.userVotes,
       userReposts: userReposts ?? this.userReposts,
       followedHandles: followedHandles ?? this.followedHandles,
+      headerVisible: headerVisible ?? this.headerVisible,
+      bottomNavVisible: bottomNavVisible ?? this.bottomNavVisible,
     );
   }
 }
@@ -42,6 +51,8 @@ class AppNotifier extends Notifier<AppState> {
     return const AppState(
       activeTab: 0,
       currentUser: null,
+      headerVisible: true,
+      bottomNavVisible: true,
     );
   }
 
@@ -55,20 +66,20 @@ class AppNotifier extends Notifier<AppState> {
   int toggleVote(String feedItemId, bool isUpvote) {
     final currentVote = state.userVotes[feedItemId] ?? 0;
     int newVote;
-    
+
     if (isUpvote) {
       newVote = currentVote == 1 ? 0 : 1;
     } else {
       newVote = currentVote == -1 ? 0 : -1;
     }
-    
+
     final newVotes = Map<String, int>.from(state.userVotes);
     if (newVote == 0) {
       newVotes.remove(feedItemId);
     } else {
       newVotes[feedItemId] = newVote;
     }
-    
+
     state = state.copyWith(userVotes: newVotes);
     return newVote;
   }
@@ -109,7 +120,14 @@ class AppNotifier extends Notifier<AppState> {
   bool isFollowing(String handle) {
     return state.followedHandles.contains(handle);
   }
+
+  /// Set header and bottom nav visibility (for scroll-to-hide behavior)
+  void setBarsVisible({required bool header, required bool bottomNav}) {
+    state = state.copyWith(headerVisible: header, bottomNavVisible: bottomNav);
+  }
 }
 
 /// App notifier provider
-final appNotifierProvider = NotifierProvider<AppNotifier, AppState>(() => AppNotifier());
+final appNotifierProvider = NotifierProvider<AppNotifier, AppState>(
+  () => AppNotifier(),
+);

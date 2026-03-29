@@ -30,13 +30,6 @@ class PostActions extends ConsumerWidget {
     final isReposted = appState.userReposts.contains(id);
     final currentVotes = votes + voteValue;
 
-    String formatCount(int count) {
-      if (count >= 1000) {
-        return '${(count / 1000).toStringAsFixed(1)}k';
-      }
-      return count.toString();
-    }
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -124,9 +117,9 @@ class _ActionButton extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 _formatCount(count!),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: color,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: color),
               ),
             ],
           ],
@@ -173,8 +166,12 @@ class _VotePill extends StatelessWidget {
       child: Row(
         children: [
           // Upvote button
-          GestureDetector(
+          InkWell(
             onTap: onUpvote,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(20),
+            ),
+            hoverColor: const Color(0xFFF97316).withOpacity(0.1),
             child: Container(
               padding: const EdgeInsets.only(
                 left: 8,
@@ -207,14 +204,18 @@ class _VotePill extends StatelessWidget {
               votes >= 1000
                   ? '${(votes / 1000).toStringAsFixed(1)}k'
                   : votes.toString(),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: voteColor,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(color: voteColor),
             ),
           ),
           // Downvote button
-          GestureDetector(
+          InkWell(
             onTap: onDownvote,
+            borderRadius: const BorderRadius.horizontal(
+              right: Radius.circular(20),
+            ),
+            hoverColor: const Color(0xFF6366F1).withOpacity(0.1),
             child: Container(
               padding: const EdgeInsets.only(
                 left: 6,

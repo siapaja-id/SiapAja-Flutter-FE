@@ -16,7 +16,6 @@ class FeedComposer extends ConsumerStatefulWidget {
 class _FeedComposerState extends ConsumerState<FeedComposer> {
   final TextEditingController _textController = TextEditingController();
   bool _isFocused = false;
-  bool _isFullscreen = false;
   final List<_Attachment> _attachments = [];
 
   @override
@@ -27,11 +26,9 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
 
   void _handleSubmit() {
     if (_textController.text.trim().isEmpty && _attachments.isEmpty) return;
-    // TODO: Navigate to create post screen
     _textController.clear();
     _attachments.clear();
     _isFocused = false;
-    _isFullscreen = false;
   }
 
   void _addMockAttachment(_AttachmentType type) {
@@ -53,417 +50,342 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
     });
   }
 
+  void _openFullscreenComposer() {
+    final textController = TextEditingController(text: _textController.text);
+    final List<_Attachment> sheetAttachments = List.from(_attachments);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _FullscreenComposerSheet(
+        textController: textController,
+        attachments: sheetAttachments,
+        onAddAttachment: (type) {
+          final urls = {
+            _AttachmentType.image: 'https://picsum.photos/seed/post/400/300',
+            _AttachmentType.video: 'video',
+            _AttachmentType.voice: '0:15',
+            _AttachmentType.file: 'document.pdf',
+          };
+          sheetAttachments.add(_Attachment(type: type, url: urls[type]!));
+        },
+        onRemoveAttachment: (index) {
+          sheetAttachments.removeAt(index);
+        },
+        onSubmit: () {
+          if (textController.text.trim().isNotEmpty ||
+              sheetAttachments.isNotEmpty) {
+            _textController.text = textController.text;
+            setState(() {
+              _attachments
+                ..clear()
+                ..addAll(sheetAttachments);
+            });
+            _handleSubmit();
+          }
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasContent =
         _isFocused ||
-        _isFullscreen ||
         _textController.text.isNotEmpty ||
         _attachments.isNotEmpty;
 
-    return Stack(
-      children: [
-        // Fullscreen backdrop — matches React AnimatePresence + motion.div overlay
-        AnimatedOpacity(
-          opacity: _isFullscreen ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOut,
-          child: IgnorePointer(
-            ignoring: !_isFullscreen,
-            child: Container(color: Colors.black.withOpacity(0.8)),
-          ),
-        ),
-        // Composer container
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-          margin: _isFullscreen
-              ? EdgeInsets.zero
-              : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: _isFullscreen
-              ? null
-              : BoxDecoration(
-                  color: AppColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0x1AFFFFFF)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                    ),
-                  ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x1AFFFFFF)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 4, right: 12),
+                  child: UserAvatar(
+                    src: 'https://picsum.photos/seed/user/100/100',
+                    size: AvatarSize.md,
+                  ),
                 ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Fullscreen header — AnimatedOpacity matches React AnimatePresence
-              AnimatedSize(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                child: AnimatedOpacity(
-                  opacity: _isFullscreen ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: _isFullscreen
-                      ? Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0x1AFFFFFF)),
-                            color: AppColors.surfaceContainerHigh.withOpacity(
-                              0.3,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _isFullscreen = false),
-                                icon: const Icon(
-                                  PhosphorIconsRegular.x,
-                                  color: AppColors.onSurfaceVariant,
-                                ),
-                              ),
-                              Text(
-                                'CREATE TASK',
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      color: AppColors.onSurface,
-                                      letterSpacing: 2,
-                                    ),
-                              ),
-                              ElevatedButton(
-                                onPressed: _textController.text.isEmpty
-                                    ? null
-                                    : _handleSubmit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: AppColors.primaryForeground,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Continue',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(
-                                        color: AppColors.primaryForeground,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-              // Content area
-              Padding(
-                padding: _isFullscreen
-                    ? const EdgeInsets.fromLTRB(24, 24, 24, 8)
-                    : const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Avatar
-                    if (!_isFullscreen)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 4, right: 12),
-                        child: UserAvatar(
-                          src: 'https://picsum.photos/seed/user/100/100',
-                          size: AvatarSize.md,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _textController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: '',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
                         ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.onSurface,
+                          height: 1.5,
+                        ),
+                        onTap: () => setState(() => _isFocused = true),
                       ),
-                    // Text field and attachments
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // User info for fullscreen mode
-                          if (_isFullscreen) ...[
-                            Row(
-                              children: [
-                                const UserAvatar(
-                                  src:
-                                      'https://picsum.photos/seed/user/100/100',
-                                  size: AvatarSize.md,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Current User',
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(color: AppColors.onSurface),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                          ],
-                          // Text input
-                          TextField(
-                            controller: _textController,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              hintText: _isFullscreen
-                                  ? 'What do you need help with? Describe your task in detail...'
-                                  : '',
-                              hintStyle: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: AppColors.onSurfaceVariant
-                                        .withOpacity(0.4),
-                                  )
-                                  .copyWith(
-                                    fontSize: _isFullscreen ? 20 : null,
-                                  ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: AppColors.onSurface,
-                                  height: _isFullscreen ? 1.8 : 1.5,
-                                )
-                                .copyWith(fontSize: _isFullscreen ? 20 : null),
-                            onTap: () => setState(() => _isFocused = true),
-                          ),
-                          // Attachment previews — AnimatedOpacity + Slide matches React AnimatePresence
-                          AnimatedSize(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOutCubic,
-                            child: AnimatedOpacity(
-                              opacity: _attachments.isNotEmpty ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 200),
-                              child: _attachments.isNotEmpty
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        child: _attachments.isNotEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    ...List.generate(_attachments.length, (
+                                      index,
+                                    ) {
+                                      final attachment = _attachments[index];
+                                      return Stack(
                                         children: [
-                                          ...List.generate(
-                                            _attachments.length,
-                                            (index) {
-                                              final attachment =
-                                                  _attachments[index];
-                                              return Stack(
-                                                children: [
-                                                  Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors
-                                                          .surfaceContainerHigh,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            12,
-                                                          ),
-                                                      border: Border.all(
-                                                        color: const Color(
-                                                          0x1AFFFFFF,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    child:
-                                                        _buildAttachmentPreview(
-                                                          attachment,
-                                                        ),
-                                                  ),
-                                                  Positioned(
-                                                    top: -4,
-                                                    right: -4,
-                                                    child: GestureDetector(
-                                                      onTap: () =>
-                                                          _removeAttachment(
-                                                            index,
-                                                          ),
-                                                      child: Container(
-                                                        width: 24,
-                                                        height: 24,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                              color: Color(
-                                                                0xFFDC2626,
-                                                              ),
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                            ),
-                                                        child: const Icon(
-                                                          PhosphorIconsRegular
-                                                              .x,
-                                                          size: 14,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => _addMockAttachment(
-                                              _AttachmentType.image,
-                                            ),
-                                            child: Container(
-                                              width: 80,
-                                              height: 80,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: const Color(
-                                                    0x1AFFFFFF,
-                                                  ),
-                                                  style: BorderStyle.solid,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            decoration: BoxDecoration(
+                                              color: AppColors
+                                                  .surfaceContainerHigh,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: const Color(0x1AFFFFFF),
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    PhosphorIconsRegular.plus,
-                                                    color: AppColors
-                                                        .onSurfaceVariant,
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    'Add More',
-                                                    style: AppTheme.labelTiny
-                                                        .copyWith(
-                                                          color: AppColors
-                                                              .onSurfaceVariant,
-                                                        ),
-                                                  ),
-                                                ],
+                                            ),
+                                            child: _buildAttachmentPreview(
+                                              attachment,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: -4,
+                                            right: -4,
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _removeAttachment(index),
+                                              child: Container(
+                                                width: 24,
+                                                height: 24,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xFFDC2626),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  PhosphorIconsRegular.x,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ],
+                                      );
+                                    }),
+                                    GestureDetector(
+                                      onTap: () => _addMockAttachment(
+                                        _AttachmentType.image,
                                       ),
-                                    )
-                                  : const SizedBox.shrink(),
-                            ),
-                          ),
-                        ],
+                                      child: Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0x1AFFFFFF),
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              PhosphorIconsRegular.plus,
+                                              color: AppColors.onSurfaceVariant,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Add More',
+                                              style: AppTheme.labelTiny
+                                                  .copyWith(
+                                                    color: AppColors
+                                                        .onSurfaceVariant,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // Action bar — AnimatedSize + AnimatedOpacity matches React motion layout + AnimatePresence
-              AnimatedSize(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                child: AnimatedOpacity(
-                  opacity: hasContent ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: hasContent
-                      ? AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: _isFullscreen
-                              ? const EdgeInsets.all(24)
-                              : const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0x1AFFFFFF)),
-                            color: _isFullscreen
-                                ? AppColors.surfaceContainerHigh.withOpacity(
-                                    0.3,
-                                  )
-                                : null,
+              ],
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            child: hasContent
+                ? Container(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0x1AFFFFFF)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () =>
+                                  _addMockAttachment(_AttachmentType.image),
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.1,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(
+                                PhosphorIconsRegular.image,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () =>
+                                  _addMockAttachment(_AttachmentType.video),
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.1,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(
+                                PhosphorIconsRegular.filmStrip,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () =>
+                                  _addMockAttachment(_AttachmentType.voice),
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.1,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(
+                                PhosphorIconsRegular.microphone,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () =>
+                                  _addMockAttachment(_AttachmentType.file),
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppColors.primary.withOpacity(
+                                  0.1,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(
+                                PhosphorIconsRegular.paperclip,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: _openFullscreenComposer,
+                              style: IconButton.styleFrom(
+                                padding: const EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(
+                                PhosphorIconsRegular.arrowsOutCardinal,
+                                size: 18,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: _textController.text.isEmpty
+                              ? null
+                              : _handleSubmit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.primaryForeground,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            elevation: 0,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Attachment buttons
-                              Row(
-                                children: [
-                                  _AttachmentButton(
-                                    icon: PhosphorIconsRegular.image,
-                                    onTap: () => _addMockAttachment(
-                                      _AttachmentType.image,
+                              Text(
+                                'Next',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      color: AppColors.primaryForeground,
                                     ),
-                                  ),
-                                  _AttachmentButton(
-                                    icon: PhosphorIconsRegular.filmStrip,
-                                    onTap: () => _addMockAttachment(
-                                      _AttachmentType.video,
-                                    ),
-                                  ),
-                                  _AttachmentButton(
-                                    icon: PhosphorIconsRegular.microphone,
-                                    onTap: () => _addMockAttachment(
-                                      _AttachmentType.voice,
-                                    ),
-                                  ),
-                                  _AttachmentButton(
-                                    icon: PhosphorIconsRegular.paperclip,
-                                    onTap: () => _addMockAttachment(
-                                      _AttachmentType.file,
-                                    ),
-                                  ),
-                                  if (!_isFullscreen)
-                                    _AttachmentButton(
-                                      icon: PhosphorIconsRegular
-                                          .arrowsOutCardinal,
-                                      onTap: () =>
-                                          setState(() => _isFullscreen = true),
-                                      isVariant: true,
-                                    ),
-                                ],
                               ),
-                              // Submit button
-                              if (!_isFullscreen)
-                                ElevatedButton(
-                                  onPressed: _textController.text.isEmpty
-                                      ? null
-                                      : _handleSubmit,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor:
-                                        AppColors.primaryForeground,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Next',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              color:
-                                                  AppColors.primaryForeground,
-                                            ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Icon(
-                                        PhosphorIconsRegular.caretRight,
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                PhosphorIconsRegular.caretRight,
+                                size: 16,
+                              ),
                             ],
                           ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-            ],
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -510,35 +432,365 @@ class _Attachment {
   _Attachment({required this.type, required this.url});
 }
 
-class _AttachmentButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isVariant;
+// ---------------------------------------------------------------------------
+// Fullscreen Composer Bottom Sheet
+// ---------------------------------------------------------------------------
 
-  const _AttachmentButton({
-    required this.icon,
-    required this.onTap,
-    this.isVariant = false,
+class _FullscreenComposerSheet extends StatefulWidget {
+  final TextEditingController textController;
+  final List<_Attachment> attachments;
+  final void Function(_AttachmentType) onAddAttachment;
+  final void Function(int) onRemoveAttachment;
+  final VoidCallback onSubmit;
+
+  const _FullscreenComposerSheet({
+    required this.textController,
+    required this.attachments,
+    required this.onAddAttachment,
+    required this.onRemoveAttachment,
+    required this.onSubmit,
   });
 
   @override
+  State<_FullscreenComposerSheet> createState() =>
+      _FullscreenComposerSheetState();
+}
+
+class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: isVariant
-              ? Colors.transparent
-              : AppColors.primary.withOpacity(0.1),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: isVariant ? AppColors.onSurfaceVariant : AppColors.primary,
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerHigh.withOpacity(0.95),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: const Color(0x1AFFFFFF)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0x1AFFFFFF))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    PhosphorIconsRegular.x,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  'CREATE TASK',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.onSurface,
+                    letterSpacing: 2,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: widget.textController.text.isEmpty
+                      ? null
+                      : widget.onSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.primaryForeground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: Text(
+                    'Continue',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.primaryForeground,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: UserAvatar(
+                    src: 'https://picsum.photos/seed/user/100/100',
+                    size: AvatarSize.md,
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Current User',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: AppColors.onSurface),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: widget.textController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText:
+                              'What do you need help with? Describe your task in detail...',
+                          hintStyle: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: AppColors.onSurfaceVariant.withOpacity(
+                                  0.4,
+                                ),
+                                fontSize: 20,
+                              ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.onSurface,
+                          height: 1.8,
+                          fontSize: 20,
+                        ),
+                        autofocus: true,
+                      ),
+                      if (widget.attachments.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              ...List.generate(widget.attachments.length, (
+                                index,
+                              ) {
+                                final attachment = widget.attachments[index];
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.surfaceContainerHigh,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: const Color(0x1AFFFFFF),
+                                        ),
+                                      ),
+                                      child: _buildSheetAttachmentPreview(
+                                        attachment,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -4,
+                                      right: -4,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            widget.onRemoveAttachment(index);
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFDC2626),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            PhosphorIconsRegular.x,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    widget.onAddAttachment(
+                                      _AttachmentType.image,
+                                    );
+                                  });
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: const Color(0x1AFFFFFF),
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        PhosphorIconsRegular.plus,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Add More',
+                                        style: AppTheme.labelTiny.copyWith(
+                                          color: AppColors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0x1AFFFFFF))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.image);
+                        });
+                      },
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        padding: const EdgeInsets.all(8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: const Icon(
+                        PhosphorIconsRegular.image,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.video);
+                        });
+                      },
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        padding: const EdgeInsets.all(8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: const Icon(
+                        PhosphorIconsRegular.filmStrip,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.voice);
+                        });
+                      },
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        padding: const EdgeInsets.all(8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: const Icon(
+                        PhosphorIconsRegular.microphone,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.file);
+                        });
+                      },
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        padding: const EdgeInsets.all(8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: const Icon(
+                        PhosphorIconsRegular.paperclip,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildSheetAttachmentPreview(_Attachment attachment) {
+    switch (attachment.type) {
+      case _AttachmentType.image:
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            attachment.url,
+            fit: BoxFit.cover,
+            width: 80,
+            height: 80,
+          ),
+        );
+      case _AttachmentType.video:
+        return const Icon(
+          PhosphorIconsRegular.filmStrip,
+          color: AppColors.onSurfaceVariant,
+          size: 24,
+        );
+      case _AttachmentType.voice:
+        return const Icon(
+          PhosphorIconsRegular.microphone,
+          color: AppColors.primary,
+          size: 24,
+        );
+      case _AttachmentType.file:
+        return const Icon(
+          PhosphorIconsRegular.paperclip,
+          color: AppColors.onSurfaceVariant,
+          size: 24,
+        );
+    }
   }
 }
