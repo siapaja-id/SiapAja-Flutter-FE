@@ -3,6 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/author.dart';
 
 // ---------------------------------------------------------------------------
+// Mock current user
+// ---------------------------------------------------------------------------
+
+const _mockCurrentUser = Author(
+  name: 'You',
+  handle: 'currentuser',
+  avatar: 'https://picsum.photos/seed/currentuser/100/100',
+  verified: true,
+  karma: 98,
+  isOnline: true,
+);
+
+// ---------------------------------------------------------------------------
 // UI State — active tab, current user, bar visibility
 // ---------------------------------------------------------------------------
 
@@ -39,7 +52,7 @@ class UiStateNotifier extends Notifier<UiState> {
   UiState build() {
     return const UiState(
       activeTab: 0,
-      currentUser: null,
+      currentUser: _mockCurrentUser,
       headerVisible: true,
       bottomNavVisible: true,
     );

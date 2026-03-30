@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'features/feed/pages/feed_page.dart';
 import 'features/feed/pages/main_shell.dart';
+import 'features/feed/pages/post_detail_page.dart';
 
 /// GoRouter configuration
 class AppRouter {
@@ -38,20 +39,20 @@ class AppRouter {
           ),
         ],
       ),
-      // Post detail page (stub)
+      // Post detail page
       GoRoute(
         path: '/post/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return ScaffoldPageStub(title: 'Post #$id');
+          return PostDetailPage(postId: id);
         },
       ),
-      // Task detail page (stub)
+      // Task detail page
       GoRoute(
         path: '/task/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return ScaffoldPageStub(title: 'Task #$id');
+          return PostDetailPage(postId: id);
         },
       ),
     ],
