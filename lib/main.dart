@@ -23,7 +23,9 @@ class SiapAjaApp extends StatelessWidget {
         return LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth >= 768) {
-              return const ZoomWrapper(child: DesktopKanbanLayout());
+              return const ZoomWrapper(
+                child: HeroControllerScope.none(child: DesktopKanbanLayout()),
+              );
             }
             return ZoomWrapper(child: child!);
           },
