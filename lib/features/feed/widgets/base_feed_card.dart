@@ -8,6 +8,7 @@ import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/post_actions.dart';
 import '../providers.dart';
+import 'kanban_column_widget.dart';
 
 // ---------------------------------------------------------------------------
 // InteractiveFeedCard — multi-input hover / press effects
@@ -27,35 +28,13 @@ class InteractiveFeedCard extends StatefulWidget {
   State<InteractiveFeedCard> createState() => _InteractiveFeedCardState();
 }
 
-class _InteractiveFeedCardState extends State<InteractiveFeedCard>
-    with SingleTickerProviderStateMixin {
+class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
   bool _isHovering = false;
   bool _isPressed = false;
-  late final AnimationController _glowCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _glowCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
-  }
-
-  @override
-  void dispose() {
-    _glowCtrl.dispose();
-    super.dispose();
-  }
 
   void _setHovering(bool v) {
     if (_isHovering == v) return;
     setState(() => _isHovering = v);
-    if (v) {
-      _glowCtrl.repeat();
-    } else {
-      _glowCtrl.reset();
-    }
   }
 
   void _setPressed(bool v) {
@@ -124,25 +103,19 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard>
                     left: 0,
                     right: 0,
                     height: 1,
-                    child: AnimatedBuilder(
-                      animation: _glowCtrl,
-                      builder: (context, _) {
-                        final t = _glowCtrl.value;
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment(-1 + 2 * t, 0),
-                              end: Alignment(1 + 2 * t, 0),
-                              colors: [
-                                Colors.transparent,
-                                AppColors.primary.withOpacity(0.6),
-                                AppColors.primary.withOpacity(0.0),
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        );
-                      },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.transparent,
+                            AppColors.primary.withOpacity(0.6),
+                            AppColors.primary.withOpacity(0.0),
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
+                        ),
+                      ),
                     ),
                   ),
                 widget.child,
@@ -234,10 +207,20 @@ class BaseFeedCard extends ConsumerWidget {
           return;
         }
         if (!isClickable) return;
-        if (data is TaskData) {
-          context.go('/task/${data.id}');
+        final kanbanCtx = KanbanColumnContext.of(context);
+        if (kanbanCtx != null) {
+          final path = data is TaskData
+              ? '/task/${data.id}'
+              : '/post/${data.id}';
+          ref
+              .read(kanbanProvider.notifier)
+              .openColumn(path, sourceId: kanbanCtx.columnId);
         } else {
-          context.go('/post/${data.id}');
+          if (data is TaskData) {
+            context.go('/task/${data.id}');
+          } else {
+            context.go('/post/${data.id}');
+          }
         }
       },
       child: Container(

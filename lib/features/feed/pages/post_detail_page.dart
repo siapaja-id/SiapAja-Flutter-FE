@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,8 +17,13 @@ import 'task_main_content.dart';
 /// Main post detail page — matches React PostDetail.Page.tsx exactly.
 class PostDetailPage extends ConsumerStatefulWidget {
   final String postId;
+  final bool inKanban;
 
-  const PostDetailPage({super.key, required this.postId});
+  const PostDetailPage({
+    super.key,
+    required this.postId,
+    this.inKanban = false,
+  });
 
   @override
   ConsumerState<PostDetailPage> createState() => _PostDetailPageState();
@@ -28,16 +34,11 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   final List<FeedItem> _postStack = [];
   String _replyText = '';
 
-  // Bid modal state
-  bool _isBidding = false;
+  // Bid state
   late int _bidAmount;
   int _defaultBid = 50;
   bool _isNegotiable = false;
 
-  // Complete / Review modal state
-  bool _showCompleteModal = false;
-  bool _showReviewModal = false;
-  int _reviewRating = 5;
   final TextEditingController _completionNotesCtrl = TextEditingController();
   final TextEditingController _bidPitchCtrl = TextEditingController();
 
@@ -94,7 +95,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
   void _pushReply(FeedItem reply) {
     setState(() => _postStack.add(reply));
-    // Load replies for the pushed reply
     final feedState = ref.read(feedNotifierProvider);
     if (!feedState.replies.containsKey(reply.id)) {
       final isTask = reply is TaskData;
@@ -111,6 +111,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   void _handleBack() {
     if (_postStack.length > 1) {
       setState(() => _postStack.removeLast());
+    } else if (widget.inKanban) {
+      Navigator.of(context).pop();
     } else {
       context.pop();
     }
@@ -205,19 +207,17 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     });
   }
 
-  void _handleBidSubmit(TaskData task) {
+  void _handleBidSubmit(TaskData task, int bidAmount, String pitch) {
     final currentUser = ref.read(uiStateProvider).currentUser;
     if (currentUser == null) return;
 
     final bid = SocialPostData(
       id: 'bid-${DateTime.now().millisecondsSinceEpoch}',
       author: currentUser,
-      content: _bidPitchCtrl.text.trim().isNotEmpty
-          ? _bidPitchCtrl.text.trim()
-          : "I can help with this task!",
+      content: pitch.isNotEmpty ? pitch : "I can help with this task!",
       timestamp: 'Just now',
       isBid: true,
-      bidAmount: '\$${_bidAmount.toStringAsFixed(2)}',
+      bidAmount: '\$${bidAmount.toStringAsFixed(2)}',
       bidStatus: BidStatus.pending,
       replies: 0,
       reposts: 0,
@@ -229,7 +229,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     _incrementReplyCount(task);
 
     setState(() {
-      _isBidding = false;
       _replyText = '';
       _bidAmount = _defaultBid;
       _bidPitchCtrl.clear();
@@ -255,13 +254,587 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   void _handleCompleteTask(TaskData task) {
     final updated = task.copyWith(status: TaskStatus.completed);
     ref.read(feedNotifierProvider.notifier).updateFeedItem(task.id, updated);
-    setState(() => _showCompleteModal = false);
   }
 
-  void _handleReviewTask(TaskData task) {
+  void _handleReviewTask(TaskData task, int rating) {
     final updated = task.copyWith(status: TaskStatus.finished);
     ref.read(feedNotifierProvider.notifier).updateFeedItem(task.id, updated);
-    setState(() => _showReviewModal = false);
+  }
+
+  // ---- Modal sheets using official Flutter showModalBottomSheet ----
+
+  void _showBidSheet(TaskData task) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerHigh,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Submit Your Bid',
+                          style: TextStyle(
+                            color: AppColors.onSurface,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.05),
+                          ),
+                          icon: const Icon(
+                            PhosphorIconsRegular.x,
+                            size: 20,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Stepper
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Minus button
+                          InkWell(
+                            onTap: () => setModalState(
+                              () =>
+                                  _bidAmount = (_bidAmount - 5).clamp(1, 99999),
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Ink(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                PhosphorIconsRegular.minus,
+                                size: 28,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          // Amount display
+                          Expanded(
+                            child: Column(
+                              children: [
+                                const Text(
+                                  'YOUR BID',
+                                  style: TextStyle(
+                                    color: AppColors.onSurfaceVariant,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 3,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '\$',
+                                      style: TextStyle(
+                                        color: AppColors.emerald,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 112,
+                                      child: TextField(
+                                        controller: TextEditingController(
+                                          text: _bidAmount.toString(),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        onChanged: (val) {
+                                          final parsed = int.tryParse(val);
+                                          if (parsed != null) {
+                                            setModalState(
+                                              () => _bidAmount = parsed,
+                                            );
+                                          }
+                                        },
+                                        style: const TextStyle(
+                                          color: AppColors.onSurface,
+                                          fontSize: 48,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -2,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          filled: false,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Plus button
+                          InkWell(
+                            onTap: () => setModalState(
+                              () => _bidAmount = _bidAmount + 5,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Ink(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                PhosphorIconsRegular.plus,
+                                size: 28,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Quick bid adjustments
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ActionChip(
+                          onPressed: () => setModalState(
+                            () =>
+                                _bidAmount = (_bidAmount - 15).clamp(1, 99999),
+                          ),
+                          avatar: const Icon(
+                            PhosphorIconsRegular.trendDown,
+                            size: 14,
+                            color: AppColors.onSurface,
+                          ),
+                          label: const Text('Down Bid'),
+                          backgroundColor: Colors.white.withOpacity(0.05),
+                          labelStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ActionChip(
+                          onPressed: () =>
+                              setModalState(() => _bidAmount = _defaultBid),
+                          label: const Text('Match Original'),
+                          backgroundColor: Colors.white.withOpacity(0.05),
+                          labelStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ActionChip(
+                          onPressed: () =>
+                              setModalState(() => _bidAmount = _bidAmount + 15),
+                          avatar: const Icon(
+                            PhosphorIconsRegular.trendUp,
+                            size: 14,
+                            color: AppColors.onSurface,
+                          ),
+                          label: const Text('Up Bid'),
+                          backgroundColor: Colors.white.withOpacity(0.05),
+                          labelStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Pitch textarea
+                    TextField(
+                      controller: _bidPitchCtrl,
+                      style: const TextStyle(
+                        color: AppColors.onSurface,
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Why should they choose you? (Optional)',
+                        hintStyle: TextStyle(
+                          color: AppColors.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.05),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                      maxLines: 4,
+                      minLines: 4,
+                    ),
+                    const SizedBox(height: 20),
+                    // Submit button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _handleBidSubmit(
+                            task,
+                            _bidAmount,
+                            _bidPitchCtrl.text.trim(),
+                          );
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.emerald,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                          shadowColor: AppColors.emerald.withOpacity(0.2),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(PhosphorIconsRegular.paperPlaneTilt, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'PLACE BID',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showCompleteSheet(TaskData task) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerHigh,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Complete Task',
+                    style: TextStyle(
+                      color: AppColors.onSurface,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withOpacity(0.05),
+                    ),
+                    icon: const Icon(
+                      PhosphorIconsRegular.x,
+                      size: 20,
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Notes textarea
+              TextField(
+                controller: _completionNotesCtrl,
+                style: const TextStyle(
+                  color: AppColors.onSurface,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Add completion notes or proof of work...',
+                  hintStyle: TextStyle(
+                    color: AppColors.onSurfaceVariant.withOpacity(0.3),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.05),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+                maxLines: 5,
+                minLines: 5,
+              ),
+              const SizedBox(height: 16),
+              // Upload proof button
+              OutlinedButton(
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.onSurfaceVariant,
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      PhosphorIconsRegular.camera,
+                      size: 24,
+                      color: AppColors.onSurfaceVariant.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Upload Proof Image',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _handleCompleteTask(task);
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.emerald,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 4,
+                    shadowColor: AppColors.emerald.withOpacity(0.2),
+                  ),
+                  child: const Text(
+                    'SUBMIT COMPLETION',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showReviewSheet(TaskData task) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) {
+        int reviewRating = 5;
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerHigh,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Review Work',
+                        style: TextStyle(
+                          color: AppColors.onSurface,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(0.05),
+                        ),
+                        icon: const Icon(
+                          PhosphorIconsRegular.x,
+                          size: 20,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Rate the worker',
+                    style: TextStyle(
+                      color: AppColors.onSurfaceVariant,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Star rating
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (i) {
+                      return InkWell(
+                        onTap: () => setModalState(() => reviewRating = i + 1),
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Icon(
+                            i < reviewRating
+                                ? PhosphorIconsFill.star
+                                : PhosphorIconsRegular.star,
+                            size: 32,
+                            color: i < reviewRating
+                                ? const Color(0xFFFBBF24)
+                                : Colors.white24,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 24),
+                  // Release button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _handleReviewTask(task, reviewRating);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.emerald,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 4,
+                        shadowColor: AppColors.emerald.withOpacity(0.2),
+                      ),
+                      child: const Text(
+                        'RELEASE PAYMENT',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -294,9 +867,296 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         ? 'Replying to @${_postStack[_postStack.length - 2].author.handle}'
         : null;
 
+    final isTask = currentItem is TaskData;
+
+    final content = Column(
+      children: [
+        if (!isTask)
+          _DetailHeader(
+            title: headerTitle,
+            subtitle: headerSubtitle,
+            contentType: 'Post',
+            onBack: _handleBack,
+          ),
+        Expanded(
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              if (isTask)
+                SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  expandedHeight: 200,
+                  backgroundColor: AppColors.surfaceContainerHigh,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    titlePadding: const EdgeInsetsDirectional.only(
+                      start: 56,
+                      bottom: 14,
+                    ),
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            currentItem.title,
+                            style: const TextStyle(
+                              color: AppColors.onSurface,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Text(
+                            currentItem.category.toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.emerald.withOpacity(0.12),
+                                AppColors.primary.withOpacity(0.08),
+                                AppColors.indigo.withOpacity(0.04),
+                                AppColors.surfaceContainerHigh,
+                              ],
+                              stops: const [0.0, 0.35, 0.65, 1.0],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: -20,
+                          right: -20,
+                          child: Icon(
+                            _getIconForTaskType(currentItem.iconType),
+                            size: 160,
+                            color: Colors.white.withOpacity(0.03),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 56,
+                          left: 20,
+                          right: 20,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                currentItem.title,
+                                style: const TextStyle(
+                                  color: AppColors.onSurface,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.2,
+                                  letterSpacing: -0.5,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.glassTint,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: AppColors.glassBorder,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          _getIconForTaskType(
+                                            currentItem.iconType,
+                                          ),
+                                          size: 12,
+                                          color: AppColors.primary,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          currentItem.category.toUpperCase(),
+                                          style: const TextStyle(
+                                            color: AppColors.onSurfaceVariant,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    currentItem.price,
+                                    style: const TextStyle(
+                                      color: AppColors.onSurface,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    collapseMode: CollapseMode.pin,
+                  ),
+                  leading: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.glassTint,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.glassBorder),
+                          ),
+                          child: IconButton(
+                            onPressed: _handleBack,
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              PhosphorIconsRegular.arrowLeft,
+                              size: 20,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  actions: [_buildTaskStats()],
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              if (_postStack.length > 1)
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: _postStack
+                        .sublist(0, _postStack.length - 1)
+                        .asMap()
+                        .entries
+                        .map((entry) {
+                          return FeedItemCard(
+                            item: entry.value,
+                            isParent: true,
+                            hasLineBelow: true,
+                            onClick: () {
+                              setState(() {
+                                _postStack.removeRange(
+                                  entry.key + 1,
+                                  _postStack.length,
+                                );
+                              });
+                            },
+                          );
+                        })
+                        .toList(),
+                  ),
+                ),
+              SliverToBoxAdapter(
+                child: isTask
+                    ? TaskMainContent(data: currentItem)
+                    : FeedItemCard(
+                        item: currentItem,
+                        isMain: true,
+                        hasLineBelow: replies.isNotEmpty,
+                      ),
+              ),
+              if (replies.isNotEmpty &&
+                  !(currentItem is SocialPostData &&
+                      currentItem.threadCount != null &&
+                      currentItem.threadCount! > 1))
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Colors.white.withOpacity(0.05)),
+                        bottom: BorderSide(
+                          color: Colors.white.withOpacity(0.05),
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      currentItem is TaskData ? 'DISCUSSION & BIDS' : 'REPLIES',
+                      style: const TextStyle(
+                        color: AppColors.onSurfaceVariant,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 3,
+                      ),
+                    ),
+                  ),
+                ),
+              if (replies.isNotEmpty)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final reply = replies[index];
+                    return FeedItemCard(
+                      item: reply,
+                      hasLineBelow: index < replies.length - 1,
+                      onClick: () => _pushReply(reply),
+                    );
+                  }, childCount: replies.length),
+                )
+              else
+                SliverToBoxAdapter(
+                  child: _buildEmptyState(currentItem, isCreator),
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 180)),
+            ],
+          ),
+        ),
+        _buildBottomBar(currentItem, isCreator, currentUser),
+      ],
+    );
+
+    if (widget.inKanban) {
+      return content;
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      // PageSlide wrapper: fixed inset, border-x, max-w-2xl centered
       body: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -304,162 +1164,97 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             right: BorderSide(color: Colors.white.withOpacity(0.05)),
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // DetailHeader matching React exactly
-              _DetailHeader(
-                title: headerTitle,
-                subtitle: headerSubtitle,
-                contentType: currentItem is TaskData ? 'Task' : 'Post',
-                onBack: _handleBack,
-              ),
-              // Scrollable content
-              Expanded(
-                child: Stack(
-                  children: [
-                    // Gradient bg for tasks
-                    if (currentItem is TaskData)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 256,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                AppColors.emerald.withOpacity(0.1),
-                                AppColors.primary.withOpacity(0.05),
-                                AppColors.surfaceContainerHigh,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    // Scroll content
-                    CustomScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
-                      slivers: [
-                        const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                        // Parent posts (thread navigation)
-                        if (_postStack.length > 1)
-                          SliverToBoxAdapter(
-                            child: Column(
-                              children: _postStack
-                                  .sublist(0, _postStack.length - 1)
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
-                                    return FeedItemCard(
-                                      item: entry.value,
-                                      isParent: true,
-                                      hasLineBelow: true,
-                                      onClick: () {
-                                        setState(() {
-                                          _postStack.removeRange(
-                                            entry.key + 1,
-                                            _postStack.length,
-                                          );
-                                        });
-                                      },
-                                    );
-                                  })
-                                  .toList(),
-                            ),
-                          ),
-                        // Main post content
-                        SliverToBoxAdapter(
-                          child: currentItem is TaskData
-                              ? TaskMainContent(data: currentItem)
-                              : FeedItemCard(
-                                  item: currentItem,
-                                  isMain: true,
-                                  hasLineBelow: replies.isNotEmpty,
-                                ),
-                        ),
-                        // Replies section
-                        if (replies.isNotEmpty &&
-                            !(currentItem is SocialPostData &&
-                                currentItem.threadCount != null &&
-                                currentItem.threadCount! > 1))
-                          SliverToBoxAdapter(
-                            child: Container(
-                              padding: const EdgeInsets.fromLTRB(
-                                24,
-                                16,
-                                24,
-                                16,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  top: BorderSide(
-                                    color: Colors.white.withOpacity(0.05),
-                                  ),
-                                  bottom: BorderSide(
-                                    color: Colors.white.withOpacity(0.05),
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                currentItem is TaskData
-                                    ? 'DISCUSSION & BIDS'
-                                    : 'REPLIES',
-                                style: const TextStyle(
-                                  color: AppColors.onSurfaceVariant,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 3,
-                                ),
-                              ),
-                            ),
-                          ),
-                        // Reply list
-                        if (replies.isNotEmpty)
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final reply = replies[index];
-                              return FeedItemCard(
-                                item: reply,
-                                hasLineBelow: index < replies.length - 1,
-                                onClick: () => _pushReply(reply),
-                              );
-                            }, childCount: replies.length),
-                          )
-                        else
-                          SliverToBoxAdapter(
-                            child: _buildEmptyState(currentItem, isCreator),
-                          ),
-                        // Bottom padding for fixed bar
-                        const SliverToBoxAdapter(child: SizedBox(height: 180)),
-                      ],
-                    ),
-                  ],
+        child: SafeArea(child: content),
+      ),
+    );
+  }
+
+  Widget _buildTaskStats() {
+    final views =
+        '${10 + widget.postId.hashCode % 90}.${widget.postId.hashCode % 9}k';
+    final viewing = 12 + (widget.postId.hashCode % 40).abs();
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.glassTint,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.glassBorder),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  PhosphorIconsRegular.eye,
+                  size: 14,
+                  color: AppColors.onSurfaceVariant,
                 ),
-              ),
-              // Fixed bottom bar (matches React: textarea ABOVE action button)
-              _buildBottomBar(currentItem, isCreator, currentUser),
-              // Modal overlays
-              if (_isBidding && currentItem is TaskData)
-                Positioned.fill(child: _buildBidModal(currentItem)),
-              if (_showCompleteModal && currentItem is TaskData)
-                Positioned.fill(child: _buildCompleteModal(currentItem)),
-              if (_showReviewModal && currentItem is TaskData)
-                Positioned.fill(child: _buildReviewModal(currentItem)),
-            ],
+                const SizedBox(width: 4),
+                Text(
+                  views,
+                  style: const TextStyle(
+                    color: AppColors.onSurfaceVariant,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 4,
+                  height: 4,
+                  decoration: const BoxDecoration(
+                    color: Colors.white24,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: AppColors.emerald,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.emerald.withOpacity(0.6),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$viewing',
+                  style: const TextStyle(
+                    color: AppColors.emerald,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  IconData _getIconForTaskType(TaskIconType type) => switch (type) {
+    TaskIconType.palette => PhosphorIconsRegular.palette,
+    TaskIconType.code => PhosphorIconsRegular.code,
+    TaskIconType.car => PhosphorIconsRegular.car,
+    TaskIconType.truck => PhosphorIconsRegular.truck,
+    TaskIconType.writing => PhosphorIconsRegular.pencilSimple,
+    TaskIconType.repair => PhosphorIconsRegular.wrench,
+    TaskIconType.package => PhosphorIconsRegular.package,
+    TaskIconType.location => PhosphorIconsRegular.mapPin,
+  };
 
   Widget _buildEmptyState(FeedItem item, bool isCreator) {
     final isTask = item is TaskData;
@@ -541,74 +1336,62 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
           const SizedBox(height: 24),
           // CTA button
           if (!isCreator && isTask)
-            GestureDetector(
-              onTap: () => setState(() => _isBidding = true),
-              child: Container(
+            OutlinedButton.icon(
+              onPressed: () => _showBidSheet(item),
+              icon: const Icon(
+                PhosphorIconsFill.sparkle,
+                size: 14,
+                color: AppColors.emerald,
+              ),
+              label: const Text(
+                'PLACE FIRST BID',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.emerald,
+                side: BorderSide(color: AppColors.emerald.withOpacity(0.2)),
+                backgroundColor: AppColors.emerald.withOpacity(0.1),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 10,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.emerald.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.emerald.withOpacity(0.2)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIconsFill.sparkle,
-                      size: 14,
-                      color: AppColors.emerald,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'PLACE FIRST BID',
-                      style: TextStyle(
-                        color: AppColors.emerald,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             )
           else if (!isTask)
-            GestureDetector(
-              onTap: () {
+            OutlinedButton.icon(
+              onPressed: () {
                 // Focus the reply text field
               },
-              child: Container(
+              icon: const Icon(
+                PhosphorIconsRegular.chatTeardropDots,
+                size: 14,
+                color: AppColors.primary,
+              ),
+              label: const Text(
+                'WRITE A REPLY',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: BorderSide(color: AppColors.primary.withOpacity(0.2)),
+                backgroundColor: AppColors.primary.withOpacity(0.1),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 10,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIconsRegular.chatTeardropDots,
-                      size: 14,
-                      color: AppColors.primary,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'WRITE A REPLY',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -774,7 +1557,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         return _buildActionButton(
           'REVIEW & RELEASE PAYMENT',
           color: AppColors.emerald,
-          onTap: () => setState(() => _showReviewModal = true),
+          onTap: () => _showReviewSheet(task),
         );
       } else if (tStatus == TaskStatus.finished) {
         return _buildActionLabel('TASK FINISHED');
@@ -792,7 +1575,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   color: Colors.white.withOpacity(0.05),
                   textColor: AppColors.onSurface,
                   borderColor: Colors.white.withOpacity(0.1),
-                  onTap: () => setState(() => _isBidding = true),
+                  onTap: () => _showBidSheet(task),
                 ),
               ),
               const SizedBox(width: 8),
@@ -810,7 +1593,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
           return _buildActionButton(
             'SUBMIT BID',
             color: AppColors.primary,
-            onTap: () => setState(() => _isBidding = true),
+            onTap: () => _showBidSheet(task),
           );
         }
       } else if (tStatus == TaskStatus.assigned) {
@@ -828,7 +1611,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
           return _buildActionButton(
             'MARK AS COMPLETED',
             color: AppColors.emerald,
-            onTap: () => setState(() => _showCompleteModal = true),
+            onTap: () => _showCompleteSheet(task),
           );
         } else {
           return _buildActionLabel('IN PROGRESS BY ANOTHER WORKER');
@@ -909,628 +1692,56 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     Color? borderColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(16),
-          border: borderColor != null ? Border.all(color: borderColor) : null,
-          boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 20)],
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-              color:
-                  textColor ??
-                  (color == AppColors.primary || color == AppColors.emerald
-                      ? Colors.black
-                      : AppColors.onSurface),
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+    final bool isPrimaryColor =
+        color == AppColors.primary || color == AppColors.emerald;
 
-  // ---- Modals (matching React AnimatePresence + spring animation) ----
-
-  Widget _buildBidModal(TaskData task) {
-    return GestureDetector(
-      onTap: () => setState(() => _isBidding = false),
-      child: Container(
-        color: Colors.black.withOpacity(0.8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {}, // Prevent dismiss on content tap
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+    return SizedBox(
+      width: double.infinity,
+      child: isPrimaryColor
+          ? ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Submit Your Bid',
-                          style: TextStyle(
-                            color: AppColors.onSurface,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => setState(() => _isBidding = false),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              PhosphorIconsRegular.x,
-                              size: 20,
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Stepper
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainer,
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Minus button
-                          GestureDetector(
-                            onTap: () => setState(
-                              () =>
-                                  _bidAmount = (_bidAmount - 5).clamp(1, 99999),
-                            ),
-                            child: Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
-                                PhosphorIconsRegular.minus,
-                                size: 28,
-                                color: AppColors.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          // Amount display
-                          Expanded(
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'YOUR BID',
-                                  style: TextStyle(
-                                    color: AppColors.onSurfaceVariant,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 3,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      '\$',
-                                      style: TextStyle(
-                                        color: AppColors.emerald,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 112,
-                                      child: TextField(
-                                        controller: TextEditingController(
-                                          text: _bidAmount.toString(),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (val) {
-                                          final parsed = int.tryParse(val);
-                                          if (parsed != null)
-                                            setState(() => _bidAmount = parsed);
-                                        },
-                                        style: const TextStyle(
-                                          color: AppColors.onSurface,
-                                          fontSize: 48,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: -2,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          filled: false,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Plus button
-                          GestureDetector(
-                            onTap: () =>
-                                setState(() => _bidAmount = _bidAmount + 5),
-                            child: Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
-                                PhosphorIconsRegular.plus,
-                                size: 28,
-                                color: AppColors.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Quick bid adjustments
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildQuickBidButton(
-                          'Down Bid',
-                          PhosphorIconsRegular.trendDown,
-                          () {
-                            setState(
-                              () => _bidAmount = (_bidAmount - 15).clamp(
-                                1,
-                                99999,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        _buildQuickBidButton('Match Original', null, () {
-                          setState(() => _bidAmount = _defaultBid);
-                        }),
-                        const SizedBox(width: 8),
-                        _buildQuickBidButton(
-                          'Up Bid',
-                          PhosphorIconsRegular.trendUp,
-                          () {
-                            setState(() => _bidAmount = _bidAmount + 15);
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Pitch textarea
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _bidPitchCtrl,
-                        style: const TextStyle(
-                          color: AppColors.onSurface,
-                          fontSize: 14,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Why should they choose you? (Optional)',
-                          hintStyle: TextStyle(
-                            color: AppColors.onSurfaceVariant.withOpacity(0.3),
-                            fontSize: 14,
-                          ),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          filled: false,
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                        maxLines: 4,
-                        minLines: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Submit button
-                    GestureDetector(
-                      onTap: () => _handleBidSubmit(task),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.emerald,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.emerald.withOpacity(0.2),
-                              blurRadius: 20,
-                            ),
-                          ],
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              PhosphorIconsRegular.paperPlaneTilt,
-                              size: 18,
-                              color: Colors.black,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'PLACE BID',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                elevation: 4,
+                shadowColor: color.withOpacity(0.3),
+              ),
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            )
+          : OutlinedButton(
+              onPressed: onTap,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: textColor ?? AppColors.onSurface,
+                backgroundColor: color,
+                side: borderColor != null
+                    ? BorderSide(color: borderColor)
+                    : BorderSide.none,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: textColor ?? AppColors.onSurface,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickBidButton(
-    String label,
-    IconData? icon,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 14, color: AppColors.onSurface),
-              const SizedBox(width: 4),
-            ],
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.onSurface,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCompleteModal(TaskData task) {
-    return GestureDetector(
-      onTap: () => setState(() => _showCompleteModal = false),
-      child: Container(
-        color: Colors.black.withOpacity(0.8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Complete Task',
-                          style: TextStyle(
-                            color: AppColors.onSurface,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () =>
-                              setState(() => _showCompleteModal = false),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              PhosphorIconsRegular.x,
-                              size: 20,
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Notes textarea
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _completionNotesCtrl,
-                        style: const TextStyle(
-                          color: AppColors.onSurface,
-                          fontSize: 14,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Add completion notes or proof of work...',
-                          hintStyle: TextStyle(
-                            color: AppColors.onSurfaceVariant.withOpacity(0.3),
-                            fontSize: 14,
-                          ),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          filled: false,
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                        maxLines: 5,
-                        minLines: 5,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Upload proof button
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          style: BorderStyle.solid,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            PhosphorIconsRegular.camera,
-                            size: 24,
-                            color: AppColors.onSurfaceVariant.withOpacity(0.5),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Upload Proof Image',
-                            style: TextStyle(
-                              color: AppColors.onSurfaceVariant,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Submit button
-                    GestureDetector(
-                      onTap: () => _handleCompleteTask(task),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.emerald,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.emerald.withOpacity(0.2),
-                              blurRadius: 20,
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'SUBMIT COMPLETION',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReviewModal(TaskData task) {
-    return GestureDetector(
-      onTap: () => setState(() => _showReviewModal = false),
-      child: Container(
-        color: Colors.black.withOpacity(0.8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Review Work',
-                          style: TextStyle(
-                            color: AppColors.onSurface,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => setState(() => _showReviewModal = false),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              PhosphorIconsRegular.x,
-                              size: 20,
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Rate the worker',
-                      style: TextStyle(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Star rating
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (i) {
-                        return GestureDetector(
-                          onTap: () => setState(() => _reviewRating = i + 1),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Icon(
-                              i < _reviewRating
-                                  ? PhosphorIconsFill.star
-                                  : PhosphorIconsRegular.star,
-                              size: 32,
-                              color: i < _reviewRating
-                                  ? const Color(0xFFFBBF24)
-                                  : Colors.white24,
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 24),
-                    // Release button
-                    GestureDetector(
-                      onTap: () => _handleReviewTask(task),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.emerald,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.emerald.withOpacity(0.2),
-                              blurRadius: 20,
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'RELEASE PAYMENT',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -1552,7 +1763,6 @@ class _DetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // React: sticky top-0 z-20 bg-surface-container-high/95 border-b border-white/5
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -1564,19 +1774,15 @@ class _DetailHeader extends StatelessWidget {
       child: Row(
         children: [
           // Back button
-          GestureDetector(
-            onTap: onBack,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                PhosphorIconsRegular.arrowLeft,
-                size: 20,
-                color: AppColors.onSurface,
-              ),
+          IconButton(
+            onPressed: onBack,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.black.withOpacity(0.2),
+            ),
+            icon: const Icon(
+              PhosphorIconsRegular.arrowLeft,
+              size: 20,
+              color: AppColors.onSurface,
             ),
           ),
           const SizedBox(width: 12),
@@ -1600,27 +1806,25 @@ class _DetailHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     // Type badge
-                    Container(
+                    Chip(
+                      label: Text(contentType),
+                      labelStyle: const TextStyle(
+                        color: AppColors.onSurfaceVariant,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                      ),
+                      backgroundColor: Colors.white.withOpacity(0.05),
+                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
-                        vertical: 2,
+                        vertical: 0,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: Text(
-                        contentType,
-                        style: const TextStyle(
-                          color: AppColors.onSurfaceVariant,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ],
                 ),

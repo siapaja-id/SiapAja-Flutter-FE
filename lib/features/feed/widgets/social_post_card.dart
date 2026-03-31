@@ -10,6 +10,7 @@ import '../../../shared/widgets/media_carousel.dart';
 import '../providers.dart';
 import 'feed_item_card.dart';
 import 'base_feed_card.dart';
+import 'kanban_column_widget.dart';
 
 // ---------------------------------------------------------------------------
 // SocialPostCard
@@ -256,7 +257,22 @@ class SocialPostCard extends ConsumerWidget {
         ],
         if (!isParent && data.quote != null) ...[
           const SizedBox(height: 8),
-          FeedItemCard(item: data.quote!, isQuote: true),
+          GestureDetector(
+            onTap: isMain
+                ? () {
+                    final kanbanCtx = KanbanColumnContext.of(context);
+                    if (kanbanCtx != null) {
+                      ref
+                          .read(kanbanProvider.notifier)
+                          .openColumn(
+                            '/post/${data.quote!.id}',
+                            sourceId: kanbanCtx.columnId,
+                          );
+                    }
+                  }
+                : null,
+            child: FeedItemCard(item: data.quote!, isQuote: true),
+          ),
         ],
       ],
     );

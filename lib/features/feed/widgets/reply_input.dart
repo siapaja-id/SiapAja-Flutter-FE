@@ -8,7 +8,11 @@ import '../../../shared/widgets/user_avatar.dart';
 import '../pages/create_reply_page.dart';
 
 /// Bottom fixed reply input bar — matches React ReplyInput exactly.
-/// Glass container, avatar on left, auto-grow textarea, send Button, expand icon.
+/// Glass container, avatar on left, auto-grow textarea, send button, expand icon.
+///
+/// This is the single source of truth for reply text composition.
+/// When expanded to fullscreen ([CreateReplyPage]), the same [TextEditingController]
+/// state carries over so the user sees their draft in the fullscreen view.
 class ReplyInput extends StatelessWidget {
   final String handle;
   final String parentId;
@@ -78,9 +82,14 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            CreateReplyPage(parentItem: widget.parentItem),
+            CreateReplyPage(
+              parentItem: widget.parentItem,
+              onSend: (text) {
+                widget.onSend(text);
+                _controller.clear();
+              },
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // React: slide up from bottom
           final tween = Tween(
             begin: const Offset(0.0, 1.0),
             end: Offset.zero,
@@ -99,7 +108,6 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
   Widget build(BuildContext context) {
     final hasText = _controller.text.trim().isNotEmpty;
 
-    // Glass container matching React: fixed bottom, glass p-3, shadow, border-t
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
@@ -124,7 +132,7 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Avatar on left (hidden on very small screens via LayoutBuilder)
+              // Avatar on left
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: UserAvatar(src: widget.avatarUrl, size: AvatarSize.md),
@@ -176,7 +184,7 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                           textInputAction: TextInputAction.send,
                         ),
                       ),
-                      // Expand button when empty (Maximize2 in React)
+                      // Expand button when empty
                       if (!hasText)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 2, right: 2),
@@ -196,7 +204,7 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                 ),
               ),
               const SizedBox(width: 8),
-              // Send Button (matches React Button size="sm")
+              // Send Button
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: FilledButton(

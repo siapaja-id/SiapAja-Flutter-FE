@@ -9,13 +9,18 @@ const int _maxChars = 280;
 
 /// Fullscreen reply composition — matches React CreatePostPage exactly.
 ///
-/// React: motion.div slide-up from bottom, fixed inset, glass header,
-/// reply context with avatar + vertical line, multi-thread, toolbar,
-/// circular char counter, "Everyone can reply" footer.
+/// Atomically reuses the same reply flow as [ReplyInput]:
+/// - [onSend] callback is the same one used by the inline reply bar
+/// - Same text field UX, same posting behavior
+/// - Glass header with close / REPLY / Drafts / Post+Sparkles
+/// - Reply context card above the text field
+/// - Multi-thread blocks, toolbar, circular char counter
+/// - "Everyone can reply" floating footer
 class CreateReplyPage extends StatefulWidget {
   final FeedItem? parentItem;
+  final ValueChanged<String>? onSend;
 
-  const CreateReplyPage({super.key, this.parentItem});
+  const CreateReplyPage({super.key, this.parentItem, this.onSend});
 
   @override
   State<CreateReplyPage> createState() => _CreateReplyPageState();
@@ -70,7 +75,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       _threads.add(_ThreadData());
       _activeIndex = _threads.length - 1;
     });
-    // Scroll to bottom after frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -99,7 +103,14 @@ class _CreateReplyPageState extends State<CreateReplyPage>
         .where((s) => s.isNotEmpty)
         .join('\n\n');
     if (content.isEmpty) return;
-    Navigator.of(context).pop(content);
+
+    // Atomic reuse: call the same onSend callback as ReplyInput
+    if (widget.onSend != null) {
+      widget.onSend!(content);
+    }
+    _animController.reverse().then((_) {
+      if (mounted) Navigator.of(context).pop();
+    });
   }
 
   double _calculateProgress(String text) {
@@ -107,13 +118,13 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   }
 
   // ---------------------------------------------------------------------------
-  // Reply context (parent item shown above thread area)
+  // Reply context helpers
   // ---------------------------------------------------------------------------
 
   String _getReplyContextContent() {
     final item = widget.parentItem;
     if (item is SocialPostData) return item.content;
-    if (item is TaskData) return item.description ?? item.title;
+    if (item is TaskData) return item.description;
     if (item is EditorialData) return item.title;
     return '';
   }
@@ -146,73 +157,68 @@ class _CreateReplyPageState extends State<CreateReplyPage>
     final item = widget.parentItem;
     final hasContext = item != null;
 
-    return AnimatedBuilder(
-      animation: _animController,
-      builder: (context, _) {
-        return SlideTransition(
-          position: _slideAnim,
-          child: FadeTransition(
-            opacity: _fadeAnim,
-            child: Scaffold(
-              backgroundColor: AppColors.background,
-              // React: max-w-2xl mx-auto border-x border-white/5
-              body: Container(
-                constraints: const BoxConstraints(maxWidth: 672), // max-w-2xl
-                decoration: const BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: AppColors.border),
-                    right: BorderSide(color: AppColors.border),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    // ---- HEADER ----
-                    _buildHeader(),
-                    // ---- CONTENT (scrollable) ----
-                    Expanded(
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 672),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Reply context
-                                if (hasContext) _buildReplyContext(item),
-                                // Thread blocks
-                                for (int i = 0; i < _threads.length; i++)
-                                  _buildThreadBlock(i),
-                                // "Add to thread" trigger
-                                if (_threads.last.controller.text.isNotEmpty &&
-                                    _activeIndex != _threads.length - 1)
-                                  _buildAddThreadTrigger(),
-                              ],
-                            ),
-                          ),
+    // Slide-up animation — no redundant AnimatedBuilder.
+    // SlideTransition and FadeTransition already listen to their animations.
+    return SlideTransition(
+      position: _slideAnim,
+      child: FadeTransition(
+        opacity: _fadeAnim,
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          // React: max-w-2xl mx-auto border-x border-white/5
+          body: Container(
+            constraints: const BoxConstraints(maxWidth: 672),
+            decoration: const BoxDecoration(
+              border: Border(
+                left: BorderSide(color: AppColors.border),
+                right: BorderSide(color: AppColors.border),
+              ),
+            ),
+            child: Column(
+              children: [
+                // ---- HEADER ----
+                _buildHeader(),
+                // ---- CONTENT (scrollable) ----
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 672),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Reply context
+                            if (hasContext) _buildReplyContext(item),
+                            // Thread blocks
+                            for (int i = 0; i < _threads.length; i++)
+                              _buildThreadBlock(i),
+                            // "Add to thread" trigger
+                            if (_threads.last.controller.text.isNotEmpty &&
+                                _activeIndex != _threads.length - 1)
+                              _buildAddThreadTrigger(),
+                          ],
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              // ---- FLOATING FOOTER ----
-              floatingActionButton: _buildFloatingFooter(),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
+              ],
             ),
           ),
-        );
-      },
+          // ---- FLOATING FOOTER ----
+          floatingActionButton: _buildFloatingFooter(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+        ),
+      ),
     );
   }
 
   // ---------------------------------------------------------------------------
   // HEADER
   // ---------------------------------------------------------------------------
-  // React: <header className="flex items-center justify-between px-4 h-16
-  //   border-b border-white/5 glass sticky top-0 z-20">
 
   Widget _buildHeader() {
     return Container(
@@ -224,7 +230,7 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       ),
       child: Row(
         children: [
-          // Close button — React: <X size={24} />
+          // Close button
           GestureDetector(
             onTap: _onBack,
             child: const Padding(
@@ -237,7 +243,7 @@ class _CreateReplyPageState extends State<CreateReplyPage>
             ),
           ),
           const SizedBox(width: 4),
-          // Title — React: text-sm font-bold uppercase tracking-widest opacity-50
+          // Title
           Expanded(
             child: Text(
               widget.parentItem != null ? 'REPLY' : 'NEW THREAD',
@@ -245,12 +251,12 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                 color: AppColors.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 3.0, // tracking-widest
+                letterSpacing: 3.0,
                 height: 1.0,
               ),
             ),
           ),
-          // Drafts — React: text-primary font-bold text-sm px-3 py-1.5 rounded-full
+          // Drafts
           TextButton(
             onPressed: () {},
             style: TextButton.styleFrom(
@@ -269,8 +275,7 @@ class _CreateReplyPageState extends State<CreateReplyPage>
             ),
           ),
           const SizedBox(width: 8),
-          // Post / Reply button — React: bg-primary rounded-full shadow-lg
-          //   font-black text-sm uppercase tracking-widest
+          // Post / Reply button
           _buildPostButton(),
         ],
       ),
@@ -328,19 +333,8 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   }
 
   // ---------------------------------------------------------------------------
-  // REPLY CONTEXT (parent card)
+  // REPLY CONTEXT
   // ---------------------------------------------------------------------------
-  // React:
-  // <div className="flex gap-4 mb-2">
-  //   <div className="flex flex-col items-center pt-1">
-  //     <UserAvatar ... />
-  //     <div className="w-[2px] flex-grow bg-white/10 my-2 rounded-full min-h-[40px]" />
-  //   </div>
-  //   <div className="flex-grow pb-6 pt-1">
-  //     handle + task price badge
-  //     taskTitle card (for tasks) or plain text
-  //   </div>
-  // </div>
 
   Widget _buildReplyContext(FeedItem item) {
     final type = _getReplyContextType();
@@ -353,7 +347,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left rail: avatar + vertical line
           SizedBox(
             width: 48,
             child: Column(
@@ -366,7 +359,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Vertical line — React: w-[2px] flex-grow bg-white/10 my-2 rounded-full min-h-[40px]
                 Container(
                   width: 2,
                   height: 40,
@@ -379,14 +371,12 @@ class _CreateReplyPageState extends State<CreateReplyPage>
             ),
           ),
           const SizedBox(width: 16),
-          // Right content
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Handle + price badge
                   Row(
                     children: [
                       Text(
@@ -425,9 +415,7 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                     ],
                   ),
                   const SizedBox(height: 4),
-                  // Content
                   if (type == 'task' && taskTitle != null)
-                    // Task card — React: bg-surface-container-low border border-white/10 rounded-xl p-3 mt-2 shadow-inner
                     Container(
                       margin: const EdgeInsets.only(top: 8),
                       padding: const EdgeInsets.all(12),
@@ -489,9 +477,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   // ---------------------------------------------------------------------------
   // THREAD BLOCK
   // ---------------------------------------------------------------------------
-  // React: flex gap-4 group
-  //   Left: UserAvatar + vertical line between blocks
-  //   Right: "You" + delete button + AutoResizeTextarea + toolbar + char counter
 
   Widget _buildThreadBlock(int index) {
     final thread = _threads[index];
@@ -506,21 +491,16 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left rail: avatar + line
           SizedBox(
             width: 48,
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: UserAvatar(
-                    src: '', // current user — empty triggers fallback
-                    size: AvatarSize.lg,
-                  ),
+                  child: UserAvatar(src: '', size: AvatarSize.lg),
                 ),
                 if (!isLast) ...[
                   const SizedBox(height: 8),
-                  // Gradient line — React: bg-gradient-to-b from-white/20 to-white/5
                   Container(
                     width: 2,
                     height: 40,
@@ -541,14 +521,12 @@ class _CreateReplyPageState extends State<CreateReplyPage>
             ),
           ),
           const SizedBox(width: 16),
-          // Right content
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // "You" + delete button
                   Row(
                     children: [
                       const Text(
@@ -581,7 +559,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                     ],
                   ),
                   const SizedBox(height: 4),
-                  // Auto-resize text field
                   TextField(
                     controller: thread.controller,
                     focusNode: thread.focusNode,
@@ -611,7 +588,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
                   ),
-                  // Toolbar + character counter (active thread only)
                   if (isActive) _buildToolbar(index, progress, isOverLimit),
                 ],
               ),
@@ -625,13 +601,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   // ---------------------------------------------------------------------------
   // TOOLBAR + CHARACTER COUNTER
   // ---------------------------------------------------------------------------
-  // React:
-  // <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-  //   <div className="flex items-center gap-1 text-primary">
-  //     [ImageIcon, Film, BarChart2, Smile]
-  //   </div>
-  //   <div> circular progress + separator + plus button </div>
-  // </div>
 
   Widget _buildToolbar(int index, double progress, bool isOverLimit) {
     final hasText = _threads[index].controller.text.isNotEmpty;
@@ -645,7 +614,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       ),
       child: Row(
         children: [
-          // Media icons — React: flex items-center gap-1 text-primary
           ...[
             PhosphorIconsRegular.image,
             PhosphorIconsRegular.filmStrip,
@@ -664,11 +632,9 @@ class _CreateReplyPageState extends State<CreateReplyPage>
             ),
           ),
           const Spacer(),
-          // Right side: char counter + plus
           if (hasText)
             Row(
               children: [
-                // Circular progress — React: SVG with rotated circle
                 SizedBox(
                   width: 24,
                   height: 24,
@@ -692,14 +658,12 @@ class _CreateReplyPageState extends State<CreateReplyPage>
                       ),
                     ),
                   ),
-                // Separator
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 12),
                   width: 1,
                   height: 24,
                   color: Colors.white.withOpacity(0.1),
                 ),
-                // Add thread button — React: w-6 h-6 rounded-full bg-primary/10
                 if (canAddThread)
                   GestureDetector(
                     onTap: _addThread,
@@ -727,7 +691,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   // ---------------------------------------------------------------------------
   // ADD THREAD TRIGGER
   // ---------------------------------------------------------------------------
-  // React: dashed border avatar + "Add to thread" text
 
   Widget _buildAddThreadTrigger() {
     return GestureDetector(
@@ -777,13 +740,6 @@ class _CreateReplyPageState extends State<CreateReplyPage>
   // ---------------------------------------------------------------------------
   // FLOATING FOOTER — "Everyone can reply"
   // ---------------------------------------------------------------------------
-  // React:
-  // <div className="fixed bottom-6 left-0 right-0 flex justify-center pointer-events-none z-20">
-  //   <motion.div ... className="... rounded-full text-xs font-bold text-primary
-  //     uppercase tracking-widest shadow-2xl border border-white/10 ...">
-  //     <Globe size={14} /> <span>Everyone can reply</span>
-  //   </motion.div>
-  // </div>
 
   Widget _buildFloatingFooter() {
     return Container(
@@ -832,11 +788,6 @@ class _ThreadData {
 // ---------------------------------------------------------------------------
 // Circular character progress painter
 // ---------------------------------------------------------------------------
-// React SVG:
-// <circle cx="12" cy="12" r="10" fill="none" className="stroke-white/10" strokeWidth="2" />
-// <circle cx="12" cy="12" r="10" fill="none"
-//   className={isOverLimit ? 'stroke-red-500' : progress > 80 ? 'stroke-yellow-500' : 'stroke-primary'}
-//   strokeWidth="2" strokeDasharray={`${progress * 0.628} 62.8`} />
 
 class _CharProgressPainter extends CustomPainter {
   final double progress;
@@ -855,14 +806,12 @@ class _CharProgressPainter extends CustomPainter {
     final radius = size.width / 2 - 1;
     const strokeWidth = 2.0;
 
-    // Background circle
     final bgPaint = Paint()
       ..color = Colors.white.withOpacity(0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius, bgPaint);
 
-    // Progress arc
     if (progress > 0) {
       Color arcColor;
       if (isOverLimit) {
@@ -879,9 +828,7 @@ class _CharProgressPainter extends CustomPainter {
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;
 
-      // React: strokeDasharray with 2πr=62.8 for r=10
       final sweepAngle = (progress / 100) * 2 * 3.14159;
-      // Start from top (-π/2) like SVG default
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         -3.14159 / 2,

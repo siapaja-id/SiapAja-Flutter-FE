@@ -137,9 +137,12 @@ class TaskData extends FeedItem {
   final String? meta;
   final String? mapUrl;
   final List<String>? images;
+  final String? video;
+  final String? voiceNote;
   final Author? assignedWorker;
   final String? acceptedBidAmount;
   final bool? isFirstTask;
+  final bool? isFirstPost;
 
   const TaskData({
     required super.id,
@@ -156,9 +159,12 @@ class TaskData extends FeedItem {
     this.meta,
     this.mapUrl,
     this.images,
+    this.video,
+    this.voiceNote,
     this.assignedWorker,
     this.acceptedBidAmount,
     this.isFirstTask,
+    this.isFirstPost,
     super.replies,
     super.reposts,
     super.shares,
@@ -183,9 +189,12 @@ class TaskData extends FeedItem {
     String? meta,
     String? mapUrl,
     List<String>? images,
+    String? video,
+    String? voiceNote,
     Author? assignedWorker,
     String? acceptedBidAmount,
     bool? isFirstTask,
+    bool? isFirstPost,
     int? replies,
     int? reposts,
     int? shares,
@@ -206,9 +215,12 @@ class TaskData extends FeedItem {
       meta: meta ?? this.meta,
       mapUrl: mapUrl ?? this.mapUrl,
       images: images ?? this.images,
+      video: video ?? this.video,
+      voiceNote: voiceNote ?? this.voiceNote,
       assignedWorker: assignedWorker ?? this.assignedWorker,
       acceptedBidAmount: acceptedBidAmount ?? this.acceptedBidAmount,
       isFirstTask: isFirstTask ?? this.isFirstTask,
+      isFirstPost: isFirstPost ?? this.isFirstPost,
       replies: replies ?? this.replies,
       reposts: reposts ?? this.reposts,
       shares: shares ?? this.shares,

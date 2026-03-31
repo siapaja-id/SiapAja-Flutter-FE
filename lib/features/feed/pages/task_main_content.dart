@@ -6,78 +6,99 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
-import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
 import '../../../shared/widgets/post_actions.dart';
 
 /// Full task detail view — matches React TaskMainContent.Component.tsx exactly.
-class TaskMainContent extends StatelessWidget {
+class TaskMainContent extends StatefulWidget {
   final TaskData data;
 
   const TaskMainContent({super.key, required this.data});
 
   @override
+  State<TaskMainContent> createState() => _TaskMainContentState();
+}
+
+class _TaskMainContentState extends State<TaskMainContent> {
+  bool _isDescExpanded = false;
+
+  TaskData get data => widget.data;
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Depth background gradient (matches React: from-primary/10 via-background to-transparent)
-        _buildBackgroundGradient(),
-        // Content above gradient
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 24),
-              
-              if (data.isFirstTask == true) ...[_buildFirstTaskBadge(), const SizedBox(height: 16)],
-              _buildInfoPill(context),
-              const SizedBox(height: 20),
-              _buildTitle(context),
-              const SizedBox(height: 24),
-              _buildTrustCard(context),
-              const SizedBox(height: 24),
-              _buildStatusTracker(context),
-              const SizedBox(height: 24),
-              _buildDescription(context),
-              if (data.mapUrl != null || (data.images != null && data.images!.isNotEmpty)) ...[
-                const SizedBox(height: 32),
-                _buildMediaModules(context),
-              ],
-              if (data.tags != null && data.tags!.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                _buildTags(context),
-              ],
-              if (data.meta != null) ...[
-                const SizedBox(height: 16),
-                _buildMeta(context),
-              ],
-              const SizedBox(height: 16),
-              _buildPostActions(context),
-            ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          const SizedBox(height: 16),
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(0.08),
+                  Colors.white.withOpacity(0.02),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 24),
+
+          if (data.isFirstPost == true) ...[
+            _buildFirstPostBadge(),
+            const SizedBox(height: 16),
+          ],
+          if (data.isFirstTask == true) ...[
+            _buildFirstTaskBadge(),
+            const SizedBox(height: 16),
+          ],
+          _buildInfoPill(context),
+          const SizedBox(height: 20),
+          _buildTitle(context),
+          const SizedBox(height: 24),
+          _buildTrustCard(context),
+          const SizedBox(height: 24),
+          _buildStatusTracker(context),
+          const SizedBox(height: 24),
+          _buildSectionLabel('DESCRIPTION'),
+          const SizedBox(height: 10),
+          _buildDescription(context),
+          if (data.mapUrl != null ||
+              (data.images != null && data.images!.isNotEmpty) ||
+              data.video != null ||
+              data.voiceNote != null) ...[
+            const SizedBox(height: 32),
+            _buildSectionLabel('ATTACHMENTS'),
+            const SizedBox(height: 10),
+            _buildMediaModules(context),
+          ],
+          if (data.tags != null && data.tags!.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            _buildSectionLabel('TAGS'),
+            const SizedBox(height: 10),
+            _buildTags(context),
+          ],
+          if (data.meta != null) ...[
+            const SizedBox(height: 16),
+            _buildMeta(context),
+          ],
+          const SizedBox(height: 24),
+          _buildPostActions(context),
+        ],
+      ),
     );
   }
 
-  Widget _buildBackgroundGradient() {
-    // React: absolute top-0 inset-x-0 h-64 bg-[radial-gradient(...)] from-primary/10 via-background to-transparent
-    return Container(
-      height: 256,
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment.topCenter,
-          radius: 1.5,
-          colors: [
-            AppColors.primary.withOpacity(0.1),
-            AppColors.background,
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.6, 1.0],
-        ),
+  Widget _buildSectionLabel(String label) {
+    return Text(
+      label,
+      style: TextStyle(
+        color: AppColors.onSurfaceVariant.withOpacity(0.4),
+        fontSize: 9,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 2.5,
       ),
     );
   }
@@ -85,74 +106,105 @@ class TaskMainContent extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     // React: flex items-center justify-between mb-6
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Left: avatar + name + handle
-        Row(
-          children: [
-            UserAvatar(
-              src: data.author.avatar,
-              size: AvatarSize.xl,
-              isOnline: data.author.isOnline,
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      data.author.name,
-                      style: const TextStyle(
-                        color: AppColors.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                      ),
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 16,
                     ),
-                    if (data.author.verified) ...[
-                      const SizedBox(width: 6),
-                      const Icon(
-                        PhosphorIconsFill.sealCheck,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                    ],
                   ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '@${data.author.handle}',
-                  style: const TextStyle(
-                    color: AppColors.onSurfaceVariant,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: UserAvatar(
+                  src: data.author.avatar,
+                  size: AvatarSize.xl,
+                  isOnline: data.author.isOnline,
                 ),
-              ],
-            ),
-          ],
-        ),
-        // Right: price + status tag
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // React: text-3xl font-black tracking-tighter (white, NOT red)
-            Text(
-              data.price,
-              style: const TextStyle(
-                color: AppColors.onSurface,
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -1,
               ),
-            ),
-            // Status TagBadge below price
-            if (data.status != TaskStatus.open) ...[
-              const SizedBox(height: 4),
-              _buildStatusTag(data.status),
+              const SizedBox(width: 12),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            data.author.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.onSurface,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
+                        if (data.author.verified) ...[
+                          const SizedBox(width: 6),
+                          const Icon(
+                            PhosphorIconsFill.sealCheck,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '@${data.author.handle}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Right: price + status tag
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // React: text-3xl font-black tracking-tighter (white, NOT red)
+              Text(
+                data.price,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColors.onSurface,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1,
+                ),
+              ),
+              // React: status badge shown whenever status is truthy
+              if (data.status != TaskStatus.open) ...[
+                const SizedBox(height: 4),
+                _buildStatusTag(data.status),
+              ],
+            ],
+          ),
         ),
       ],
     );
@@ -197,24 +249,15 @@ class TaskMainContent extends StatelessWidget {
         color: AppColors.emerald,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.emerald.withOpacity(0.5),
-            blurRadius: 15,
-          ),
+          BoxShadow(color: AppColors.emerald.withOpacity(0.5), blurRadius: 15),
         ],
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 6,
-            height: 6,
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-            ),
-          ),
-          SizedBox(width: 6),
-          Text(
+          const _PulsingDot(color: Colors.black, size: 6),
+          const SizedBox(width: 6),
+          const Text(
             'First Post',
             style: TextStyle(
               color: Colors.black,
@@ -235,24 +278,15 @@ class TaskMainContent extends StatelessWidget {
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.5),
-            blurRadius: 15,
-          ),
+          BoxShadow(color: AppColors.primary.withOpacity(0.5), blurRadius: 15),
         ],
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 6,
-            height: 6,
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: AppColors.primaryForeground, shape: BoxShape.circle),
-            ),
-          ),
-          SizedBox(width: 6),
-          Text(
+          const _PulsingDot(color: AppColors.primaryForeground, size: 6),
+          const SizedBox(width: 6),
+          const Text(
             'First Task',
             style: TextStyle(
               color: AppColors.primaryForeground,
@@ -270,7 +304,7 @@ class TaskMainContent extends StatelessWidget {
     // React: inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass
     // icon in w-5 h-5 rounded-full bg-primary/20, dot separator, Clock icon
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.glassTint,
         borderRadius: BorderRadius.circular(20),
@@ -297,13 +331,17 @@ class TaskMainContent extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // Category
-          Text(
-            data.category.toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
+          Flexible(
+            child: Text(
+              data.category.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+              ),
             ),
           ),
           // Dot separator
@@ -313,12 +351,19 @@ class TaskMainContent extends StatelessWidget {
               width: 4,
               height: 4,
               child: DecoratedBox(
-                decoration: BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
           ),
           // Timestamp with clock icon
-          const Icon(PhosphorIconsRegular.clock, size: 12, color: AppColors.onSurfaceVariant),
+          const Icon(
+            PhosphorIconsRegular.clock,
+            size: 12,
+            color: AppColors.onSurfaceVariant,
+          ),
           const SizedBox(width: 4),
           Text(
             data.timestamp,
@@ -372,18 +417,25 @@ class TaskMainContent extends StatelessWidget {
             children: [
               // Top glow line
               Positioned(
-                left: 0, right: 0, top: 0, height: 1,
+                left: 0,
+                right: 0,
+                top: 0,
+                height: 1,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.glassGlow, AppColors.glassGlow.withOpacity(0)],
+                      colors: [
+                        AppColors.glassGlow,
+                        AppColors.glassGlow.withOpacity(0),
+                      ],
                     ),
                   ),
                 ),
               ),
               // Emerald radial gradient in corner
               Positioned(
-                top: -40, right: -40,
+                top: -40,
+                right: -40,
                 child: Container(
                   width: 128,
                   height: 128,
@@ -393,6 +445,24 @@ class TaskMainContent extends StatelessWidget {
                       colors: [
                         AppColors.emerald.withOpacity(0.1),
                         Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Bottom emerald glow line
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 1,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.emerald.withOpacity(0),
+                        AppColors.emerald.withOpacity(0.15),
+                        AppColors.emerald.withOpacity(0),
                       ],
                     ),
                   ),
@@ -437,7 +507,9 @@ class TaskMainContent extends StatelessWidget {
                             Text(
                               '(124)',
                               style: TextStyle(
-                                color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                color: AppColors.onSurfaceVariant.withOpacity(
+                                  0.6,
+                                ),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -505,7 +577,13 @@ class TaskMainContent extends StatelessWidget {
     // Dots: w-3.5 h-3.5 (14px), border-[2.5px]
     // Labels: absolute -bottom-5, text-[9px] font-black uppercase tracking-widest
     // Assigned worker inside this container, separated by border-t
-    const statuses = ['Open', 'Assigned', 'In Progress', 'Reviewing', 'Finished'];
+    const statuses = [
+      'Open',
+      'Assigned',
+      'In Progress',
+      'Reviewing',
+      'Finished',
+    ];
     final currentIndex = data.status.index;
 
     return Container(
@@ -515,17 +593,15 @@ class TaskMainContent extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
         ],
       ),
       child: Stack(
         children: [
           // Emerald radial gradient in corner
           Positioned(
-            top: -40, right: -40,
+            top: -40,
+            right: -40,
             child: Container(
               width: 128,
               height: 128,
@@ -544,7 +620,7 @@ class TaskMainContent extends StatelessWidget {
             children: [
               // Progress dots with track
               SizedBox(
-                height: 40,
+                height: 50,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -565,60 +641,102 @@ class TaskMainContent extends StatelessWidget {
                     Positioned(
                       top: 7,
                       left: 7,
-                      child: FractionallySizedBox(
-                        widthFactor: currentIndex / (statuses.length - 1),
-                        child: Container(
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: AppColors.emerald,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
+                      right: 7,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final progressWidth =
+                              constraints.maxWidth *
+                              (currentIndex / (statuses.length - 1));
+                          return SizedBox(
+                            width: progressWidth,
+                            child: Container(
+                              height: 3,
+                              decoration: BoxDecoration(
+                                color: AppColors.emerald,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    // Dots + labels
+                    // Dots (labels positioned absolutely below — matches React)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: statuses.asMap().entries.map((entry) {
                         final i = entry.key;
                         final label = entry.value;
                         final isActive = i <= currentIndex;
-                        return SizedBox(
-                          width: 48,
-                          child: Column(
-                            children: [
-                              // Dot
+                        return Column(
+                          children: [
+                            // Dot
+                            if (isActive && i == currentIndex)
+                              // Currently active dot — pulsing
                               Container(
                                 width: 14,
                                 height: 14,
                                 decoration: BoxDecoration(
-                                  color: isActive ? AppColors.emerald : AppColors.surfaceContainer,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.emerald.withOpacity(0.5),
+                                      blurRadius: 20,
+                                    ),
+                                  ],
+                                ),
+                                child: const _PulsingDot(
+                                  color: AppColors.emerald,
+                                  size: 14,
+                                ),
+                              )
+                            else
+                              Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: isActive
+                                      ? AppColors.emerald
+                                      : AppColors.surfaceContainer,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isActive ? AppColors.emerald : Colors.white.withOpacity(0.2),
+                                    color: isActive
+                                        ? AppColors.emerald
+                                        : Colors.white.withOpacity(0.2),
                                     width: 2.5,
                                   ),
                                   boxShadow: isActive
-                                      ? [BoxShadow(color: AppColors.emerald.withOpacity(0.5), blurRadius: 15)]
+                                      ? [
+                                          BoxShadow(
+                                            color: AppColors.emerald
+                                                .withOpacity(0.5),
+                                            blurRadius: 20,
+                                          ),
+                                        ]
                                       : null,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              // Label
-                              Text(
+                            const SizedBox(height: 8),
+                            // Label — absolute bottom (React: absolute -bottom-5)
+                            // Wrapping in FittedBox to prevent overflow on narrow screens
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
                                 label,
                                 textAlign: TextAlign.center,
+                                maxLines: 1,
                                 style: TextStyle(
                                   color: isActive
                                       ? AppColors.emerald
-                                      : AppColors.onSurfaceVariant.withOpacity(0.4),
+                                      : AppColors.onSurfaceVariant.withOpacity(
+                                          0.4,
+                                        ),
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.5,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         );
                       }).toList(),
                     ),
@@ -652,7 +770,9 @@ class TaskMainContent extends StatelessWidget {
                               Text(
                                 'ASSIGNED TO',
                                 style: TextStyle(
-                                  color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                  color: AppColors.onSurfaceVariant.withOpacity(
+                                    0.6,
+                                  ),
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 2,
@@ -677,7 +797,9 @@ class TaskMainContent extends StatelessWidget {
                           Text(
                             'AGREED PRICE',
                             style: TextStyle(
-                              color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                              color: AppColors.onSurfaceVariant.withOpacity(
+                                0.6,
+                              ),
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 2,
@@ -707,21 +829,61 @@ class TaskMainContent extends StatelessWidget {
   }
 
   Widget _buildDescription(BuildContext context) {
-    // React: prose prose-invert prose-sm with Markdown, expand button text-[10px] uppercase tracking-[0.2em]
-    return ExpandableText(
-      text: data.description,
-      limit: 500,
-      style: const TextStyle(
-        color: AppColors.onSurface,
-        fontSize: 14,
-        height: 1.7,
-      ),
-      buttonStyle: const TextStyle(
-        color: AppColors.primary,
-        fontSize: 10,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 2,
-      ),
+    final isLong = data.description.length > 500;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isLong && !_isDescExpanded
+              ? '${data.description.substring(0, 500)}...'
+              : data.description,
+          style: TextStyle(
+            color: AppColors.onSurfaceVariant.withOpacity(0.9),
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        if (isLong)
+          GestureDetector(
+            onTap: () => setState(() => _isDescExpanded = !_isDescExpanded),
+            child: Container(
+              margin: EdgeInsets.only(top: _isDescExpanded ? 16 : 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.glassTint,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.glassBorder),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _isDescExpanded ? 'Show Less' : 'Show Full Description',
+                    style: TextStyle(
+                      color: _isDescExpanded
+                          ? AppColors.onSurfaceVariant
+                          : AppColors.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    _isDescExpanded
+                        ? PhosphorIconsRegular.caretUp
+                        : PhosphorIconsRegular.caretDown,
+                    size: 12,
+                    color: _isDescExpanded
+                        ? AppColors.onSurfaceVariant
+                        : AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -731,15 +893,175 @@ class TaskMainContent extends StatelessWidget {
         // Map preview
         if (data.mapUrl != null) ...[
           _buildMapPreview(context),
-          if (data.images != null && data.images!.isNotEmpty) const SizedBox(height: 16),
+          if (data.images != null && data.images!.isNotEmpty ||
+              data.video != null ||
+              data.voiceNote != null)
+            const SizedBox(height: 16),
         ],
         // Image carousel
-        if (data.images != null && data.images!.isNotEmpty)
+        if (data.images != null && data.images!.isNotEmpty) ...[
           ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: MediaCarousel(images: data.images!, aspect: '16/9'),
           ),
+          if (data.video != null || data.voiceNote != null)
+            const SizedBox(height: 16),
+        ],
+        // Video
+        if (data.video != null) ...[
+          _buildVideoModule(),
+          if (data.voiceNote != null) const SizedBox(height: 16),
+        ],
+        // Voice note
+        if (data.voiceNote != null) _buildVoiceNoteModule(),
       ],
+    );
+  }
+
+  // React: <div className="relative w-full rounded-[24px] overflow-hidden border border-white/10 bg-black shadow-lg">
+  //        <video src={task.video} controls className="w-full h-auto max-h-80" />
+  Widget _buildVideoModule() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          color: Colors.black,
+          height: 200,
+          child: const Center(
+            child: Icon(
+              PhosphorIconsRegular.play,
+              size: 48,
+              color: Colors.white54,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // React: flex items-center gap-4 p-4 bg-gradient-to-r from-surface-container-high to-surface-container
+  //        rounded-[24px] border border-white/5 shadow-lg
+  //        play button: w-12 h-12 rounded-full bg-primary, play triangle
+  //        progress: h-2 bg-white/10 rounded-full, h-full bg-primary w-1/3, thumb dot
+  //        times: 0:12 and voiceNote duration
+  Widget _buildVoiceNoteModule() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.surfaceContainerHigh, AppColors.surfaceContainer],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Play button
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.3),
+                  blurRadius: 20,
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Icon(
+                PhosphorIconsFill.play,
+                size: 20,
+                color: AppColors.primaryForeground,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Progress bar + times
+          Expanded(
+            child: Column(
+              children: [
+                // Progress track
+                Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Stack(
+                    children: [
+                      FractionallySizedBox(
+                        widthFactor: 0.33,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      // Thumb dot
+                      const Positioned(
+                        right: -4,
+                        top: -2,
+                        child: SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(color: Colors.black26, blurRadius: 4),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // Times
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '0:12',
+                      style: TextStyle(
+                        color: AppColors.onSurfaceVariant,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    Text(
+                      data.voiceNote ?? '0:00',
+                      style: const TextStyle(
+                        color: AppColors.onSurfaceVariant,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -787,24 +1109,23 @@ class TaskMainContent extends StatelessWidget {
                     top: 16,
                     right: 16,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            width: 8,
-                            height: 8,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(color: AppColors.emerald, shape: BoxShape.circle),
-                            ),
-                          ),
-                          SizedBox(width: 6),
-                          Text(
+                          _PulsingDot(color: AppColors.emerald, size: 8),
+                          const SizedBox(width: 6),
+                          const Text(
                             'OSRM ROUTED',
                             style: TextStyle(
                               color: Colors.white,
@@ -836,11 +1157,18 @@ class TaskMainContent extends StatelessWidget {
                             height: 10,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primary, width: 2),
+                              border: Border.all(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
                               color: AppColors.background,
                             ),
                           ),
-                          Container(width: 2, height: 32, color: Colors.white.withOpacity(0.1)),
+                          Container(
+                            width: 2,
+                            height: 32,
+                            color: Colors.white.withOpacity(0.1),
+                          ),
                           Container(
                             width: 10,
                             height: 10,
@@ -848,7 +1176,10 @@ class TaskMainContent extends StatelessWidget {
                               shape: BoxShape.circle,
                               color: AppColors.emerald,
                               boxShadow: [
-                                BoxShadow(color: AppColors.emerald.withOpacity(0.5), blurRadius: 10),
+                                BoxShadow(
+                                  color: AppColors.emerald.withOpacity(0.5),
+                                  blurRadius: 10,
+                                ),
                               ],
                             ),
                           ),
@@ -858,9 +1189,15 @@ class TaskMainContent extends StatelessWidget {
                       Expanded(
                         child: Column(
                           children: [
-                            _buildRoutePoint('PICKUP POINT', 'Downtown Hub (37.7749 N, 122.4194 W)'),
+                            _buildRoutePoint(
+                              'PICKUP POINT',
+                              'Downtown Hub (37.7749 N, 122.4194 W)',
+                            ),
                             const SizedBox(height: 12),
-                            _buildRoutePoint('DROPOFF POINT', 'Midtown Square (37.7833 N, 122.4167 W)'),
+                            _buildRoutePoint(
+                              'DROPOFF POINT',
+                              'Midtown Square (37.7833 N, 122.4167 W)',
+                            ),
                           ],
                         ),
                       ),
@@ -874,12 +1211,18 @@ class TaskMainContent extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.2),
+                      ),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(PhosphorIconsRegular.navigationArrow, size: 16, color: AppColors.primary),
+                        Icon(
+                          PhosphorIconsRegular.navigationArrow,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
                         SizedBox(width: 8),
                         Text(
                           'Navigate via Google Maps',
@@ -890,7 +1233,11 @@ class TaskMainContent extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 8),
-                        Icon(PhosphorIconsRegular.arrowSquareOut, size: 14, color: AppColors.primary),
+                        Icon(
+                          PhosphorIconsRegular.arrowSquareOut,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
                       ],
                     ),
                   ),
@@ -938,11 +1285,11 @@ class TaskMainContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),
           child: Text(
-            tag.toUpperCase(),
+            '#${tag.toUpperCase()}',
             style: const TextStyle(
               color: AppColors.onSurfaceVariant,
               fontSize: 10,
@@ -970,21 +1317,29 @@ class TaskMainContent extends StatelessWidget {
   }
 
   Widget _buildPostActions(BuildContext context) {
-    // React: pt-4 border-t border-white/5
-    return Container(
-      padding: const EdgeInsets.only(top: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.05)),
+    return Column(
+      children: [
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0),
+                Colors.white.withOpacity(0.08),
+                Colors.white.withOpacity(0),
+              ],
+            ),
+          ),
         ),
-      ),
-      child: PostActions(
-        id: data.id,
-        votes: data.votes,
-        replies: data.replies,
-        reposts: data.reposts,
-        shares: data.shares,
-      ),
+        const SizedBox(height: 16),
+        PostActions(
+          id: data.id,
+          votes: data.votes,
+          replies: data.replies,
+          reposts: data.reposts,
+          shares: data.shares,
+        ),
+      ],
     );
   }
 
@@ -998,4 +1353,21 @@ class TaskMainContent extends StatelessWidget {
     TaskIconType.package => PhosphorIconsRegular.package,
     TaskIconType.location => PhosphorIconsRegular.mapPin,
   };
+}
+
+/// Static dot indicator (no continuous animation).
+class _PulsingDot extends StatelessWidget {
+  final Color color;
+  final double size;
+
+  const _PulsingDot({required this.color, this.size = 8});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
 }
