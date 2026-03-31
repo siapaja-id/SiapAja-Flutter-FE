@@ -11,6 +11,7 @@ import '../../../models/feed_item.dart';
 import '../data/reply_generator.dart';
 import '../providers.dart';
 import '../widgets/feed_item_card.dart';
+import '../widgets/kanban_column_widget.dart';
 import '../widgets/reply_input.dart';
 import 'task_main_content.dart';
 
@@ -112,7 +113,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     if (_postStack.length > 1) {
       setState(() => _postStack.removeLast());
     } else if (widget.inKanban) {
-      Navigator.of(context).pop();
+      final kanbanCtx = KanbanColumnContext.of(context);
+      if (kanbanCtx != null) {
+        ref.read(kanbanProvider.notifier).closeColumn(kanbanCtx.columnId);
+      } else {
+        Navigator.of(context).pop();
+      }
     } else {
       context.pop();
     }
