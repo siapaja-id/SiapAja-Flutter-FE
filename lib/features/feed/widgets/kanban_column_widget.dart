@@ -356,19 +356,41 @@ class _ColumnHeader extends StatelessWidget {
 }
 
 /// Column body — renders routes matching the column path
-class _ColumnBody extends StatelessWidget {
+class _ColumnBody extends StatefulWidget {
   final String path;
   final String columnId;
 
   const _ColumnBody({required this.path, required this.columnId});
 
   @override
+  State<_ColumnBody> createState() => _ColumnBodyState();
+}
+
+class _ColumnBodyState extends State<_ColumnBody> {
+  final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final nav = _navKey.currentState;
+      if (nav == null) return;
+      nav.push(
+        MaterialPageRoute(
+          builder: (ctx) => _buildPageForRoute(widget.path, ctx),
+        ),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Navigator(
-      key: ValueKey(columnId),
+      key: _navKey,
       onGenerateRoute: (settings) {
         return MaterialPageRoute(
-          builder: (context) => _buildPageForRoute(path, context),
+          builder: (context) => _buildPageForRoute(widget.path, context),
         );
       },
     );
@@ -393,10 +415,10 @@ class _ColumnBody extends StatelessWidget {
 
   Widget _buildPageForRoute(String path, BuildContext context) {
     final exact = _exactRoutes[path];
-    if (exact != null) return exact(columnId);
+    if (exact != null) return exact(widget.columnId);
     for (final entry in _prefixRoutes.entries) {
       if (path.startsWith(entry.key)) {
-        return entry.value(path.substring(entry.key.length), columnId);
+        return entry.value(path.substring(entry.key.length), widget.columnId);
       }
     }
     return const ScaffoldPageStub(title: 'Column');
