@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -26,33 +27,10 @@ class CreateReplyPage extends StatefulWidget {
   State<CreateReplyPage> createState() => _CreateReplyPageState();
 }
 
-class _CreateReplyPageState extends State<CreateReplyPage>
-    with SingleTickerProviderStateMixin {
+class _CreateReplyPageState extends State<CreateReplyPage> {
   final List<_ThreadData> _threads = [_ThreadData()];
   int _activeIndex = 0;
   final ScrollController _scrollController = ScrollController();
-  late final AnimationController _animController;
-  late final Animation<double> _fadeAnim;
-  late final Animation<Offset> _slideAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-    // React: damping 25, stiffness 200 — approximated with easeOutCubic
-    _slideAnim = Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero)
-        .animate(
-          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
-        );
-    _fadeAnim = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
-    _animController.forward();
-  }
 
   @override
   void dispose() {
@@ -60,14 +38,11 @@ class _CreateReplyPageState extends State<CreateReplyPage>
       t.controller.dispose();
     }
     _scrollController.dispose();
-    _animController.dispose();
     super.dispose();
   }
 
   void _onBack() {
-    _animController.reverse().then((_) {
-      if (mounted) Navigator.of(context).pop();
-    });
+    Navigator.of(context).pop();
   }
 
   void _addThread() {
@@ -108,9 +83,7 @@ class _CreateReplyPageState extends State<CreateReplyPage>
     if (widget.onSend != null) {
       widget.onSend!(content);
     }
-    _animController.reverse().then((_) {
-      if (mounted) Navigator.of(context).pop();
-    });
+    Navigator.of(context).pop();
   }
 
   double _calculateProgress(String text) {
@@ -157,61 +130,59 @@ class _CreateReplyPageState extends State<CreateReplyPage>
     final item = widget.parentItem;
     final hasContext = item != null;
 
-    // Slide-up animation — no redundant AnimatedBuilder.
-    // SlideTransition and FadeTransition already listen to their animations.
-    return SlideTransition(
-      position: _slideAnim,
-      child: FadeTransition(
-        opacity: _fadeAnim,
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          // React: max-w-2xl mx-auto border-x border-white/5
-          body: Container(
-            constraints: const BoxConstraints(maxWidth: 672),
-            decoration: const BoxDecoration(
-              border: Border(
-                left: BorderSide(color: AppColors.border),
-                right: BorderSide(color: AppColors.border),
-              ),
+    final route = ModalRoute.of(context)!;
+
+    return SharedAxisTransition(
+      animation: route.animation!,
+      secondaryAnimation: route.secondaryAnimation!,
+      transitionType: SharedAxisTransitionType.vertical,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        // React: max-w-2xl mx-auto border-x border-white/5
+        body: Container(
+          constraints: const BoxConstraints(maxWidth: 672),
+          decoration: const BoxDecoration(
+            border: Border(
+              left: BorderSide(color: AppColors.border),
+              right: BorderSide(color: AppColors.border),
             ),
-            child: Column(
-              children: [
-                // ---- HEADER ----
-                _buildHeader(),
-                // ---- CONTENT (scrollable) ----
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 672),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Reply context
-                            if (hasContext) _buildReplyContext(item),
-                            // Thread blocks
-                            for (int i = 0; i < _threads.length; i++)
-                              _buildThreadBlock(i),
-                            // "Add to thread" trigger
-                            if (_threads.last.controller.text.isNotEmpty &&
-                                _activeIndex != _threads.length - 1)
-                              _buildAddThreadTrigger(),
-                          ],
-                        ),
+          ),
+          child: Column(
+            children: [
+              // ---- HEADER ----
+              _buildHeader(),
+              // ---- CONTENT (scrollable) ----
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 672),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Reply context
+                          if (hasContext) _buildReplyContext(item),
+                          // Thread blocks
+                          for (int i = 0; i < _threads.length; i++)
+                            _buildThreadBlock(i),
+                          // "Add to thread" trigger
+                          if (_threads.last.controller.text.isNotEmpty &&
+                              _activeIndex != _threads.length - 1)
+                            _buildAddThreadTrigger(),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          // ---- FLOATING FOOTER ----
-          floatingActionButton: _buildFloatingFooter(),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
         ),
+        // ---- FLOATING FOOTER ----
+        floatingActionButton: _buildFloatingFooter(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }

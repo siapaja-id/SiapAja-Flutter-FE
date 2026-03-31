@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -80,24 +81,79 @@ class KanbanColumnWidget extends ConsumerStatefulWidget {
   final KanbanColumn column;
   final int index;
   final int total;
+  final AnimationController? enterController;
+  final VoidCallback? onCloseRequested;
 
   const KanbanColumnWidget({
     super.key,
     required this.column,
     required this.index,
     required this.total,
+    this.enterController,
+    this.onCloseRequested,
   });
 
   @override
   ConsumerState<KanbanColumnWidget> createState() => _KanbanColumnWidgetState();
 }
 
-class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget> {
+class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
+    with TickerProviderStateMixin {
   bool _isHovering = false;
   bool _isResizing = false;
   double _resizeStartX = 0;
   double _resizeStartWidth = 0;
   double _localWidth = 0;
+
+  late final AnimationController _entranceController;
+  late final AnimationController _hoverController;
+  late final Animation<double> _hoverAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use external controller (for exit animation) or create own (for entrance)
+    _entranceController =
+        widget.enterController ??
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 350),
+        );
+    _hoverController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _hoverAnimation = CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOutCubic,
+    );
+
+    // Only auto-play entrance when using internal controller
+    if (widget.enterController == null) {
+      final delay = widget.index * 80;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          if (delay > 0) {
+            Future.delayed(Duration(milliseconds: delay), () {
+              if (mounted) _entranceController.forward();
+            });
+          } else {
+            _entranceController.forward();
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Only dispose controllers we own (not externally provided)
+    if (widget.enterController == null) {
+      _entranceController.dispose();
+    }
+    _hoverController.dispose();
+    super.dispose();
+  }
 
   void _startResize(DragStartDetails e) {
     setState(() {
@@ -128,41 +184,76 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget> {
     final isFirst = widget.index == 0;
     final canClose = !isFirst;
 
+    void handleClose() {
+      // Play exit animation FIRST, then remove from provider
+      _entranceController.reverse().then((_) {
+        if (mounted) {
+          widget.onCloseRequested?.call();
+        }
+      });
+    }
+
     return KanbanColumnContext(
       columnId: widget.column.id,
       path: widget.column.path,
       routeState: widget.column.routeState,
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovering = true),
-        onExit: (_) => setState(() => _isHovering = false),
-        child: SizedBox(
-          width: _isResizing ? _localWidth : widget.column.width,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Column content — Positioned.fill ensures Container fills the Stack bounds
-                Positioned.fill(
-                  child: RepaintBoundary(
-                    child: AnimatedOpacity(
-                      opacity: _isResizing ? 0.8 : 1.0,
-                      duration: const Duration(milliseconds: 100),
-                      child: AnimatedScale(
-                        scale: _isResizing ? 0.98 : 1.0,
-                        duration: const Duration(milliseconds: 100),
-                        child: Container(
+      child: SharedAxisTransition(
+        animation: _entranceController,
+        secondaryAnimation: kAlwaysDismissedAnimation,
+        transitionType: SharedAxisTransitionType.horizontal,
+        child: AnimatedBuilder(
+          animation: _hoverAnimation,
+          builder: (context, child) {
+            return Transform(
+              transform: Matrix4.translationValues(
+                0,
+                -_hoverAnimation.value * 2.0,
+                0,
+              ),
+              child: child,
+            );
+          },
+          child: MouseRegion(
+            onEnter: (_) {
+              setState(() => _isHovering = true);
+              _hoverController.forward();
+            },
+            onExit: (_) {
+              setState(() => _isHovering = false);
+              _hoverController.reverse();
+            },
+            child: SizedBox(
+              width: _isResizing ? _localWidth : widget.column.width,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 12,
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned.fill(
+                      child: RepaintBoundary(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOutCubic,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(36),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
+                              color: _isHovering
+                                  ? Colors.white.withOpacity(0.18)
+                                  : Colors.white.withOpacity(0.1),
                             ),
-                            color: const Color(0x801F1F1F),
+                            color: _isResizing
+                                ? const Color(0x661F1F1F)
+                                : const Color(0x801F1F1F),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black54,
-                                blurRadius: 50,
-                                spreadRadius: -12,
+                                color: _isHovering
+                                    ? Colors.black87
+                                    : Colors.black54,
+                                blurRadius: _isHovering ? 60 : 50,
+                                spreadRadius: _isHovering ? -8 : -12,
                               ),
                             ],
                           ),
@@ -173,7 +264,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget> {
                               filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                               child: Column(
                                 children: [
-                                  // Column Header Bar
                                   _ColumnHeader(
                                     icon: meta.icon,
                                     title:
@@ -185,11 +275,8 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget> {
                                     index: widget.index,
                                     total: widget.total,
                                     canClose: canClose,
-                                    onClose: () => ref
-                                        .read(kanbanProvider.notifier)
-                                        .closeColumn(widget.column.id),
+                                    onClose: handleClose,
                                   ),
-                                  // Column body
                                   Expanded(
                                     child: _ColumnBody(
                                       path: widget.column.path,
@@ -203,35 +290,35 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget> {
                         ),
                       ),
                     ),
-                  ),
-                ),
-                // Resizer handle
-                if (_isHovering || _isResizing)
-                  Positioned(
-                    right: -4,
-                    top: 0,
-                    bottom: 0,
-                    width: 8,
-                    child: GestureDetector(
-                      onPanStart: _startResize,
-                      onPanUpdate: _updateResize,
-                      onPanEnd: _endResize,
-                      child: Center(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: 4,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: _isResizing
-                                ? AppColors.primary
-                                : Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(999),
+                    // Resizer handle
+                    if (_isHovering || _isResizing)
+                      Positioned(
+                        right: -4,
+                        top: 0,
+                        bottom: 0,
+                        width: 8,
+                        child: GestureDetector(
+                          onPanStart: _startResize,
+                          onPanUpdate: _updateResize,
+                          onPanEnd: _endResize,
+                          child: Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 4,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: _isResizing
+                                    ? AppColors.primary
+                                    : Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),

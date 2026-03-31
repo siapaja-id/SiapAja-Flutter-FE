@@ -22,9 +22,10 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+
     // Auto-scroll to end when new columns are added
     ref.listenManual(kanbanProvider, (prev, next) {
-      if (prev != null && next.columns.length > prev.columns.length) {
+      if (next.columns.length > (prev?.columns.length ?? 0)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
             _scrollController.animateTo(
@@ -87,11 +88,16 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
                     child: Row(
                       children: [
                         ...columns.asMap().entries.map((entry) {
+                          final col = entry.value;
+                          final index = entry.key;
                           return KanbanColumnWidget(
-                            key: ValueKey(entry.value.id),
-                            column: entry.value,
-                            index: entry.key,
+                            key: ValueKey(col.id),
+                            column: col,
+                            index: index,
                             total: columns.length,
+                            onCloseRequested: () => ref
+                                .read(kanbanProvider.notifier)
+                                .closeColumn(col.id),
                           );
                         }),
                         // Add column button — inline after columns (matches React)
