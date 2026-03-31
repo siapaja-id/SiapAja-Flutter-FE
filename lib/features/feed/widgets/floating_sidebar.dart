@@ -4,23 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
+import '../../../shared/models/nav_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../providers.dart';
-
-class _NavItem {
-  final IconData icon;
-  final String label;
-  final String route;
-  final bool isPrimary;
-  final VoidCallback? action;
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.route,
-    this.isPrimary = false,
-    this.action,
-  });
-}
 
 class FloatingSidebar extends ConsumerStatefulWidget {
   const FloatingSidebar({super.key});
@@ -37,17 +23,17 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
     final currentUser = ref.read(uiStateProvider).currentUser;
 
     final navItems = [
-      const _NavItem(
+      const NavItem(
         icon: PhosphorIconsRegular.house,
         label: 'Home',
         route: '/',
       ),
-      const _NavItem(
+      const NavItem(
         icon: PhosphorIconsRegular.magnifyingGlass,
         label: 'Explore',
         route: '/explore',
       ),
-      _NavItem(
+      NavItem(
         icon: PhosphorIconsRegular.plus,
         label: 'Create',
         route: 'create',
@@ -56,17 +42,17 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
           // TODO: open create modal
         },
       ),
-      const _NavItem(
+      const NavItem(
         icon: PhosphorIconsRegular.chatCircle,
         label: 'Messages',
         route: '/messages',
       ),
-      const _NavItem(
+      const NavItem(
         icon: PhosphorIconsRegular.clipboardText,
         label: 'Orders',
         route: '/orders',
       ),
-      const _NavItem(
+      const NavItem(
         icon: PhosphorIconsRegular.user,
         label: 'Profile',
         route: '/profile',
@@ -220,7 +206,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
 }
 
 class _NavButton extends StatelessWidget {
-  final _NavItem item;
+  final NavItem item;
   final bool expanded;
   final VoidCallback onTap;
 

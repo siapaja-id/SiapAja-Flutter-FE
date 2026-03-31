@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/widgets/user_avatar.dart';
+import '../../../shared/widgets/glass_header.dart';
+import '../../../shared/widgets/karma_badge.dart';
 import '../widgets/feed_composer.dart';
 import '../widgets/feed_item_card.dart';
 import '../providers.dart';
@@ -221,113 +220,63 @@ class _KanbanFeedHeaderState extends ConsumerState<_KanbanFeedHeader>
     final currentUser = ref.read(uiStateProvider).currentUser;
     final karma = currentUser?.karma ?? 98;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: AppColors.glassTint,
-            border: const Border(
-              bottom: BorderSide(color: AppColors.glassBorder),
-            ),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.glassGlow, AppColors.glassTint],
+    return GlassHeader(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => ref
+                .read(kanbanProvider.notifier)
+                .openColumn(
+                  '/profile',
+                  sourceId: widget.columnId,
+                  routeState: {
+                    'user': {
+                      'name': currentUser?.name ?? 'You',
+                      'handle': currentUser?.handle ?? 'currentuser',
+                      'avatar':
+                          currentUser?.avatar ??
+                          'https://picsum.photos/seed/currentuser/100/100',
+                      'karma': karma,
+                      'isOnline': currentUser?.isOnline ?? true,
+                    },
+                  },
+                ),
+            child: UserAvatar(
+              src:
+                  currentUser?.avatar ??
+                  'https://picsum.photos/seed/user/100/100',
+              size: AvatarSize.md,
+              isOnline: true,
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () => ref
-                    .read(kanbanProvider.notifier)
-                    .openColumn(
-                      '/profile',
-                      sourceId: widget.columnId,
-                      routeState: {
-                        'user': {
-                          'name': currentUser?.name ?? 'You',
-                          'handle': currentUser?.handle ?? 'currentuser',
-                          'avatar':
-                              currentUser?.avatar ??
-                              'https://picsum.photos/seed/currentuser/100/100',
-                          'karma': karma,
-                          'isOnline': currentUser?.isOnline ?? true,
-                        },
-                      },
-                    ),
-                child: UserAvatar(
-                  src:
-                      currentUser?.avatar ??
-                      'https://picsum.photos/seed/user/100/100',
-                  size: AvatarSize.md,
-                  isOnline: true,
-                ),
-              ),
-              Flexible(
-                child: _TabBar(
-                  activeIndex: widget.activeTab,
-                  onIndexChanged: (i) => _tabController.animateTo(i),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => ref
-                    .read(kanbanProvider.notifier)
-                    .openColumn(
-                      '/profile',
-                      sourceId: widget.columnId,
-                      routeState: {
-                        'user': {
-                          'name': currentUser?.name ?? 'You',
-                          'handle': currentUser?.handle ?? 'currentuser',
-                          'avatar':
-                              currentUser?.avatar ??
-                              'https://picsum.photos/seed/currentuser/100/100',
-                          'karma': karma,
-                          'isOnline': currentUser?.isOnline ?? true,
-                        },
-                      },
-                    ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.glassTint,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.glassBorder),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '$karma',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: const Color(0xFF34D399)),
-                          ),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            PhosphorIconsRegular.caretUp,
-                            size: 14,
-                            color: Color(0xFF34D399),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          Flexible(
+            child: _TabBar(
+              activeIndex: widget.activeTab,
+              onIndexChanged: (i) => _tabController.animateTo(i),
+            ),
           ),
-        ),
+          GestureDetector(
+            onTap: () => ref
+                .read(kanbanProvider.notifier)
+                .openColumn(
+                  '/profile',
+                  sourceId: widget.columnId,
+                  routeState: {
+                    'user': {
+                      'name': currentUser?.name ?? 'You',
+                      'handle': currentUser?.handle ?? 'currentuser',
+                      'avatar':
+                          currentUser?.avatar ??
+                          'https://picsum.photos/seed/currentuser/100/100',
+                      'karma': karma,
+                      'isOnline': currentUser?.isOnline ?? true,
+                    },
+                  },
+                ),
+            child: KarmaBadge(karma: karma),
+          ),
+        ],
       ),
     );
   }
@@ -386,81 +335,26 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
       uiStateProvider.select((s) => s.currentUser?.karma),
     );
 
-    return SizedBox(
-      height: 64,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: AppColors.glassTint,
-              border: const Border(
-                bottom: BorderSide(color: AppColors.glassBorder),
-              ),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [AppColors.glassGlow, AppColors.glassTint],
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () {},
-                  child: const UserAvatar(
-                    src: 'https://picsum.photos/seed/user/100/100',
-                    size: AvatarSize.md,
-                    isOnline: true,
-                  ),
-                ),
-                Flexible(
-                  child: _TabBar(
-                    activeIndex: activeTab,
-                    onIndexChanged: (i) => _tabController.animateTo(i),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.glassTint,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.glassBorder),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${karma ?? 98}',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(color: const Color(0xFF34D399)),
-                            ),
-                            const SizedBox(width: 2),
-                            const Icon(
-                              PhosphorIconsRegular.caretUp,
-                              size: 14,
-                              color: Color(0xFF34D399),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+    return GlassHeader(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {},
+            child: const UserAvatar(
+              src: 'https://picsum.photos/seed/user/100/100',
+              size: AvatarSize.md,
+              isOnline: true,
             ),
           ),
-        ),
+          Flexible(
+            child: _TabBar(
+              activeIndex: activeTab,
+              onIndexChanged: (i) => _tabController.animateTo(i),
+            ),
+          ),
+          KarmaBadge(karma: karma ?? 98),
+        ],
       ),
     );
   }

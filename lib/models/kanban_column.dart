@@ -1,45 +1,14 @@
-/// Kanban column model for desktop layout
-class KanbanColumn {
-  final String id;
-  final String path;
-  final double width;
-  final Map<String, dynamic>? routeState;
-  final int? activeTab;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const KanbanColumn({
-    required this.id,
-    required this.path,
-    this.width = 420,
-    this.routeState,
-    this.activeTab,
-  });
+part 'kanban_column.freezed.dart';
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is KanbanColumn &&
-          id == other.id &&
-          path == other.path &&
-          width == other.width &&
-          activeTab == other.activeTab &&
-          identical(routeState, other.routeState);
-
-  @override
-  int get hashCode => Object.hash(id, path, width, activeTab, routeState);
-
-  KanbanColumn copyWith({
-    String? id,
-    String? path,
-    double? width,
+@freezed
+abstract class KanbanColumn with _$KanbanColumn {
+  const factory KanbanColumn({
+    required String id,
+    required String path,
+    @Default(420) double width,
     Map<String, dynamic>? routeState,
     int? activeTab,
-  }) {
-    return KanbanColumn(
-      id: id ?? this.id,
-      path: path ?? this.path,
-      width: width ?? this.width,
-      routeState: routeState ?? this.routeState,
-      activeTab: activeTab ?? this.activeTab,
-    );
-  }
+  }) = _KanbanColumn;
 }

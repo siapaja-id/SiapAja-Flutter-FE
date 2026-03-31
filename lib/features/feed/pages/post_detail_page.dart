@@ -7,6 +7,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/utils/scroll_helpers.dart';
+import '../../../shared/utils/task_icons.dart';
+import '../../../shared/widgets/primary_action_button.dart';
+import '../../../shared/widgets/tag_pill.dart';
+import '../../../shared/widgets/view_stats_badge.dart';
 
 import '../data/reply_generator.dart';
 import '../providers.dart';
@@ -146,15 +151,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     setState(() => _replyText = '');
 
     // Auto-scroll to bottom
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 100,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
+    scrollToBottom(_scrollController);
   }
 
   void _incrementReplyCount(FeedItem parent) {
@@ -202,15 +199,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     ref.read(feedNotifierProvider.notifier).updateFeedItem(task.id, updated);
 
     // Scroll to bottom to show the bid
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 100,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
+    scrollToBottom(_scrollController);
   }
 
   void _handleBidSubmit(TaskData task, int bidAmount, String pitch) {
@@ -241,15 +230,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     });
 
     // Scroll to bottom
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 100,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
+    scrollToBottom(_scrollController);
   }
 
   void _handleStartTask(TaskData task) {
@@ -535,43 +516,16 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     ),
                     const SizedBox(height: 20),
                     // Submit button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _handleBidSubmit(
-                            task,
-                            _bidAmount,
-                            _bidPitchCtrl.text.trim(),
-                          );
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.emerald,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 4,
-                          shadowColor: AppColors.emerald.withOpacity(0.2),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(PhosphorIconsRegular.paperPlaneTilt, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'PLACE BID',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    PrimaryActionButton(
+                      label: 'PLACE BID',
+                      onTap: () {
+                        _handleBidSubmit(
+                          task,
+                          _bidAmount,
+                          _bidPitchCtrl.text.trim(),
+                        );
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
@@ -691,32 +645,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               ),
               const SizedBox(height: 20),
               // Submit button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _handleCompleteTask(task);
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.emerald,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    shadowColor: AppColors.emerald.withOpacity(0.2),
-                  ),
-                  child: const Text(
-                    'SUBMIT COMPLETION',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ),
+              PrimaryActionButton(
+                label: 'SUBMIT COMPLETION',
+                onTap: () {
+                  _handleCompleteTask(task);
+                  Navigator.pop(context);
+                },
               ),
             ],
           ),
@@ -807,32 +741,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   ),
                   const SizedBox(height: 24),
                   // Release button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _handleReviewTask(task, reviewRating);
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.emerald,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        shadowColor: AppColors.emerald.withOpacity(0.2),
-                      ),
-                      child: const Text(
-                        'RELEASE PAYMENT',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ),
+                  PrimaryActionButton(
+                    label: 'RELEASE PAYMENT',
+                    onTap: () {
+                      _handleReviewTask(task, reviewRating);
+                      Navigator.pop(context);
+                    },
                   ),
                 ],
               ),
@@ -917,26 +831,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Container(
+                        TagPill(
+                          label: currentItem.category.toUpperCase(),
+                          fontSize: 9,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
                             vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.2),
-                            ),
-                          ),
-                          child: Text(
-                            currentItem.category.toUpperCase(),
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
                           ),
                         ),
                       ],
@@ -963,7 +863,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                           top: -20,
                           right: -20,
                           child: Icon(
-                            _getIconForTaskType(currentItem.iconType),
+                            getIconForTaskType(currentItem.iconType),
                             size: 160,
                             color: Colors.white.withOpacity(0.03),
                           ),
@@ -1006,7 +906,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(
-                                          _getIconForTaskType(
+                                          getIconForTaskType(
                                             currentItem.iconType,
                                           ),
                                           size: 12,
@@ -1176,91 +1076,14 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   }
 
   Widget _buildTaskStats() {
-    final views =
-        '${10 + widget.postId.hashCode % 90}.${widget.postId.hashCode % 9}k';
+    final viewCount = 10000 + (widget.postId.hashCode % 90000).abs();
     final viewing = 12 + (widget.postId.hashCode % 40).abs();
 
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.glassTint,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.glassBorder),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  PhosphorIconsRegular.eye,
-                  size: 14,
-                  color: AppColors.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  views,
-                  style: const TextStyle(
-                    color: AppColors.onSurfaceVariant,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: AppColors.emerald,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.emerald.withOpacity(0.6),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$viewing',
-                  style: const TextStyle(
-                    color: AppColors.emerald,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: ViewStatsBadge(viewCount: viewCount, viewingNow: viewing),
     );
   }
-
-  IconData _getIconForTaskType(TaskIconType type) => switch (type) {
-    TaskIconType.palette => PhosphorIconsRegular.palette,
-    TaskIconType.code => PhosphorIconsRegular.code,
-    TaskIconType.car => PhosphorIconsRegular.car,
-    TaskIconType.truck => PhosphorIconsRegular.truck,
-    TaskIconType.writing => PhosphorIconsRegular.pencilSimple,
-    TaskIconType.repair => PhosphorIconsRegular.wrench,
-    TaskIconType.package => PhosphorIconsRegular.package,
-    TaskIconType.location => PhosphorIconsRegular.mapPin,
-  };
 
   Widget _buildEmptyState(FeedItem item, bool isCreator) {
     final isTask = item is TaskData;
@@ -1812,25 +1635,13 @@ class _DetailHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     // Type badge
-                    Chip(
-                      label: Text(contentType),
-                      labelStyle: const TextStyle(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                      ),
-                      backgroundColor: Colors.white.withOpacity(0.05),
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                    TagPill.ghost(
+                      label: contentType,
+                      fontSize: 9,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
                         vertical: 0,
                       ),
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ],
                 ),
@@ -1857,68 +1668,9 @@ class _DetailHeader extends StatelessWidget {
   }
 
   Widget _buildStats() {
-    final views =
-        '${(10 + title.hashCode % 90).abs()}.${(title.hashCode % 9).abs()}k';
+    final viewCount = 10000 + (title.hashCode % 90000).abs();
     final viewing = 12 + (title.hashCode % 40).abs();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            PhosphorIconsRegular.eye,
-            size: 14,
-            color: AppColors.onSurfaceVariant,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            views,
-            style: const TextStyle(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 4,
-            height: 4,
-            decoration: const BoxDecoration(
-              color: Colors.white24,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: AppColors.emerald,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.emerald.withOpacity(0.6),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '$viewing',
-            style: const TextStyle(
-              color: AppColors.emerald,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
+    return ViewStatsBadge(viewCount: viewCount, viewingNow: viewing);
   }
 }

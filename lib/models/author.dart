@@ -1,36 +1,15 @@
-/// Author model ported from React domain type
-class Author {
-  final String name;
-  final String handle;
-  final String avatar;
-  final bool verified;
-  final int? karma;
-  final bool isOnline;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const Author({
-    required this.name,
-    required this.handle,
-    required this.avatar,
-    this.verified = false,
-    this.karma,
-    this.isOnline = false,
-  });
+part 'author.freezed.dart';
 
-  Author copyWith({
-    String? name,
-    String? handle,
-    String? avatar,
-    bool? verified,
+@freezed
+abstract class Author with _$Author {
+  const factory Author({
+    required String name,
+    required String handle,
+    required String avatar,
+    @Default(false) bool verified,
     int? karma,
-    bool? isOnline,
-  }) {
-    return Author(
-      name: name ?? this.name,
-      handle: handle ?? this.handle,
-      avatar: avatar ?? this.avatar,
-      verified: verified ?? this.verified,
-      karma: karma ?? this.karma,
-      isOnline: isOnline ?? this.isOnline,
-    );
-  }
+    @Default(false) bool isOnline,
+  }) = _Author;
 }

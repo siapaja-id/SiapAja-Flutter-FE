@@ -6,24 +6,26 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
+import '../../../shared/models/nav_item.dart';
 import '../providers.dart';
 
-// ---------------------------------------------------------------------------
-// Navigation item data
-// ---------------------------------------------------------------------------
-
-class _NavItem {
-  final IconData icon;
-  final String label;
-  final String route;
-  const _NavItem(this.icon, this.label, this.route);
-}
-
 const _navItems = [
-  _NavItem(PhosphorIconsRegular.house, 'Home', '/'),
-  _NavItem(PhosphorIconsRegular.magnifyingGlass, 'Explore', '/explore'),
-  _NavItem(PhosphorIconsRegular.chatCircle, 'Messages', '/messages'),
-  _NavItem(PhosphorIconsRegular.clipboardText, 'Orders', '/orders'),
+  NavItem(icon: PhosphorIconsRegular.house, label: 'Home', route: '/'),
+  NavItem(
+    icon: PhosphorIconsRegular.magnifyingGlass,
+    label: 'Explore',
+    route: '/explore',
+  ),
+  NavItem(
+    icon: PhosphorIconsRegular.chatCircle,
+    label: 'Messages',
+    route: '/messages',
+  ),
+  NavItem(
+    icon: PhosphorIconsRegular.clipboardText,
+    label: 'Orders',
+    route: '/orders',
+  ),
 ];
 
 // ---------------------------------------------------------------------------
@@ -69,17 +71,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.primary.withOpacity(0.04),
-                      AppColors.indigo.withOpacity(0.03),
-                      AppColors.emerald.withOpacity(0.02),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.3, 0.6, 1.0],
-                  ),
+                  gradient: AppTheme.backgroundGradient,
                 ),
               ),
             ),

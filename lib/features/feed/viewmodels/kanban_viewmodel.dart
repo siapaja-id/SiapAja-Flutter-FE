@@ -1,20 +1,16 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../models/kanban_column.dart';
 
-/// Kanban state for desktop layout
-class KanbanState {
-  final List<KanbanColumn> columns;
-  final bool isDesktop;
+part 'kanban_viewmodel.freezed.dart';
 
-  const KanbanState({required this.columns, this.isDesktop = false});
-
-  KanbanState copyWith({List<KanbanColumn>? columns, bool? isDesktop}) {
-    return KanbanState(
-      columns: columns ?? this.columns,
-      isDesktop: isDesktop ?? this.isDesktop,
-    );
-  }
+@freezed
+abstract class KanbanState with _$KanbanState {
+  const factory KanbanState({
+    required List<KanbanColumn> columns,
+    @Default(false) bool isDesktop,
+  }) = _KanbanState;
 }
 
 /// Kanban Notifier — manages desktop kanban columns
@@ -29,7 +25,6 @@ class KanbanNotifier extends Notifier<KanbanState> {
     );
   }
 
-  /// Open a new column. If sourceId is provided, inserts after that column.
   void openColumn(
     String path, {
     String? sourceId,
@@ -56,7 +51,6 @@ class KanbanNotifier extends Notifier<KanbanState> {
     state = state.copyWith(columns: [...state.columns, newCol]);
   }
 
-  /// Close a column by id. First column (index 0) cannot be removed.
   void closeColumn(String id) {
     final index = state.columns.indexWhere((c) => c.id == id);
     if (index == 0) return;
@@ -65,7 +59,6 @@ class KanbanNotifier extends Notifier<KanbanState> {
     );
   }
 
-  /// Set column width, clamped to [320, 800].
   void setColumnWidth(String id, double width) {
     final clamped = width.clamp(320.0, 800.0);
     state = state.copyWith(
@@ -76,12 +69,10 @@ class KanbanNotifier extends Notifier<KanbanState> {
     );
   }
 
-  /// Update desktop flag.
   void setIsDesktop(bool isDesktop) {
     state = state.copyWith(isDesktop: isDesktop);
   }
 
-  /// Set per-column active tab.
   void setColumnActiveTab(String columnId, int tab) {
     state = state.copyWith(
       columns: state.columns.map((c) {
@@ -97,7 +88,6 @@ class KanbanNotifier extends Notifier<KanbanState> {
   }
 }
 
-/// Kanban provider
 final kanbanProvider = NotifierProvider<KanbanNotifier, KanbanState>(
   () => KanbanNotifier(),
 );

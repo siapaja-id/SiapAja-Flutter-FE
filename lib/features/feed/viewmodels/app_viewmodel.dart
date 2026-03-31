@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../models/author.dart';
 
-// ---------------------------------------------------------------------------
-// Mock current user
-// ---------------------------------------------------------------------------
+part 'app_viewmodel.freezed.dart';
 
 const _mockCurrentUser = Author(
   name: 'You',
@@ -15,36 +14,14 @@ const _mockCurrentUser = Author(
   isOnline: true,
 );
 
-// ---------------------------------------------------------------------------
-// UI State — active tab, current user, bar visibility
-// ---------------------------------------------------------------------------
-
-class UiState {
-  final int activeTab;
-  final Author? currentUser;
-  final bool headerVisible;
-  final bool bottomNavVisible;
-
-  const UiState({
-    this.activeTab = 0,
-    this.currentUser,
-    this.headerVisible = true,
-    this.bottomNavVisible = true,
-  });
-
-  UiState copyWith({
-    int? activeTab,
+@freezed
+abstract class UiState with _$UiState {
+  const factory UiState({
+    @Default(0) int activeTab,
     Author? currentUser,
-    bool? headerVisible,
-    bool? bottomNavVisible,
-  }) {
-    return UiState(
-      activeTab: activeTab ?? this.activeTab,
-      currentUser: currentUser ?? this.currentUser,
-      headerVisible: headerVisible ?? this.headerVisible,
-      bottomNavVisible: bottomNavVisible ?? this.bottomNavVisible,
-    );
-  }
+    @Default(true) bool headerVisible,
+    @Default(true) bool bottomNavVisible,
+  }) = _UiState;
 }
 
 class UiStateNotifier extends Notifier<UiState> {

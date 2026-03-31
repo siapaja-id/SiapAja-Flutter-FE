@@ -53,22 +53,11 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Background gradient (matches MainShell)
           Positioned.fill(
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.primary.withOpacity(0.04),
-                      AppColors.indigo.withOpacity(0.03),
-                      AppColors.emerald.withOpacity(0.02),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.3, 0.6, 1.0],
-                  ),
+                  gradient: AppTheme.backgroundGradient,
                 ),
               ),
             ),

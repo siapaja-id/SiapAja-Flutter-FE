@@ -1,13 +1,18 @@
 import 'dart:ui';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/utils/task_icons.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/media_carousel.dart';
 import '../../../shared/widgets/post_actions.dart';
+import '../../../shared/widgets/pulsing_dot.dart';
+import '../../../shared/widgets/tag_pill.dart';
+import '../../../shared/widgets/voice_note_player.dart';
+import '../../../shared/widgets/map_preview.dart';
+import '../widgets/base_feed_card.dart';
 
 /// Full task detail view — matches React TaskMainContent.Component.tsx exactly.
 class TaskMainContent extends StatefulWidget {
@@ -47,11 +52,21 @@ class _TaskMainContentState extends State<TaskMainContent> {
           const SizedBox(height: 24),
 
           if (data.isFirstPost == true) ...[
-            _buildFirstPostBadge(),
+            const FirstItemBadge(
+              label: 'First Post',
+              bgColor: Color(0xFF10B981),
+              fgColor: Colors.black,
+              dotColor: Colors.black,
+            ),
             const SizedBox(height: 16),
           ],
           if (data.isFirstTask == true) ...[
-            _buildFirstTaskBadge(),
+            const FirstItemBadge(
+              label: 'First Task',
+              bgColor: AppColors.primary,
+              fgColor: AppColors.primaryForeground,
+              dotColor: AppColors.primaryForeground,
+            ),
             const SizedBox(height: 16),
           ],
           _buildInfoPill(context),
@@ -218,86 +233,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
       TaskStatus.completed => 'Completed',
       TaskStatus.finished => 'Finished',
     };
-
-    // React: TagBadge variant="primary" className="mt-1 shadow-sm px-2 py-0.5 text-[10px]"
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 2),
-        ],
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: AppColors.primary,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFirstPostBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.emerald,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: AppColors.emerald.withOpacity(0.5), blurRadius: 15),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _PulsingDot(color: Colors.black, size: 6),
-          const SizedBox(width: 6),
-          const Text(
-            'First Post',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFirstTaskBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.5), blurRadius: 15),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _PulsingDot(color: AppColors.primaryForeground, size: 6),
-          const SizedBox(width: 6),
-          const Text(
-            'First Task',
-            style: TextStyle(
-              color: AppColors.primaryForeground,
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
-      ),
-    );
+    return TagPill(label: label);
   }
 
   Widget _buildInfoPill(BuildContext context) {
@@ -323,7 +259,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
             ),
             child: Center(
               child: Icon(
-                _getIconForTaskType(data.iconType),
+                getIconForTaskType(data.iconType),
                 size: 12,
                 color: AppColors.primary,
               ),
@@ -684,7 +620,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                                     ),
                                   ],
                                 ),
-                                child: const _PulsingDot(
+                                child: const PulsingDot(
                                   color: AppColors.emerald,
                                   size: 14,
                                 ),
@@ -946,359 +882,21 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  // React: flex items-center gap-4 p-4 bg-gradient-to-r from-surface-container-high to-surface-container
-  //        rounded-[24px] border border-white/5 shadow-lg
-  //        play button: w-12 h-12 rounded-full bg-primary, play triangle
-  //        progress: h-2 bg-white/10 rounded-full, h-full bg-primary w-1/3, thumb dot
-  //        times: 0:12 and voiceNote duration
   Widget _buildVoiceNoteModule() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.surfaceContainerHigh, AppColors.surfaceContainer],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Play button
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
-                  blurRadius: 20,
-                ),
-              ],
-            ),
-            child: const Center(
-              child: Icon(
-                PhosphorIconsFill.play,
-                size: 20,
-                color: AppColors.primaryForeground,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Progress bar + times
-          Expanded(
-            child: Column(
-              children: [
-                // Progress track
-                Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Stack(
-                    children: [
-                      FractionallySizedBox(
-                        widthFactor: 0.33,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      // Thumb dot
-                      const Positioned(
-                        right: -4,
-                        top: -2,
-                        child: SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(color: Colors.black26, blurRadius: 4),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 6),
-                // Times
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '0:12',
-                      style: TextStyle(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    Text(
-                      data.voiceNote ?? '0:00',
-                      style: const TextStyle(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    return VoiceNotePlayer(duration: data.voiceNote ?? '0:00');
   }
 
   Widget _buildMapPreview(BuildContext context) {
-    // React: rounded-[24px], route details with pickup/dropoff, "Navigate via Google Maps" button, "OSRM Routed" badge
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Column(
-          children: [
-            // Map image
-            SizedBox(
-              height: 160,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CachedNetworkImage(
-                    imageUrl: data.mapUrl!,
-                    fit: BoxFit.cover,
-                    color: Colors.grey.withOpacity(0.2),
-                    colorBlendMode: BlendMode.saturation,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.transparent,
-                          AppColors.surfaceContainerHigh.withOpacity(1),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // OSRM Routed badge
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _PulsingDot(color: AppColors.emerald, size: 8),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'OSRM ROUTED',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Route details
-            Container(
-              padding: const EdgeInsets.all(20),
-              color: AppColors.surfaceContainerHigh,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Pickup/dropoff indicators
-                      Column(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.primary,
-                                width: 2,
-                              ),
-                              color: AppColors.background,
-                            ),
-                          ),
-                          Container(
-                            width: 2,
-                            height: 32,
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.emerald,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.emerald.withOpacity(0.5),
-                                  blurRadius: 10,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            _buildRoutePoint(
-                              'PICKUP POINT',
-                              'Downtown Hub (37.7749 N, 122.4194 W)',
-                            ),
-                            const SizedBox(height: 12),
-                            _buildRoutePoint(
-                              'DROPOFF POINT',
-                              'Midtown Square (37.7833 N, 122.4167 W)',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Navigate button
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primary.withOpacity(0.2),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          PhosphorIconsRegular.navigationArrow,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Navigate via Google Maps',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Icon(
-                          PhosphorIconsRegular.arrowSquareOut,
-                          size: 14,
-                          color: AppColors.primary,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoutePoint(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.onSurfaceVariant.withOpacity(0.7),
-            fontSize: 9,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(
-            color: AppColors.onSurface,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
-    );
+    return MapPreview(mapUrl: data.mapUrl!);
   }
 
   Widget _buildTags(BuildContext context) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: data.tags!.map((tag) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Text(
-            '#${tag.toUpperCase()}',
-            style: const TextStyle(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.5,
-            ),
-          ),
-        );
-      }).toList(),
+      children: data.tags!
+          .map((tag) => TagPill.ghost(label: '#${tag.toUpperCase()}'))
+          .toList(),
     );
   }
 
@@ -1340,34 +938,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
           shares: data.shares,
         ),
       ],
-    );
-  }
-
-  IconData _getIconForTaskType(TaskIconType type) => switch (type) {
-    TaskIconType.palette => PhosphorIconsRegular.palette,
-    TaskIconType.code => PhosphorIconsRegular.code,
-    TaskIconType.car => PhosphorIconsRegular.car,
-    TaskIconType.truck => PhosphorIconsRegular.truck,
-    TaskIconType.writing => PhosphorIconsRegular.pencilSimple,
-    TaskIconType.repair => PhosphorIconsRegular.wrench,
-    TaskIconType.package => PhosphorIconsRegular.package,
-    TaskIconType.location => PhosphorIconsRegular.mapPin,
-  };
-}
-
-/// Static dot indicator (no continuous animation).
-class _PulsingDot extends StatelessWidget {
-  final Color color;
-  final double size;
-
-  const _PulsingDot({required this.color, this.size = 8});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

@@ -1,35 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../models/feed_item.dart';
 import '../data/sample_data.dart';
 
-/// Feed state for managing feed items list
-class FeedState {
-  final List<FeedItem> feedItems;
-  final bool isLoading;
-  final int? lastUpdated;
-  final Map<String, List<FeedItem>> replies;
+part 'feed_viewmodel.freezed.dart';
 
-  const FeedState({
-    required this.feedItems,
-    this.isLoading = false,
-    this.lastUpdated,
-    this.replies = const {},
-  });
-
-  FeedState copyWith({
-    List<FeedItem>? feedItems,
-    bool? isLoading,
+@freezed
+abstract class FeedState with _$FeedState {
+  const factory FeedState({
+    required List<FeedItem> feedItems,
+    @Default(false) bool isLoading,
     int? lastUpdated,
-    Map<String, List<FeedItem>>? replies,
-  }) {
-    return FeedState(
-      feedItems: feedItems ?? this.feedItems,
-      isLoading: isLoading ?? this.isLoading,
-      lastUpdated: lastUpdated ?? this.lastUpdated,
-      replies: replies ?? this.replies,
-    );
-  }
+    @Default({}) Map<String, List<FeedItem>> replies,
+  }) = _FeedState;
 }
 
 /// Feed Notifier - manages feed items state
@@ -44,7 +28,6 @@ class FeedNotifier extends Notifier<FeedState> {
     );
   }
 
-  /// Get a feed item by id from the main list or replies
   FeedItem? getItemById(String id) {
     for (final item in state.feedItems) {
       if (item.id == id) return item;
@@ -57,7 +40,6 @@ class FeedNotifier extends Notifier<FeedState> {
     return null;
   }
 
-  /// Add a new feed item
   void addFeedItem(FeedItem item) {
     state = state.copyWith(
       feedItems: [item, ...state.feedItems],
@@ -65,7 +47,6 @@ class FeedNotifier extends Notifier<FeedState> {
     );
   }
 
-  /// Update a feed item using copyWith
   void updateFeedItem(String id, FeedItem updated) {
     state = state.copyWith(
       feedItems: state.feedItems.map((item) {
@@ -76,7 +57,6 @@ class FeedNotifier extends Notifier<FeedState> {
     );
   }
 
-  /// Remove a feed item
   void removeFeedItem(String id) {
     state = state.copyWith(
       feedItems: state.feedItems.where((item) => item.id != id).toList(),
@@ -84,7 +64,6 @@ class FeedNotifier extends Notifier<FeedState> {
     );
   }
 
-  /// Refresh the feed
   void refreshFeed() {
     state = FeedState(
       feedItems: sampleData,
@@ -94,19 +73,16 @@ class FeedNotifier extends Notifier<FeedState> {
     );
   }
 
-  /// Set loading state
   void setLoading(bool loading) {
     state = state.copyWith(isLoading: loading);
   }
 
-  /// Set replies for a parent post
   void setReplies(String parentId, List<FeedItem> items) {
     final newReplies = Map<String, List<FeedItem>>.from(state.replies);
     newReplies[parentId] = items;
     state = state.copyWith(replies: newReplies);
   }
 
-  /// Add a reply to a parent post
   void addReply(String parentId, FeedItem item) {
     final newReplies = Map<String, List<FeedItem>>.from(state.replies);
     final existing = newReplies[parentId] ?? [];
@@ -114,7 +90,6 @@ class FeedNotifier extends Notifier<FeedState> {
     state = state.copyWith(replies: newReplies);
   }
 
-  /// Update a reply within a parent's reply list
   void updateReply(String parentId, String replyId, FeedItem updated) {
     final newReplies = Map<String, List<FeedItem>>.from(state.replies);
     final existing = newReplies[parentId];
@@ -127,7 +102,6 @@ class FeedNotifier extends Notifier<FeedState> {
   }
 }
 
-/// Feed notifier provider
 final feedNotifierProvider = NotifierProvider<FeedNotifier, FeedState>(
   () => FeedNotifier(),
 );
