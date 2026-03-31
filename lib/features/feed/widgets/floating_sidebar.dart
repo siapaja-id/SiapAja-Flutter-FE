@@ -262,6 +262,7 @@ class _NavButton extends StatelessWidget {
                     : null,
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: expanded
                     ? MainAxisAlignment.start
                     : MainAxisAlignment.center,

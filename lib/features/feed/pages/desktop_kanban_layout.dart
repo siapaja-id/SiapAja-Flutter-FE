@@ -46,8 +46,7 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final kanbanState = ref.watch(kanbanProvider);
-    final columns = kanbanState.columns;
+    final columns = ref.watch(kanbanProvider.select((s) => s.columns));
 
     return Scaffold(
       backgroundColor: AppColors.background,

@@ -217,9 +217,9 @@ class BaseFeedCard extends ConsumerWidget {
               .openColumn(path, sourceId: kanbanCtx.columnId);
         } else {
           if (data is TaskData) {
-            context.go('/task/${data.id}');
+            context.push('/task/${data.id}');
           } else {
-            context.go('/post/${data.id}');
+            context.push('/post/${data.id}');
           }
         }
       },

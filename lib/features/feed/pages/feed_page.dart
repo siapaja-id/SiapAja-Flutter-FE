@@ -267,9 +267,11 @@ class _KanbanFeedHeaderState extends ConsumerState<_KanbanFeedHeader>
                   isOnline: true,
                 ),
               ),
-              _TabBar(
-                activeIndex: widget.activeTab,
-                onIndexChanged: (i) => _tabController.animateTo(i),
+              Flexible(
+                child: _TabBar(
+                  activeIndex: widget.activeTab,
+                  onIndexChanged: (i) => _tabController.animateTo(i),
+                ),
               ),
               GestureDetector(
                 onTap: () => ref
@@ -413,9 +415,11 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
                     isOnline: true,
                   ),
                 ),
-                _TabBar(
-                  activeIndex: activeTab,
-                  onIndexChanged: (i) => _tabController.animateTo(i),
+                Flexible(
+                  child: _TabBar(
+                    activeIndex: activeTab,
+                    onIndexChanged: (i) => _tabController.animateTo(i),
+                  ),
                 ),
                 GestureDetector(
                   onTap: () {},
