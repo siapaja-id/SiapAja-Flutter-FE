@@ -1,17 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
+import '../settings_provider.dart';
 import '../widgets/pulsing_dot.dart';
 
-class MapPreview extends StatelessWidget {
+class MapPreview extends ConsumerWidget {
   final String mapUrl;
 
   const MapPreview({super.key, required this.mapUrl});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -63,17 +66,18 @@ class MapPreview extends StatelessWidget {
                           color: Colors.white.withOpacity(0.1),
                         ),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          PulsingDot(color: AppColors.emerald, size: 8),
-                          SizedBox(width: 6),
+                          const PulsingDot(color: AppColors.emerald, size: 8),
+                          const SizedBox(width: 6),
                           Text(
                             'OSRM ROUTED',
-                            style: TextStyle(
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2xs,
                               color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
+                              weight: FontWeight.w900,
                               letterSpacing: 1.5,
                             ),
                           ),
@@ -155,25 +159,26 @@ class MapPreview extends StatelessWidget {
                         color: AppColors.primary.withOpacity(0.2),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           PhosphorIconsRegular.navigationArrow,
                           size: 16,
                           color: AppColors.primary,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'Navigate via Google Maps',
-                          style: TextStyle(
+                          style: AppTheme.scaled(
+                            textSize: textSize,
+                            multiplier: AppTheme.mbase,
                             color: AppColors.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
+                            weight: FontWeight.w900,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Icon(
+                        const SizedBox(width: 8),
+                        const Icon(
                           PhosphorIconsRegular.arrowSquareOut,
                           size: 14,
                           color: AppColors.primary,
@@ -191,33 +196,36 @@ class MapPreview extends StatelessWidget {
   }
 }
 
-class _RoutePoint extends StatelessWidget {
+class _RoutePoint extends ConsumerWidget {
   final String label;
   final String value;
 
   const _RoutePoint({required this.label, required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: AppTheme.scaled(
+            textSize: textSize,
+            multiplier: AppTheme.m2xs,
             color: AppColors.onSurfaceVariant.withOpacity(0.7),
-            fontSize: 9,
-            fontWeight: FontWeight.w900,
+            weight: FontWeight.w900,
             letterSpacing: 2,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
+          style: AppTheme.scaled(
+            textSize: textSize,
+            multiplier: AppTheme.m13,
             color: AppColors.onSurface,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
+            weight: FontWeight.w700,
           ),
         ),
       ],

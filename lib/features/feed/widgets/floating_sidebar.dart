@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../providers.dart';
 
@@ -21,6 +22,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.read(uiStateProvider).currentUser;
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
 
     final navItems = [
       const NavItem(
@@ -57,6 +59,11 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
         label: 'Profile',
         route: '/profile',
       ),
+      const NavItem(
+        icon: PhosphorIconsRegular.gearSix,
+        label: 'Settings',
+        route: '/settings',
+      ),
     ];
 
     return AnimatedContainer(
@@ -79,7 +86,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
             child: Column(
               children: [
                 const SizedBox(height: 24),
-                // Toggle button
                 GestureDetector(
                   onTap: () => setState(() => _expanded = !_expanded),
                   child: Padding(
@@ -101,12 +107,12 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Nav items
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: navItems.map((item) {
                       return _NavButton(
+                        textSize: textSize,
                         item: item,
                         expanded: _expanded,
                         onTap: () {
@@ -123,7 +129,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                   ),
                 ),
                 const Spacer(),
-                // User card
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: GestureDetector(
@@ -171,18 +176,20 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                                 children: [
                                   Text(
                                     currentUser?.name ?? 'You',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                                    style: AppTheme.scaled(
+                                      textSize: textSize,
+                                      multiplier: AppTheme.mxs,
+                                      weight: FontWeight.bold,
                                       color: AppColors.onSurface,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
                                     '${currentUser?.karma ?? 98} karma',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
+                                    style: AppTheme.scaled(
+                                      textSize: textSize,
+                                      multiplier: AppTheme.m2sm,
+                                      weight: FontWeight.w900,
                                       color: Color(0xFF34D399),
                                     ),
                                   ),
@@ -206,11 +213,13 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
 }
 
 class _NavButton extends StatelessWidget {
+  final TextSize textSize;
   final NavItem item;
   final bool expanded;
   final VoidCallback onTap;
 
   const _NavButton({
+    required this.textSize,
     required this.item,
     required this.expanded,
     required this.onTap,
@@ -268,9 +277,10 @@ class _NavButton extends StatelessWidget {
                       duration: const Duration(milliseconds: 200),
                       child: Text(
                         item.label,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                        style: AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.mbase,
+                          weight: FontWeight.bold,
                           letterSpacing: 0.5,
                           color: item.isPrimary
                               ? AppColors.primaryForeground

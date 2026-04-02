@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 
 // ---------------------------------------------------------------------------
@@ -157,6 +158,7 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
 
   @override
   Widget build(BuildContext context) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final hasContent =
         _isFocused ||
         _textController.text.isNotEmpty ||
@@ -207,11 +209,12 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.zero,
                             ),
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: AppColors.onSurface,
-                                  height: 1.5,
-                                ),
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2xl,
+                              color: AppColors.onSurface,
+                              height: 1.8,
+                            ),
                             onTap: () => setState(() => _isFocused = true),
                           ),
                           AnimatedSize(
@@ -440,6 +443,15 @@ class _FullscreenComposerSheet extends StatefulWidget {
 class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
   @override
   Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+        return _buildContent(context, textSize);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, TextSize textSize) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: BackdropFilter(
@@ -530,21 +542,22 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                             decoration: InputDecoration(
                               hintText:
                                   'What do you need help with? Describe your task in detail...',
-                              hintStyle: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: AppColors.onSurfaceVariant
-                                        .withOpacity(0.4),
-                                    fontSize: 20,
-                                  ),
+                              hintStyle: AppTheme.scaled(
+                                textSize: textSize,
+                                multiplier: AppTheme.m2xl,
+                                color: AppColors.onSurfaceVariant.withOpacity(
+                                  0.4,
+                                ),
+                              ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.zero,
                             ),
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: AppColors.onSurface,
-                                  height: 1.8,
-                                  fontSize: 20,
-                                ),
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2xl,
+                              color: AppColors.onSurface,
+                              height: 1.8,
+                            ),
                             autofocus: true,
                           ),
                           if (widget.attachments.isNotEmpty)

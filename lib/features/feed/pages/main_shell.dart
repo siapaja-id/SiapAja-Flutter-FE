@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../providers.dart';
 
 const _navItems = [
@@ -61,6 +62,7 @@ class _MainShellState extends ConsumerState<MainShell> {
     final bottomNavVisible = ref.watch(
       uiStateProvider.select((s) => s.bottomNavVisible),
     );
+    final themeColor = ref.watch(settingsProvider.select((s) => s.themeColor));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,7 +73,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             child: IgnorePointer(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: AppTheme.backgroundGradient,
+                  gradient: AppTheme.backgroundGradient(themeColor),
                 ),
               ),
             ),

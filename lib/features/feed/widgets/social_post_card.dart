@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
@@ -33,6 +34,7 @@ class SocialPostCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final currentUserHandle = ref.watch(
       uiStateProvider.select((s) => s.currentUser?.handle),
     );
@@ -105,9 +107,10 @@ class SocialPostCard extends ConsumerWidget {
         if (isParent)
           Text(
             data.content,
-            style: const TextStyle(
+            style: AppTheme.scaled(
+              textSize: textSize,
+              multiplier: AppTheme.m13,
               color: AppColors.onSurface,
-              fontSize: 13,
               height: 1.5,
             ),
             maxLines: 1,
@@ -117,11 +120,19 @@ class SocialPostCard extends ConsumerWidget {
           ExpandableText(
             text: data.content,
             limit: isMain ? 280 : 160,
-            style: TextStyle(
-              color: AppColors.onSurface.withOpacity(0.9),
-              fontSize: isMain ? 16 : 13,
-              height: 1.5,
-            ),
+            style: isMain
+                ? AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.mlg,
+                    color: AppColors.onSurface.withOpacity(0.9),
+                    height: 1.5,
+                  )
+                : AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.m13,
+                    color: AppColors.onSurface.withOpacity(0.9),
+                    height: 1.5,
+                  ),
             suffix: data.threadCount != null && data.threadCount! > 1
                 ? Container(
                     padding: const EdgeInsets.symmetric(
@@ -137,10 +148,11 @@ class SocialPostCard extends ConsumerWidget {
                     ),
                     child: Text(
                       '${data.threadIndex}/${data.threadCount}',
-                      style: const TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.m2xs,
                         color: AppColors.primary,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
+                        weight: FontWeight.w800,
                         letterSpacing: 2,
                       ),
                     ),
@@ -230,20 +242,22 @@ class SocialPostCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             '0:12',
-                            style: TextStyle(
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2sm,
                               color: AppColors.onSurfaceVariant,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                              weight: FontWeight.w500,
                             ),
                           ),
                           Text(
                             data.voiceNote!,
-                            style: const TextStyle(
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2sm,
                               color: AppColors.onSurfaceVariant,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                              weight: FontWeight.w500,
                             ),
                           ),
                         ],

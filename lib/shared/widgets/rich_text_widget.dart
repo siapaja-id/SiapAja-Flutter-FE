@@ -1,37 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
+import '../settings_provider.dart';
 
 /// Rich text widget — matches React `RichText` + `SpoilerText` + `RichLinkAnchor` + `LinkPreviewNode`
-class RichTextWidget extends StatefulWidget {
+class RichTextWidget extends ConsumerWidget {
   final String text;
   final TextStyle? baseStyle;
 
   const RichTextWidget({super.key, required this.text, this.baseStyle});
 
   @override
-  State<RichTextWidget> createState() => _RichTextWidgetState();
-}
-
-class _RichTextWidgetState extends State<RichTextWidget> {
-  List<InlineSpan>? _cachedSpans;
-  String? _cachedText;
-
-  @override
-  Widget build(BuildContext context) {
-    if (_cachedSpans == null || _cachedText != widget.text) {
-      _cachedText = widget.text;
-      _cachedSpans = _parseText(widget.text);
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+    final cachedSpans = _parseText(text, textSize);
     return RichText(
       text: TextSpan(
         style:
-            widget.baseStyle ??
+            baseStyle ??
             Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.onSurface,
               height: 1.5,
             ),
-        children: _cachedSpans!,
+        children: cachedSpans,
       ),
     );
   }
@@ -39,7 +31,7 @@ class _RichTextWidgetState extends State<RichTextWidget> {
   /// Sequential regex parsing — same order as React `applyRegex`.
   /// Each regex only processes remaining string nodes, so already-parsed
   /// WidgetSpans are left untouched.
-  List<InlineSpan> _parseText(String text) {
+  List<InlineSpan> _parseText(String text, TextSize textSize) {
     List<InlineSpan> nodes = [TextSpan(text: text)];
 
     List<InlineSpan> _applyRegex(
@@ -65,7 +57,7 @@ class _RichTextWidgetState extends State<RichTextWidget> {
     );
 
     // 2. URLs
-    nodes = _applyRegex(RegExp(r'(https?://[^\s]+)'), _buildLink);
+    nodes = _applyRegex(RegExp(r'(https?://[^\s]+)'), (url) => _buildLink(url, textSize));
 
     // 3. @mentions
     nodes = _applyRegex(RegExp(r'(@[a-zA-Z0-9_]+)'), _buildMention);
@@ -100,7 +92,7 @@ class _RichTextWidgetState extends State<RichTextWidget> {
   // Link — matches React `RichLinkAnchor` pill styling
   // -----------------------------------------------------------------------
 
-  InlineSpan _buildLink(String url) {
+  InlineSpan _buildLink(String url, TextSize textSize) {
     final displayUrl = url.replaceFirst(RegExp(r'^https?://'), '');
     return WidgetSpan(
       alignment: PlaceholderAlignment.baseline,
@@ -121,9 +113,10 @@ class _RichTextWidgetState extends State<RichTextWidget> {
               const SizedBox(width: 4),
               Text(
                 displayUrl,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                style: AppTheme.scaled(
+                  textSize: textSize,
+                  multiplier: AppTheme.mxs,
+                  weight: FontWeight.w500,
                   color: AppColors.primary,
                 ),
               ),

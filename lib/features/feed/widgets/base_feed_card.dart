@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/post_actions.dart';
 import '../providers.dart';
@@ -188,6 +189,7 @@ class BaseFeedCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final currentUserHandle = ref.watch(
       uiStateProvider.select((s) => s.currentUser?.handle),
     );
@@ -283,14 +285,15 @@ class BaseFeedCard extends ConsumerWidget {
                                     _isThreadContext || isQuote
                                         ? data.author.name
                                         : data.author.handle,
-                                    style: TextStyle(
-                                      color: AppColors.onSurface,
-                                      fontSize: isParent || isQuote
-                                          ? 12
+                                    style: AppTheme.scaled(
+                                      textSize: textSize,
+                                      multiplier: isParent || isQuote
+                                          ? AppTheme.mxs
                                           : isMain
-                                          ? 15
-                                          : 13,
-                                      fontWeight: FontWeight.w600,
+                                          ? AppTheme.m15
+                                          : AppTheme.m13,
+                                      weight: FontWeight.w600,
+                                      color: AppColors.onSurface,
                                     ),
                                   ),
                                   if (data.author.verified)
@@ -303,9 +306,10 @@ class BaseFeedCard extends ConsumerWidget {
                                       !isParent)
                                     Text(
                                       '@${data.author.handle}',
-                                      style: const TextStyle(
+                                      style: AppTheme.scaled(
+                                        textSize: textSize,
+                                        multiplier: AppTheme.mxs,
                                         color: AppColors.onSurfaceVariant,
-                                        fontSize: 12,
                                       ),
                                     ),
                                   if (isAuthor && !isParent && !isQuote)
@@ -326,12 +330,13 @@ class BaseFeedCard extends ConsumerWidget {
                                           ),
                                         ),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'You',
-                                        style: TextStyle(
+                                        style: AppTheme.scaled(
+                                          textSize: textSize,
+                                          multiplier: AppTheme.m3xs,
                                           color: AppColors.primary,
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.w900,
+                                          weight: FontWeight.w900,
                                           letterSpacing: 2,
                                         ),
                                       ),
@@ -346,13 +351,17 @@ class BaseFeedCard extends ConsumerWidget {
                                     !isAuthor &&
                                     !isParent &&
                                     !isQuote)
-                                  FollowButton(handle: data.author.handle),
+                                  FollowButton(
+                                    handle: data.author.handle,
+                                    textSize: textSize,
+                                  ),
                                 Text(
                                   data.timestamp,
-                                  style: TextStyle(
+                                  style: AppTheme.scaled(
+                                    textSize: textSize,
+                                    multiplier: AppTheme.mxs,
                                     color: AppColors.onSurfaceVariant
                                         .withOpacity(0.6),
-                                    fontSize: 12,
                                   ),
                                 ),
                                 if (!isParent && !isQuote) ...[
@@ -375,7 +384,8 @@ class BaseFeedCard extends ConsumerWidget {
                             (data as SocialPostData).isFirstPost == true &&
                             !isQuote &&
                             !isParent)
-                          const FirstItemBadge(
+                          FirstItemBadge(
+                            textSize: textSize,
                             label: 'First Post',
                             bgColor: Color(0xFF10B981),
                             fgColor: Colors.black,
@@ -385,7 +395,8 @@ class BaseFeedCard extends ConsumerWidget {
                             (data as TaskData).isFirstTask == true &&
                             !isQuote &&
                             !isParent)
-                          const FirstItemBadge(
+                          FirstItemBadge(
+                            textSize: textSize,
                             label: 'First Task',
                             bgColor: AppColors.primary,
                             fgColor: AppColors.primaryForeground,
@@ -414,10 +425,11 @@ class BaseFeedCard extends ConsumerWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
-                                    style: TextStyle(
+                                    style: AppTheme.scaled(
+                                      textSize: textSize,
+                                      multiplier: AppTheme.m1sm,
                                       color: AppColors.primary.withOpacity(0.8),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      weight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
@@ -449,7 +461,8 @@ class BaseFeedCard extends ConsumerWidget {
 
 class FollowButton extends ConsumerWidget {
   final String handle;
-  const FollowButton({super.key, required this.handle});
+  final TextSize textSize;
+  const FollowButton({super.key, required this.handle, required this.textSize});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -484,12 +497,13 @@ class FollowButton extends ConsumerWidget {
             const SizedBox(width: 4),
             Text(
               isFollowing ? 'Following' : 'Follow',
-              style: TextStyle(
+              style: AppTheme.scaled(
+                textSize: textSize,
+                multiplier: AppTheme.m2sm,
                 color: isFollowing
                     ? AppColors.onSurfaceVariant
                     : AppColors.primaryForeground,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+                weight: FontWeight.bold,
                 letterSpacing: 1,
               ),
             ),
@@ -505,6 +519,7 @@ class FollowButton extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 
 class FirstItemBadge extends StatelessWidget {
+  final TextSize textSize;
   final String label;
   final Color bgColor;
   final Color fgColor;
@@ -512,6 +527,7 @@ class FirstItemBadge extends StatelessWidget {
 
   const FirstItemBadge({
     super.key,
+    required this.textSize,
     required this.label,
     required this.bgColor,
     required this.fgColor,
@@ -524,9 +540,10 @@ class FirstItemBadge extends StatelessWidget {
     child: Badge(
       backgroundColor: bgColor,
       textColor: fgColor,
-      textStyle: const TextStyle(
-        fontSize: 9,
-        fontWeight: FontWeight.w900,
+      textStyle: AppTheme.scaled(
+        textSize: textSize,
+        multiplier: AppTheme.m2xs,
+        weight: FontWeight.w900,
         letterSpacing: 2,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

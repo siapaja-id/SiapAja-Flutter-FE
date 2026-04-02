@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/settings_provider.dart';
 import 'base_feed_card.dart';
 import 'glass_card.dart';
 
@@ -9,7 +11,7 @@ import 'glass_card.dart';
 // EditorialCard
 // ---------------------------------------------------------------------------
 
-class EditorialCard extends StatelessWidget {
+class EditorialCard extends ConsumerWidget {
   final EditorialData data;
   final bool isMain;
   final bool isParent;
@@ -28,7 +30,8 @@ class EditorialCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return BaseFeedCard(
       data: data,
       isMain: isMain,
@@ -46,13 +49,14 @@ class EditorialCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'DS',
-                  style: TextStyle(
+                  style: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.m2xs,
                     color: AppColors.onSurfaceVariant,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+                    weight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -61,9 +65,10 @@ class EditorialCard extends StatelessWidget {
         if (isParent)
           Text(
             data.title,
-            style: const TextStyle(
+            style: AppTheme.scaled(
+              textSize: textSize,
+              multiplier: AppTheme.m13,
               color: AppColors.onSurface,
-              fontSize: 13,
               height: 1.5,
             ),
             maxLines: 1,
@@ -76,29 +81,40 @@ class EditorialCard extends StatelessWidget {
               children: [
                 Text(
                   data.tag,
-                  style: const TextStyle(
+                  style: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.m2xs,
                     color: AppColors.primary,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
+                    weight: FontWeight.w800,
                     letterSpacing: 1.08,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   data.title,
-                  style: TextStyle(
-                    color: AppColors.onSurface,
-                    fontSize: isMain ? 18 : 14,
-                    fontWeight: FontWeight.bold,
-                    height: 1.25,
-                  ),
+                  style: isMain
+                      ? AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.mxl,
+                          color: AppColors.onSurface,
+                          weight: FontWeight.bold,
+                          height: 1.25,
+                        )
+                      : AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.mbase,
+                          color: AppColors.onSurface,
+                          weight: FontWeight.bold,
+                          height: 1.25,
+                        ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   data.excerpt,
-                  style: const TextStyle(
+                  style: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.mxs,
                     color: AppColors.onSurfaceVariant,
-                    fontSize: 12,
                     height: 1.5,
                   ),
                   maxLines: 2,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'shared/settings_provider.dart';
+
 /// Design tokens ported from React index.css
 class AppColors {
   AppColors._();
@@ -16,23 +18,15 @@ class AppColors {
   static const Color onSurfaceVariant = Color(0xFFA1A1AA);
   static const Color outlineVariant = Color(0xFF27272A);
 
-  // Shared border / divider opacities (ported from React CSS)
-  static const Color border = Color(0x1AFFFFFF); // 10% white — default border
-  static const Color borderSubtle = Color(
-    0x0DFFFFFF,
-  ); // 5% white — subtle divider
-  static const Color borderHover = Color(0x0AFFFFFF); // 4% white — quote hover
-  static const Color borderQuote = Color(
-    0x05FFFFFF,
-  ); // 2% white — quote bg / thread
-  static const Color overlayDark = Color(
-    0x66121212,
-  ); // 40% dark — feed card hover
+  static const Color border = Color(0x1AFFFFFF);
+  static const Color borderSubtle = Color(0x0DFFFFFF);
+  static const Color borderHover = Color(0x0AFFFFFF);
+  static const Color borderQuote = Color(0x05FFFFFF);
+  static const Color overlayDark = Color(0x66121212);
 
   static const Color primary = Color(0xFFDC2626);
   static const Color primaryForeground = Color(0xFFFFFFFF);
 
-  // Additional colors used in the UI
   static const Color emerald = Color(0xFF10B981);
   static const Color emeraldContainer = Color(0xFF064E3B);
   static const Color orange = Color(0xFFF97316);
@@ -45,37 +39,106 @@ class AppColors {
   static const Color zinc400 = Color(0xFFA1A1AA);
   static const Color zinc300 = Color(0xFFD4D4D8);
 
-  // Glassmorphism tokens
   static const Color glassTint = Color(0x401F1F1F);
   static const Color glassBorder = Color(0x29FFFFFF);
   static const Color glassGlow = Color(0x15FFFFFF);
+
+  static const Map<ThemeColor, Color> themeColors = {
+    ThemeColor.red: Color(0xFFDC2626),
+    ThemeColor.blue: Color(0xFF3B82F6),
+    ThemeColor.emerald: Color(0xFF10B981),
+    ThemeColor.violet: Color(0xFF8B5CF6),
+    ThemeColor.amber: Color(0xFFF59E0B),
+  };
+
+  static const Map<ThemeColor, String> themeColorLabels = {
+    ThemeColor.red: 'Crimson',
+    ThemeColor.blue: 'Ocean',
+    ThemeColor.emerald: 'Emerald',
+    ThemeColor.violet: 'Amethyst',
+    ThemeColor.amber: 'Amber',
+  };
+
+  static Color getPrimary(ThemeColor themeColor) {
+    return themeColors[themeColor] ?? primary;
+  }
 }
 
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get darkTheme {
-    final colorScheme = ColorScheme.dark(
-      background: AppColors.background,
-      surface: AppColors.surface,
-      primary: AppColors.primary,
-      onPrimary: AppColors.primaryForeground,
-      secondary: AppColors.emerald,
-      tertiary: AppColors.indigo,
-      surfaceContainer: AppColors.surfaceContainer,
-      surfaceContainerLow: AppColors.surfaceContainerLow,
-      surfaceContainerLowest: AppColors.surfaceContainerLowest,
-      surfaceContainerHigh: AppColors.surfaceContainerHigh,
-      surfaceContainerHighest: AppColors.surfaceContainerHighest,
-      onSurface: AppColors.onSurface,
-      onSurfaceVariant: AppColors.onSurfaceVariant,
-      outline: AppColors.outlineVariant,
-      outlineVariant: AppColors.outlineVariant,
+  static const double m3xs = 0.571;
+  static const double m2xs = 0.643;
+  static const double m2sm = 0.714;
+  static const double m1sm = 0.786;
+  static const double mxs = 0.857;
+  static const double m13 = 0.929;
+  static const double mbase = 1.0;
+  static const double m15 = 1.071;
+  static const double mlg = 1.143;
+  static const double mxl = 1.286;
+  static const double m2xl = 1.429;
+  static const double m22 = 1.571;
+  static const double m3xl = 1.714;
+  static const double m26 = 1.857;
+  static const double m28 = 2.0;
+
+  static double _baseFontSize(TextSize textSize) {
+    switch (textSize) {
+      case TextSize.sm:
+        return 12;
+      case TextSize.md:
+        return 14;
+      case TextSize.lg:
+        return 16;
+    }
+  }
+
+  static TextStyle scaled({
+    TextSize textSize = TextSize.md,
+    required double multiplier,
+    FontWeight? weight,
+    Color? color,
+    double? letterSpacing,
+    double? height,
+    TextDecoration? decoration,
+  }) {
+    return TextStyle(
+      fontSize: _baseFontSize(textSize) * multiplier,
+      fontWeight: weight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+      decoration: decoration,
     );
+  }
+
+  static ThemeData darkTheme({
+    ThemeColor themeColor = ThemeColor.red,
+    TextSize textSize = TextSize.md,
+  }) {
+    final primary = AppColors.getPrimary(themeColor);
+    final base = _baseFontSize(textSize);
 
     return ThemeData(
       useMaterial3: true,
-      colorScheme: colorScheme,
+      colorScheme: ColorScheme.dark(
+        background: AppColors.background,
+        surface: AppColors.surface,
+        primary: primary,
+        onPrimary: AppColors.primaryForeground,
+        secondary: AppColors.emerald,
+        tertiary: AppColors.indigo,
+        surfaceContainer: AppColors.surfaceContainer,
+        surfaceContainerLow: AppColors.surfaceContainerLow,
+        surfaceContainerLowest: AppColors.surfaceContainerLowest,
+        surfaceContainerHigh: AppColors.surfaceContainerHigh,
+        surfaceContainerHighest: AppColors.surfaceContainerHighest,
+        onSurface: AppColors.onSurface,
+        onSurfaceVariant: AppColors.onSurfaceVariant,
+        outline: AppColors.outlineVariant,
+        outlineVariant: AppColors.outlineVariant,
+      ),
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
@@ -104,7 +167,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: primary),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -112,67 +175,73 @@ class AppTheme {
         ),
         hintStyle: const TextStyle(color: AppColors.onSurfaceVariant),
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         displayLarge: TextStyle(
-          fontSize: 32,
+          fontSize: base * 2.286,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         displayMedium: TextStyle(
-          fontSize: 28,
+          fontSize: base * 2.0,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         displaySmall: TextStyle(
-          fontSize: 24,
+          fontSize: base * 1.714,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         headlineLarge: TextStyle(
-          fontSize: 20,
+          fontSize: base * 1.429,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         headlineMedium: TextStyle(
-          fontSize: 18,
+          fontSize: base * 1.286,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         headlineSmall: TextStyle(
-          fontSize: 16,
+          fontSize: base * 1.143,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         titleLarge: TextStyle(
-          fontSize: 16,
+          fontSize: base * 1.143,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         titleMedium: TextStyle(
-          fontSize: 14,
+          fontSize: base,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         titleSmall: TextStyle(
-          fontSize: 12,
+          fontSize: base * 0.857,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
-        bodyLarge: TextStyle(fontSize: 16, color: AppColors.onSurface),
-        bodyMedium: TextStyle(fontSize: 14, color: AppColors.onSurface),
-        bodySmall: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+        bodyLarge: TextStyle(
+          fontSize: base * 1.143,
+          color: AppColors.onSurface,
+        ),
+        bodyMedium: TextStyle(fontSize: base, color: AppColors.onSurface),
+        bodySmall: TextStyle(
+          fontSize: base * 0.857,
+          color: AppColors.onSurfaceVariant,
+        ),
         labelLarge: TextStyle(
-          fontSize: 14,
+          fontSize: base,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         labelMedium: TextStyle(
-          fontSize: 12,
+          fontSize: base * 0.857,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         labelSmall: TextStyle(
-          fontSize: 11,
+          fontSize: base * 0.786,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurfaceVariant,
         ),
@@ -183,9 +252,9 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: primary,
         unselectedItemColor: AppColors.onSurfaceVariant,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
@@ -193,7 +262,6 @@ class AppTheme {
     );
   }
 
-  // Custom text styles for very small text (used in badges, status labels)
   static const TextStyle labelTiny = TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w500,
@@ -206,15 +274,18 @@ class AppTheme {
     color: AppColors.onSurface,
   );
 
-  static final LinearGradient backgroundGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      AppColors.primary.withOpacity(0.04),
-      AppColors.indigo.withOpacity(0.03),
-      AppColors.emerald.withOpacity(0.02),
-      Colors.transparent,
-    ],
-    stops: const [0.0, 0.3, 0.6, 1.0],
-  );
+  static LinearGradient backgroundGradient(ThemeColor themeColor) {
+    final primary = AppColors.getPrimary(themeColor);
+    return LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        primary.withOpacity(0.04),
+        AppColors.indigo.withOpacity(0.03),
+        AppColors.emerald.withOpacity(0.02),
+        Colors.transparent,
+      ],
+      stops: const [0.0, 0.3, 0.6, 1.0],
+    );
+  }
 }

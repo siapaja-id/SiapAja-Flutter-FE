@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
+import '../settings_provider.dart';
 
-class BottomSheetContainer extends StatelessWidget {
+class BottomSheetContainer extends ConsumerWidget {
   final String title;
   final Widget child;
   final VoidCallback? onClose;
@@ -32,7 +34,8 @@ class BottomSheetContainer extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
       decoration: BoxDecoration(
@@ -49,10 +52,11 @@ class BottomSheetContainer extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: AppTheme.scaled(
+                  textSize: textSize,
+                  multiplier: AppTheme.m2xl,
+                  weight: FontWeight.w900,
                   color: AppColors.onSurface,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
                   letterSpacing: -0.5,
                 ),
               ),

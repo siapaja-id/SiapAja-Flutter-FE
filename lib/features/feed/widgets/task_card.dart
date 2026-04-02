@@ -5,16 +5,13 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
 import '../providers.dart';
 import 'base_feed_card.dart';
 import 'glass_card.dart';
-
-// ---------------------------------------------------------------------------
-// TaskCard
-// ---------------------------------------------------------------------------
 
 IconData _getIconForTaskType(TaskIconType type) => switch (type) {
   TaskIconType.palette => PhosphorIconsRegular.palette,
@@ -44,6 +41,7 @@ class TaskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final currentUserHandle = ref.watch(
       uiStateProvider.select((s) => s.currentUser?.handle),
     );
@@ -94,10 +92,11 @@ class TaskCard extends ConsumerWidget {
               ),
               child: Text(
                 _getStatusText(data.status),
-                style: const TextStyle(
+                style: AppTheme.scaled(
+                  textSize: textSize,
+                  multiplier: AppTheme.m2xs,
                   color: AppColors.primary,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
+                  weight: FontWeight.w800,
                   letterSpacing: 1,
                 ),
               ),
@@ -108,9 +107,10 @@ class TaskCard extends ConsumerWidget {
         if (isParent)
           Text(
             data.title,
-            style: const TextStyle(
+            style: AppTheme.scaled(
+              textSize: textSize,
+              multiplier: AppTheme.m13,
               color: AppColors.onSurfaceVariant,
-              fontSize: 13,
               height: 1.5,
             ),
             maxLines: 1,
@@ -126,19 +126,21 @@ class TaskCard extends ConsumerWidget {
                   children: [
                     Text(
                       data.category,
-                      style: const TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.m2xs,
                         color: AppColors.onSurfaceVariant,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
+                        weight: FontWeight.w700,
                         letterSpacing: 0.92,
                       ),
                     ),
                     Text(
                       data.price,
-                      style: const TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.mxs,
                         color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        weight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -146,32 +148,35 @@ class TaskCard extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   data.title,
-                  style: const TextStyle(
+                  style: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.m13,
                     color: AppColors.onSurface,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    weight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 ExpandableText(
                   text: data.description,
                   limit: 100,
-                  style: const TextStyle(
+                  style: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.mxs,
                     color: AppColors.onSurfaceVariant,
-                    fontSize: 12,
                     height: 1.5,
                   ),
-                  buttonStyle: const TextStyle(
+                  buttonStyle: AppTheme.scaled(
+                    textSize: textSize,
+                    multiplier: AppTheme.m2sm,
                     color: AppColors.onSurfaceVariant,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    weight: FontWeight.bold,
                     letterSpacing: 1,
                   ),
                 ),
                 const SizedBox(height: 4),
                 if (data.mapUrl != null) ...[
                   const SizedBox(height: 8),
-                  _buildMapPreview(),
+                  _buildMapPreview(textSize),
                 ],
                 if (data.images != null && data.images!.isNotEmpty) ...[
                   const SizedBox(height: 8),
@@ -183,10 +188,11 @@ class TaskCard extends ConsumerWidget {
                     if (data.meta != null)
                       Text(
                         data.meta!,
-                        style: const TextStyle(
+                        style: AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.m1sm,
                           color: AppColors.onSurfaceVariant,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
+                          weight: FontWeight.w500,
                         ),
                       )
                     else
@@ -211,9 +217,10 @@ class TaskCard extends ConsumerWidget {
                             : data.category == 'Repair Needed'
                             ? 'Bid'
                             : 'Claim',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        style: AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.mxs,
+                          weight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -226,7 +233,7 @@ class TaskCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildMapPreview() => ClipRRect(
+  Widget _buildMapPreview(TextSize textSize) => ClipRRect(
     borderRadius: BorderRadius.circular(12),
     child: SizedBox(
       height: 96,
@@ -269,21 +276,22 @@ class TaskCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(9999),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         PhosphorIconsRegular.mapPin,
                         size: 10,
                         color: AppColors.primary,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         'Static Route',
-                        style: TextStyle(
+                        style: AppTheme.scaled(
+                          textSize: textSize,
+                          multiplier: AppTheme.m2xs,
                           color: AppColors.onSurface,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
+                          weight: FontWeight.w800,
                           letterSpacing: 1,
                         ),
                       ),

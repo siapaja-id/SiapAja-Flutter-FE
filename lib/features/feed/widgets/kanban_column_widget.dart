@@ -7,6 +7,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app_theme.dart';
 import '../../../app_router.dart';
 import '../../../models/kanban_column.dart';
+import '../../../features/settings/pages/settings_page.dart';
+import '../../../shared/settings_provider.dart';
 import '../providers.dart';
 import '../pages/feed_page.dart';
 import '../pages/post_detail_page.dart';
@@ -67,6 +69,9 @@ _ColumnMeta _getColumnMeta(String path, Map<String, dynamic>? routeState) {
   }
   if (path == '/payment') {
     return const _ColumnMeta(PhosphorIconsRegular.creditCard, 'Payment');
+  }
+  if (path == '/settings') {
+    return const _ColumnMeta(PhosphorIconsRegular.gear, 'Settings');
   }
   if (path.startsWith('/post/')) {
     return const _ColumnMeta(PhosphorIconsRegular.fileText, 'Post');
@@ -181,6 +186,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
   @override
   Widget build(BuildContext context) {
     final meta = _getColumnMeta(widget.column.path, widget.column.routeState);
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final isFirst = widget.index == 0;
     final canClose = !isFirst;
 
@@ -265,6 +271,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                               child: Column(
                                 children: [
                                   _ColumnHeader(
+                                    textSize: textSize,
                                     icon: meta.icon,
                                     title:
                                         widget
@@ -329,6 +336,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
 
 /// Column header bar — matches React kanban-col-header exactly
 class _ColumnHeader extends StatelessWidget {
+  final TextSize textSize;
   final IconData icon;
   final String title;
   final int index;
@@ -337,6 +345,7 @@ class _ColumnHeader extends StatelessWidget {
   final VoidCallback onClose;
 
   const _ColumnHeader({
+    required this.textSize,
     required this.icon,
     required this.title,
     required this.index,
@@ -381,9 +390,10 @@ class _ColumnHeader extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
+                    style: AppTheme.scaled(
+                      textSize: textSize,
+                      multiplier: AppTheme.m1sm,
+                      weight: FontWeight.w700,
                       color: Colors.white.withOpacity(0.65),
                       letterSpacing: 0.03,
                     ),
@@ -409,9 +419,10 @@ class _ColumnHeader extends StatelessWidget {
                   ),
                   child: Text(
                     '${index + 1}/$total',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
+                    style: AppTheme.scaled(
+                      textSize: textSize,
+                      multiplier: AppTheme.m2xs,
+                      weight: FontWeight.w800,
                       color: Colors.white.withOpacity(0.25),
                       letterSpacing: 0.08,
                     ),
@@ -480,6 +491,7 @@ class _ColumnBody extends StatelessWidget {
     '/create-post': (_) => const ScaffoldPageStub(title: 'New Post'),
     '/review-order': (_) => const ScaffoldPageStub(title: 'Review Order'),
     '/payment': (_) => const ScaffoldPageStub(title: 'Payment'),
+    '/settings': (_) => const SettingsPage(),
     '/profile': (_) => const ScaffoldPageStub(title: 'Profile'),
   };
 

@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/settings_provider.dart';
 import '../../../shared/utils/task_icons.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/media_carousel.dart';
@@ -14,29 +16,29 @@ import '../../../shared/widgets/voice_note_player.dart';
 import '../../../shared/widgets/map_preview.dart';
 import '../widgets/base_feed_card.dart';
 
-/// Full task detail view — matches React TaskMainContent.Component.tsx exactly.
-class TaskMainContent extends StatefulWidget {
+class TaskMainContent extends ConsumerStatefulWidget {
   final TaskData data;
 
   const TaskMainContent({super.key, required this.data});
 
   @override
-  State<TaskMainContent> createState() => _TaskMainContentState();
+  ConsumerState<TaskMainContent> createState() => _TaskMainContentState();
 }
 
-class _TaskMainContentState extends State<TaskMainContent> {
+class _TaskMainContentState extends ConsumerState<TaskMainContent> {
   bool _isDescExpanded = false;
 
   TaskData get data => widget.data;
 
   @override
   Widget build(BuildContext context) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          _buildHeader(context, textSize),
           const SizedBox(height: 16),
           Container(
             height: 1,
@@ -52,16 +54,18 @@ class _TaskMainContentState extends State<TaskMainContent> {
           const SizedBox(height: 24),
 
           if (data.isFirstPost == true) ...[
-            const FirstItemBadge(
+            FirstItemBadge(
+              textSize: textSize,
               label: 'First Post',
-              bgColor: Color(0xFF10B981),
+              bgColor: const Color(0xFF10B981),
               fgColor: Colors.black,
               dotColor: Colors.black,
             ),
             const SizedBox(height: 16),
           ],
           if (data.isFirstTask == true) ...[
-            const FirstItemBadge(
+            FirstItemBadge(
+              textSize: textSize,
               label: 'First Task',
               bgColor: AppColors.primary,
               fgColor: AppColors.primaryForeground,
@@ -69,35 +73,35 @@ class _TaskMainContentState extends State<TaskMainContent> {
             ),
             const SizedBox(height: 16),
           ],
-          _buildInfoPill(context),
+          _buildInfoPill(context, textSize),
           const SizedBox(height: 20),
-          _buildTitle(context),
+          _buildTitle(context, textSize),
           const SizedBox(height: 24),
-          _buildTrustCard(context),
+          _buildTrustCard(context, textSize),
           const SizedBox(height: 24),
-          _buildStatusTracker(context),
+          _buildStatusTracker(context, textSize),
           const SizedBox(height: 24),
-          _buildSectionLabel('DESCRIPTION'),
+          _buildSectionLabel('DESCRIPTION', textSize),
           const SizedBox(height: 10),
-          _buildDescription(context),
+          _buildDescription(context, textSize),
           if (data.mapUrl != null ||
               (data.images != null && data.images!.isNotEmpty) ||
               data.video != null ||
               data.voiceNote != null) ...[
             const SizedBox(height: 32),
-            _buildSectionLabel('ATTACHMENTS'),
+            _buildSectionLabel('ATTACHMENTS', textSize),
             const SizedBox(height: 10),
-            _buildMediaModules(context),
+            _buildMediaModules(context, textSize),
           ],
           if (data.tags != null && data.tags!.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _buildSectionLabel('TAGS'),
+            _buildSectionLabel('TAGS', textSize),
             const SizedBox(height: 10),
             _buildTags(context),
           ],
           if (data.meta != null) ...[
             const SizedBox(height: 16),
-            _buildMeta(context),
+            _buildMeta(context, textSize),
           ],
           const SizedBox(height: 24),
           _buildPostActions(context),
@@ -106,24 +110,23 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildSectionLabel(String label, TextSize textSize) {
     return Text(
       label,
-      style: TextStyle(
+      style: AppTheme.scaled(
+        textSize: textSize,
+        multiplier: AppTheme.m2xs,
         color: AppColors.onSurfaceVariant.withOpacity(0.4),
-        fontSize: 9,
-        fontWeight: FontWeight.w900,
+        weight: FontWeight.w900,
         letterSpacing: 2.5,
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    // React: flex items-center justify-between mb-6
+  Widget _buildHeader(BuildContext context, TextSize textSize) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left: avatar + name + handle
         Expanded(
           child: Row(
             children: [
@@ -160,10 +163,11 @@ class _TaskMainContentState extends State<TaskMainContent> {
                             data.author.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.mlg,
                               color: AppColors.onSurface,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                              weight: FontWeight.w900,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -183,10 +187,11 @@ class _TaskMainContentState extends State<TaskMainContent> {
                       '@${data.author.handle}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.m13,
                         color: AppColors.onSurfaceVariant,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        weight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -196,24 +201,22 @@ class _TaskMainContentState extends State<TaskMainContent> {
           ),
         ),
         const SizedBox(width: 12),
-        // Right: price + status tag
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // React: text-3xl font-black tracking-tighter (white, NOT red)
               Text(
                 data.price,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: AppTheme.scaled(
+                  textSize: textSize,
+                  multiplier: AppTheme.m28,
                   color: AppColors.onSurface,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
+                  weight: FontWeight.w900,
                   letterSpacing: -1,
                 ),
               ),
-              // React: status badge shown whenever status is truthy
               if (data.status != TaskStatus.open) ...[
                 const SizedBox(height: 4),
                 _buildStatusTag(data.status),
@@ -236,9 +239,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
     return TagPill(label: label);
   }
 
-  Widget _buildInfoPill(BuildContext context) {
-    // React: inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass
-    // icon in w-5 h-5 rounded-full bg-primary/20, dot separator, Clock icon
+  Widget _buildInfoPill(BuildContext context, TextSize textSize) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -249,7 +250,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Icon in circle
           Container(
             width: 20,
             height: 20,
@@ -266,21 +266,20 @@ class _TaskMainContentState extends State<TaskMainContent> {
             ),
           ),
           const SizedBox(width: 8),
-          // Category
           Flexible(
             child: Text(
               data.category.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: AppTheme.scaled(
+                textSize: textSize,
+                multiplier: AppTheme.m2sm,
                 color: AppColors.onSurfaceVariant,
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
+                weight: FontWeight.w900,
                 letterSpacing: 1.5,
               ),
             ),
           ),
-          // Dot separator
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: SizedBox(
@@ -294,7 +293,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
               ),
             ),
           ),
-          // Timestamp with clock icon
           const Icon(
             PhosphorIconsRegular.clock,
             size: 12,
@@ -303,10 +301,11 @@ class _TaskMainContentState extends State<TaskMainContent> {
           const SizedBox(width: 4),
           Text(
             data.timestamp,
-            style: const TextStyle(
+            style: AppTheme.scaled(
+              textSize: textSize,
+              multiplier: AppTheme.m1sm,
               color: AppColors.onSurfaceVariant,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
+              weight: FontWeight.w700,
             ),
           ),
         ],
@@ -314,23 +313,21 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildTitle(BuildContext context) {
-    // React: h2 text-[26px] font-black leading-[1.15] tracking-tight mb-6
+  Widget _buildTitle(BuildContext context, TextSize textSize) {
     return Text(
       data.title,
-      style: const TextStyle(
+      style: AppTheme.scaled(
+        textSize: textSize,
+        multiplier: AppTheme.m26,
         color: AppColors.onSurface,
-        fontSize: 26,
-        fontWeight: FontWeight.w900,
+        weight: FontWeight.w900,
         height: 1.15,
         letterSpacing: -0.5,
       ),
     );
   }
 
-  Widget _buildTrustCard(BuildContext context) {
-    // React: rounded-[24px] p-5 glass shadow-xl, emerald radial gradient in corner
-    // Single star icon + "4.9" + "(124)", separator line, ShieldCheck + "Verified"
+  Widget _buildTrustCard(BuildContext context, TextSize textSize) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -351,7 +348,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
           ),
           child: Stack(
             children: [
-              // Top glow line
               Positioned(
                 left: 0,
                 right: 0,
@@ -368,7 +364,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   ),
                 ),
               ),
-              // Emerald radial gradient in corner
               Positioned(
                 top: -40,
                 right: -40,
@@ -386,7 +381,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   ),
                 ),
               ),
-              // Bottom emerald glow line
               Positioned(
                 left: 0,
                 right: 0,
@@ -404,20 +398,19 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   ),
                 ),
               ),
-              // Content
               Row(
                 children: [
-                  // Rating
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'REQUESTER RATING',
-                          style: TextStyle(
+                          style: AppTheme.scaled(
+                            textSize: textSize,
+                            multiplier: AppTheme.m2sm,
                             color: AppColors.onSurfaceVariant,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
+                            weight: FontWeight.w900,
                             letterSpacing: 2,
                           ),
                         ),
@@ -430,24 +423,24 @@ class _TaskMainContentState extends State<TaskMainContent> {
                               color: Color(0xFFFBBF24),
                             ),
                             const SizedBox(width: 6),
-                            const Text(
+                            Text(
                               '4.9',
-                              style: TextStyle(
+                              style: AppTheme.scaled(
+                                textSize: textSize,
+                                multiplier: AppTheme.mxl,
                                 color: AppColors.onSurface,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
+                                weight: FontWeight.w900,
                                 letterSpacing: -0.5,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '(124)',
-                              style: TextStyle(
-                                color: AppColors.onSurfaceVariant.withOpacity(
-                                  0.6,
-                                ),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
+                              style: AppTheme.scaled(
+                                textSize: textSize,
+                                multiplier: AppTheme.m1sm,
+                                color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                weight: FontWeight.w700,
                               ),
                             ),
                           ],
@@ -455,42 +448,42 @@ class _TaskMainContentState extends State<TaskMainContent> {
                       ],
                     ),
                   ),
-                  // Separator line
                   Container(
                     width: 1,
                     height: 40,
                     color: Colors.white.withOpacity(0.1),
                   ),
                   const SizedBox(width: 16),
-                  // Payment
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'PAYMENT',
-                          style: TextStyle(
+                          style: AppTheme.scaled(
+                            textSize: textSize,
+                            multiplier: AppTheme.m2sm,
                             color: AppColors.onSurfaceVariant.withOpacity(0.6),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
+                            weight: FontWeight.w900,
                             letterSpacing: 2,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               PhosphorIconsRegular.shieldCheck,
                               size: 18,
                               color: AppColors.emerald,
                             ),
-                            SizedBox(width: 6),
+                            const SizedBox(width: 6),
                             Text(
                               'Verified',
-                              style: TextStyle(
+                              style: AppTheme.scaled(
+                                textSize: textSize,
+                                multiplier: AppTheme.mbase,
                                 color: AppColors.emerald,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w900,
+                                weight: FontWeight.w900,
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -508,11 +501,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildStatusTracker(BuildContext context) {
-    // React: rounded-2xl p-5 bg-surface-container border border-white/5 shadow-lg
-    // Dots: w-3.5 h-3.5 (14px), border-[2.5px]
-    // Labels: absolute -bottom-5, text-[9px] font-black uppercase tracking-widest
-    // Assigned worker inside this container, separated by border-t
+  Widget _buildStatusTracker(BuildContext context, TextSize textSize) {
     const statuses = [
       'Open',
       'Assigned',
@@ -534,7 +523,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
       ),
       child: Stack(
         children: [
-          // Emerald radial gradient in corner
           Positioned(
             top: -40,
             right: -40,
@@ -554,13 +542,11 @@ class _TaskMainContentState extends State<TaskMainContent> {
           ),
           Column(
             children: [
-              // Progress dots with track
               SizedBox(
                 height: 50,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    // Background track line
                     Positioned(
                       top: 7,
                       left: 7,
@@ -573,7 +559,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
                         ),
                       ),
                     ),
-                    // Progress fill line
                     Positioned(
                       top: 7,
                       left: 7,
@@ -596,7 +581,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
                         },
                       ),
                     ),
-                    // Dots (labels positioned absolutely below — matches React)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: statuses.asMap().entries.map((entry) {
@@ -605,9 +589,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                         final isActive = i <= currentIndex;
                         return Column(
                           children: [
-                            // Dot
                             if (isActive && i == currentIndex)
-                              // Currently active dot — pulsing
                               Container(
                                 width: 14,
                                 height: 14,
@@ -652,22 +634,19 @@ class _TaskMainContentState extends State<TaskMainContent> {
                                 ),
                               ),
                             const SizedBox(height: 8),
-                            // Label — absolute bottom (React: absolute -bottom-5)
-                            // Wrapping in FittedBox to prevent overflow on narrow screens
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
                                 label,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
-                                style: TextStyle(
+                                style: AppTheme.scaled(
+                                  textSize: textSize,
+                                  multiplier: AppTheme.m2xs,
                                   color: isActive
                                       ? AppColors.emerald
-                                      : AppColors.onSurfaceVariant.withOpacity(
-                                          0.4,
-                                        ),
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w900,
+                                      : AppColors.onSurfaceVariant.withOpacity(0.4),
+                                  weight: FontWeight.w900,
                                   letterSpacing: 1.5,
                                 ),
                               ),
@@ -679,7 +658,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   ],
                 ),
               ),
-              // Assigned worker (inside tracker, separated by border-t)
               if (data.assignedWorker != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -705,22 +683,22 @@ class _TaskMainContentState extends State<TaskMainContent> {
                             children: [
                               Text(
                                 'ASSIGNED TO',
-                                style: TextStyle(
-                                  color: AppColors.onSurfaceVariant.withOpacity(
-                                    0.6,
-                                  ),
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w900,
+                                style: AppTheme.scaled(
+                                  textSize: textSize,
+                                  multiplier: AppTheme.m2xs,
+                                  color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                  weight: FontWeight.w900,
                                   letterSpacing: 2,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 '@${data.assignedWorker!.handle}',
-                                style: const TextStyle(
+                                style: AppTheme.scaled(
+                                  textSize: textSize,
+                                  multiplier: AppTheme.mbase,
                                   color: AppColors.onSurface,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
+                                  weight: FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -732,22 +710,22 @@ class _TaskMainContentState extends State<TaskMainContent> {
                         children: [
                           Text(
                             'AGREED PRICE',
-                            style: TextStyle(
-                              color: AppColors.onSurfaceVariant.withOpacity(
-                                0.6,
-                              ),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.m2xs,
+                              color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                              weight: FontWeight.w900,
                               letterSpacing: 2,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             data.acceptedBidAmount ?? data.price,
-                            style: const TextStyle(
+                            style: AppTheme.scaled(
+                              textSize: textSize,
+                              multiplier: AppTheme.mxl,
                               color: AppColors.emerald,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
+                              weight: FontWeight.w900,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -764,7 +742,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildDescription(BuildContext context) {
+  Widget _buildDescription(BuildContext context, TextSize textSize) {
     final isLong = data.description.length > 500;
 
     return Column(
@@ -774,9 +752,10 @@ class _TaskMainContentState extends State<TaskMainContent> {
           isLong && !_isDescExpanded
               ? '${data.description.substring(0, 500)}...'
               : data.description,
-          style: TextStyle(
+          style: AppTheme.scaled(
+            textSize: textSize,
+            multiplier: AppTheme.mbase,
             color: AppColors.onSurfaceVariant.withOpacity(0.9),
-            fontSize: 14,
             height: 1.5,
           ),
         ),
@@ -796,12 +775,13 @@ class _TaskMainContentState extends State<TaskMainContent> {
                 children: [
                   Text(
                     _isDescExpanded ? 'Show Less' : 'Show Full Description',
-                    style: TextStyle(
+                    style: AppTheme.scaled(
+                      textSize: textSize,
+                      multiplier: AppTheme.m2sm,
                       color: _isDescExpanded
                           ? AppColors.onSurfaceVariant
                           : AppColors.primary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
+                      weight: FontWeight.w900,
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -823,10 +803,9 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildMediaModules(BuildContext context) {
+  Widget _buildMediaModules(BuildContext context, TextSize textSize) {
     return Column(
       children: [
-        // Map preview
         if (data.mapUrl != null) ...[
           _buildMapPreview(context),
           if (data.images != null && data.images!.isNotEmpty ||
@@ -834,7 +813,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
               data.voiceNote != null)
             const SizedBox(height: 16),
         ],
-        // Image carousel
         if (data.images != null && data.images!.isNotEmpty) ...[
           ClipRRect(
             borderRadius: BorderRadius.circular(24),
@@ -843,19 +821,15 @@ class _TaskMainContentState extends State<TaskMainContent> {
           if (data.video != null || data.voiceNote != null)
             const SizedBox(height: 16),
         ],
-        // Video
         if (data.video != null) ...[
           _buildVideoModule(),
           if (data.voiceNote != null) const SizedBox(height: 16),
         ],
-        // Voice note
         if (data.voiceNote != null) _buildVoiceNoteModule(),
       ],
     );
   }
 
-  // React: <div className="relative w-full rounded-[24px] overflow-hidden border border-white/10 bg-black shadow-lg">
-  //        <video src={task.video} controls className="w-full h-auto max-h-80" />
   Widget _buildVideoModule() {
     return Container(
       decoration: BoxDecoration(
@@ -900,14 +874,15 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildMeta(BuildContext context) {
+  Widget _buildMeta(BuildContext context, TextSize textSize) {
     return Center(
       child: Text(
         data.meta!,
-        style: TextStyle(
+        style: AppTheme.scaled(
+          textSize: textSize,
+          multiplier: AppTheme.m1sm,
           color: AppColors.onSurfaceVariant.withOpacity(0.6),
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
+          weight: FontWeight.w700,
           letterSpacing: 2,
         ),
       ),

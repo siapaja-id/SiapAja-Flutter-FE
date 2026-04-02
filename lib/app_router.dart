@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'features/feed/pages/feed_page.dart';
 import 'features/feed/pages/main_shell.dart';
 import 'features/feed/pages/post_detail_page.dart';
+import 'features/settings/pages/settings_page.dart';
 
 /// GoRouter configuration
 class AppRouter {
@@ -54,6 +55,11 @@ class AppRouter {
           final id = state.pathParameters['id'] ?? '';
           return PostDetailPage(postId: id);
         },
+      ),
+      // Settings page
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
   );

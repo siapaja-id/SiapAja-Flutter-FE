@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const _keyZoom = 'siapaja-zoom';
 
 /// Zoom state notifier that manages the zoom level.
 /// Zoom level ranges from 0.5 (50%) to 3.0 (300%).
@@ -10,24 +13,41 @@ class ZoomNotifier extends StateNotifier<double> {
 
   ZoomNotifier() : super(_defaultZoom);
 
+  Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getDouble(_keyZoom);
+    if (saved != null) {
+      state = saved.clamp(_minZoom, _maxZoom);
+    }
+  }
+
   /// Zoom in by 0.1 step, capped at max 3.0
   void zoomIn() {
     state = (state + _step).clamp(_minZoom, _maxZoom);
+    _persist();
   }
 
   /// Zoom out by 0.1 step, capped at min 0.5
   void zoomOut() {
     state = (state - _step).clamp(_minZoom, _maxZoom);
+    _persist();
   }
 
   /// Reset zoom to default (1.0)
   void reset() {
     state = _defaultZoom;
+    _persist();
   }
 
   /// Set zoom to a specific value (clamped to valid range)
   void setZoom(double value) {
     state = value.clamp(_minZoom, _maxZoom);
+    _persist();
+  }
+
+  Future<void> _persist() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyZoom, state);
   }
 }
 

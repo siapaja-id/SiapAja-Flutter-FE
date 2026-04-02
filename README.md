@@ -25,15 +25,39 @@ flutter build linux
 
 Output: `build/linux/x64/release/bundle/`
 
-### Standard Web Build
+### Web Run (JS Mode — no WASM)
+
+This mode compiles Dart to JavaScript (`main.dart.js`) and uses the CanvasKit renderer. It works in all browsers without special CORS headers.
+
+#### Debug (hot-reload)
 
 ```bash
-# Run in debug mode
 flutter run -d chrome
-
-# Build for production
-flutter build web
 ```
+
+#### Release build
+
+```bash
+flutter build web --release
+```
+
+Output: `build/web/`
+
+#### Serve the JS build
+
+Any static file server works — no CORS headers are required for JS-only builds.
+
+```bash
+# Option A: Python
+cd build/web && python3 -m http.server 8080
+
+# Option B: Node (npx)
+npx serve build/web -l 8080
+```
+
+Then open **http://localhost:8080**.
+
+> **Tip:** If you later want WASM, switch to the WASM Build section below and use `serve_wasm.py` instead.
 
 ### WASM Build
 

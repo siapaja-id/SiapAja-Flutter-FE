@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
+import '../settings_provider.dart';
 
-class VoiceNotePlayer extends StatelessWidget {
+class VoiceNotePlayer extends ConsumerWidget {
   final String duration;
   final double progress;
 
@@ -14,7 +16,8 @@ class VoiceNotePlayer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -93,21 +96,23 @@ class VoiceNotePlayer extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       '0:12',
-                      style: TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.m2sm,
                         color: AppColors.onSurfaceVariant,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        weight: FontWeight.w700,
                         letterSpacing: 1,
                       ),
                     ),
                     Text(
                       duration,
-                      style: const TextStyle(
+                      style: AppTheme.scaled(
+                        textSize: textSize,
+                        multiplier: AppTheme.m2sm,
                         color: AppColors.onSurfaceVariant,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        weight: FontWeight.w700,
                         letterSpacing: 1,
                       ),
                     ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
+import '../settings_provider.dart';
 
-class PrimaryActionButton extends StatelessWidget {
+class PrimaryActionButton extends ConsumerWidget {
   final String label;
   final VoidCallback? onTap;
   final Color backgroundColor;
@@ -19,7 +21,8 @@ class PrimaryActionButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -38,7 +41,11 @@ class PrimaryActionButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+          style: AppTheme.scaled(
+            textSize: textSize,
+            multiplier: AppTheme.mbase,
+            weight: FontWeight.w900,
+          ),
         ),
       ),
     );
