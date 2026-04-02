@@ -35,30 +35,12 @@ class SiapAjaApp extends ConsumerWidget {
         textSize: settings.textSize,
       ),
       builder: (context, child) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final vw = constraints.maxWidth.isFinite && constraints.maxWidth > 0
-                ? constraints.maxWidth
-                : MediaQuery.sizeOf(context).width;
-            final vh =
-                constraints.maxHeight.isFinite && constraints.maxHeight > 0
-                ? constraints.maxHeight
-                : MediaQuery.sizeOf(context).height;
-
-            if (constraints.maxWidth >= 768) {
-              return ZoomWrapper(
-                viewportWidth: vw,
-                viewportHeight: vh,
-                child: HeroControllerScope.none(child: DesktopKanbanLayout()),
-              );
-            }
-            return ZoomWrapper(
-              viewportWidth: vw,
-              viewportHeight: vh,
-              child: child!,
-            );
-          },
-        );
+        if (MediaQuery.sizeOf(context).width >= 768) {
+          return const ZoomWrapper(
+            child: HeroControllerScope.none(child: DesktopKanbanLayout()),
+          );
+        }
+        return ZoomWrapper(child: child!);
       },
       routerConfig: AppRouter.router,
     );
