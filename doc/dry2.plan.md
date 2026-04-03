@@ -591,7 +591,7 @@ plan:
           - lib/features/feed/widgets/feed_composer.dart
 
     - uuid: 'a8b9c0d1-2e3f-4a4b-5c6d-7e8f9a0b1c2d'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 13: Radar Page _GigCard Animation Cleanup'
       reason: |
         radar_page.dart is the largest file at 2,081 LOC. The `_GigCardState` class has ~80 lines of animation setup that is redundant:
@@ -602,7 +602,7 @@ plan:
         Additionally, the bid sheet overlay in radar_page.dart (lines 531-821) reimplements the standard bottom sheet chrome (surface decoration, title row, close button, padding) that BaseSheet already provides, but with custom animation. After Part 11 extracts bid controls, the remaining sheet scaffolding can use BaseSheet for the chrome while keeping custom animation.
       steps:
         - uuid: 'b9c0d1e2-3f4a-4b5c-6d7e-8f9a0b1c2d3e'
-          status: 'pending'
+          status: 'completed'
           name: 'Simplify _GigCard Animation Setup'
           reason: 'Remove redundant initialization of exit animations'
           files:
@@ -615,7 +615,8 @@ plan:
             - 'Simplify the `_runExitAnimation` method by extracting common patterns: the `_exitY = Tween(begin: 0.0, end: 50).animate(_exitController)` is identical for both left and right — consolidate using a direction map'
         - uuid: 'c0d1e2f3-4a5b-5c6d-8f9a-0b1c2d3e4f5a'
           status: 'pending'
-          name: 'Refactor Radar Bid Sheet Overlay to Use BaseSheet Chrome'
+          name: 'Refactor Radar Bid Sheet Overlay to Use BaseSheet Chrome (SKIPPED - depends on Part 11)'
+          reason: 'Skipped: Step 2 depends on Part 11 (Bid Controls Unification) being completed first. The bid controls are still inline in radar_page.dart.'
           reason: 'Reuse BaseSheet for the bid sheet header/decoration after Part 11 extracts bid controls'
           files:
             - lib/features/feed/pages/radar_page.dart
@@ -634,7 +635,7 @@ plan:
           - lib/features/feed/pages/radar_page.dart
 
     - uuid: 'b9c0d1e2-3f4a-4b5c-6d7e-8f9a0b1c2d3e'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 14: Sample Data Cleanup & Factory Constructors'
       reason: |
         sample_data.dart (484 LOC), mock_gigs.dart (75 LOC), and reply_generator.dart (77 LOC) are verbose. Each TaskData/SocialPostData constructor call spans 12-20 lines with explicit `replies: 0, reposts: 0, shares: 0, votes: 0` — all of which are already `@Default(0)` in the Freezed model. There are 30+ sample data items, each with 4 redundant default-value lines = ~120 lines of unnecessary verbosity.
@@ -642,7 +643,7 @@ plan:
         Additionally, repeated field patterns like `author: const Author(name: "...", handle: "...", avatar: "...")` can be simplified with factory constructors or helper functions.
       steps:
         - uuid: 'c0d1e2f3-4a5b-5c6d-8f9a-0b1c2d3e4f5a'
-          status: 'pending'
+          status: 'completed'
           name: 'Add Sample Data Factory Helpers'
           reason: 'Create concise constructors for common sample data patterns'
           files:

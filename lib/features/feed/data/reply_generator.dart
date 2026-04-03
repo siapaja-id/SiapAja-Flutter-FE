@@ -4,15 +4,11 @@ import 'sample_data.dart';
 /// Generates mock replies for a given post, matching React getReplies behavior.
 /// Tasks automatically get a bid reply as the first reply.
 List<FeedItem> getReplies(String parentId, {bool isTask = false}) {
-  final replyIdPrefix = 'reply-$parentId';
-
-  final List<FeedItem> replies = [];
-
-  if (isTask) {
-    // Auto-generate a mock bid as first reply (matches React: isBid for task + i===0)
-    replies.add(
+  final p = 'reply-$parentId';
+  return [
+    if (isTask)
       SocialPostData(
-        id: '$replyIdPrefix-bid',
+        id: '$p-bid',
         author: mockAuthors[1],
         content: "I'm available right now! I have 5 years of experience with this exact issue and can fix it in under an hour.",
         timestamp: '2h',
@@ -21,12 +17,8 @@ List<FeedItem> getReplies(String parentId, {bool isTask = false}) {
         bidAmount: '\$65.00',
         bidStatus: BidStatus.pending,
       ),
-    );
-  }
-
-  replies.addAll([
     SocialPostData(
-      id: '$replyIdPrefix-1',
+      id: '$p-1',
       author: mockAuthors[2],
       content: 'This is really interesting! Thanks for sharing.',
       timestamp: isTask ? '4h' : '1m',
@@ -34,7 +26,7 @@ List<FeedItem> getReplies(String parentId, {bool isTask = false}) {
       images: isTask ? ['https://picsum.photos/seed/${parentId}r0/600/400'] : null,
     ),
     SocialPostData(
-      id: '$replyIdPrefix-2',
+      id: '$p-2',
       author: mockAuthors[3],
       content: 'I had a similar experience last week. The key is to stay consistent and keep pushing forward.',
       timestamp: isTask ? '6h' : '5m',
@@ -43,7 +35,7 @@ List<FeedItem> getReplies(String parentId, {bool isTask = false}) {
       voiceNote: isTask ? '0:32' : null,
     ),
     SocialPostData(
-      id: '$replyIdPrefix-3',
+      id: '$p-3',
       author: mockAuthors[4],
       content: 'Could you elaborate more on this? I\'d love to hear your thoughts in detail.',
       timestamp: isTask ? '8h' : '12m',
@@ -51,13 +43,11 @@ List<FeedItem> getReplies(String parentId, {bool isTask = false}) {
       video: isTask ? 'https://www.w3schools.com/html/mov_bbb.mp4' : null,
     ),
     SocialPostData(
-      id: '$replyIdPrefix-4',
+      id: '$p-4',
       author: mockAuthors[0],
       content: 'Great point! Totally agree with you on this one.',
       timestamp: isTask ? '10h' : '20m',
       votes: 5,
     ),
-  ]);
-
-  return replies;
+  ];
 }
