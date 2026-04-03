@@ -60,23 +60,61 @@ class SettingsPage extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 96),
               sliver: SliverList(
                 delegate: SliverChildListDelegate.fixed([
-                  _ThemeColorSection(
-                    selected: settings.themeColor,
-                    onChanged: (color) => ref
-                        .read(settingsProvider.notifier)
-                        .setThemeColor(color),
+                  SettingsSection(
+                    icon: PhosphorIconsRegular.palette,
+                    title: 'Theme Color',
+                    subtitle: 'Choose your primary accent color',
+                    iconBgColor: AppColors.primary.withOpacity(0.1),
+                    iconColor: AppColors.primary,
+                    child: Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        for (final entry in AppColors.themeColors.entries)
+                          _ColorCircle(
+                            color: entry.value,
+                            label: AppColors.themeColorLabels[entry.key] ??
+                                entry.key.name,
+                            isSelected: settings.themeColor == entry.key,
+                            onTap: () => ref
+                                .read(settingsProvider.notifier)
+                                .setThemeColor(entry.key),
+                          ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  _TextSizeSection(
-                    selected: settings.textSize,
-                    onChanged: (size) =>
-                        ref.read(settingsProvider.notifier).setTextSize(size),
+                  SettingsSection(
+                    icon: PhosphorIconsRegular.textT,
+                    title: 'Typography Size',
+                    subtitle: 'Adjust the base text scale',
+                    child: _SegmentedControl(
+                      options: const [
+                        (TextSize.sm, 'Small'),
+                        (TextSize.md, 'Medium'),
+                        (TextSize.lg, 'Large'),
+                      ],
+                      selected: settings.textSize,
+                      onChanged: (size) =>
+                          ref.read(settingsProvider.notifier).setTextSize(size),
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  _ZoomSection(
-                    selected: zoom,
-                    onChanged: (value) =>
-                        ref.read(zoomProvider.notifier).setZoom(value),
+                  SettingsSection(
+                    icon: PhosphorIconsRegular.magnifyingGlassPlus,
+                    title: 'Display Zoom',
+                    subtitle: 'Scale the entire interface',
+                    child: _SegmentedControl(
+                      options: const [
+                        (0.9, '90%'),
+                        (1.0, '100%'),
+                        (1.1, '110%'),
+                        (1.2, '120%'),
+                      ],
+                      selected: zoom,
+                      onChanged: (value) =>
+                          ref.read(zoomProvider.notifier).setZoom(value),
+                    ),
                   ),
                 ]),
               ),
@@ -88,11 +126,23 @@ class SettingsPage extends ConsumerWidget {
   }
 }
 
-class _ThemeColorSection extends StatelessWidget {
-  final ThemeColor selected;
-  final ValueChanged<ThemeColor> onChanged;
+class SettingsSection extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final Color? iconBgColor;
+  final Color? iconColor;
 
-  const _ThemeColorSection({required this.selected, required this.onChanged});
+  const SettingsSection({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.iconBgColor,
+    this.iconColor,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,13 +165,13 @@ class _ThemeColorSection extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: iconBgColor ?? Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
-                  PhosphorIconsRegular.palette,
+                  icon,
                   size: 20,
-                  color: AppColors.primary,
+                  color: iconColor ?? AppColors.onSurface,
                 ),
               ),
               const SizedBox(width: 12),
@@ -130,7 +180,7 @@ class _ThemeColorSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Theme Color',
+                      title,
                       style: AppTheme.scaled(
                         multiplier: AppTheme.mlg,
                         weight: FontWeight.w900,
@@ -139,7 +189,7 @@ class _ThemeColorSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Choose your primary accent color',
+                      subtitle,
                       style: AppTheme.scaled(
                         multiplier: AppTheme.mxs,
                         weight: FontWeight.w500,
@@ -152,20 +202,7 @@ class _ThemeColorSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              for (final entry in AppColors.themeColors.entries)
-                _ColorCircle(
-                  color: entry.value,
-                  label:
-                      AppColors.themeColorLabels[entry.key] ?? entry.key.name,
-                  isSelected: selected == entry.key,
-                  onTap: () => onChanged(entry.key),
-                ),
-            ],
-          ),
+          child,
         ],
       ),
     );
@@ -221,169 +258,6 @@ class _ColorCircle extends StatelessWidget {
                 )
               : null,
         ),
-      ),
-    );
-  }
-}
-
-class _TextSizeSection extends StatelessWidget {
-  final TextSize selected;
-  final ValueChanged<TextSize> onChanged;
-
-  const _TextSizeSection({required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final options = const [
-      (TextSize.sm, 'Small'),
-      (TextSize.md, 'Medium'),
-      (TextSize.lg, 'Large'),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 16),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  PhosphorIconsRegular.textT,
-                  size: 20,
-                  color: AppColors.onSurface,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Typography Size',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mlg,
-                        weight: FontWeight.w900,
-                        color: AppColors.onSurface,
-                        height: 1.2,
-                      ),
-                    ),
-                    Text(
-                      'Adjust the base text scale',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mxs,
-                        weight: FontWeight.w500,
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _SegmentedControl(
-            options: options,
-            selected: selected,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ZoomSection extends StatelessWidget {
-  final double selected;
-  final ValueChanged<double> onChanged;
-
-  const _ZoomSection({required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final options = const [
-      (0.9, '90%'),
-      (1.0, '100%'),
-      (1.1, '110%'),
-      (1.2, '120%'),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 16),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  PhosphorIconsRegular.magnifyingGlassPlus,
-                  size: 20,
-                  color: AppColors.onSurface,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Display Zoom',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mlg,
-                        weight: FontWeight.w900,
-                        color: AppColors.onSurface,
-                        height: 1.2,
-                      ),
-                    ),
-                    Text(
-                      'Scale the entire interface',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mxs,
-                        weight: FontWeight.w500,
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _SegmentedControl(
-            options: options,
-            selected: selected,
-            onChanged: onChanged,
-          ),
-        ],
       ),
     );
   }
