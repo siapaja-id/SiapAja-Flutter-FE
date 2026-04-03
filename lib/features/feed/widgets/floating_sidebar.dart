@@ -65,8 +65,8 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
     ];
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
+      duration: AppTheme.animSlide,
+      curve: AppTheme.curveOut,
       width: _expanded ? 240 : 80,
       child: GlassCard.slab(
         border: const Border(
@@ -167,20 +167,12 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                             children: [
                               Text(
                                 currentUser?.name ?? 'You',
-                                style: AppTheme.scaled(
-                                  multiplier: AppTheme.mxs,
-                                  weight: FontWeight.bold,
-                                  color: AppColors.onSurface,
-                                ),
+                                style: AppTheme.meta,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 '${currentUser?.karma ?? 98} karma',
-                                style: AppTheme.scaled(
-                                  multiplier: AppTheme.m2sm,
-                                  weight: FontWeight.w900,
-                                  color: Color(0xFF34D399),
-                                ),
+                                style: AppTheme.smallLabel.copyWith(color: Color(0xFF34D399),
                               ),
                             ],
                           ),
@@ -223,7 +215,7 @@ class _NavButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
+              curve: AppTheme.curveOut,
               width: double.infinity,
               padding: EdgeInsets.symmetric(
                 horizontal: expanded ? 12 : 0,
@@ -262,14 +254,7 @@ class _NavButton extends StatelessWidget {
                       duration: const Duration(milliseconds: 200),
                       child: Text(
                         item.label,
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          weight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                          color: item.isPrimary
-                              ? AppColors.primaryForeground
-                              : AppColors.onSurfaceVariant,
-                        ),
+                        style: AppTheme.bodyBold.copyWith(letterSpacing: 0.5, color: item.isPrimary ? AppColors.primaryForeground : AppColors.onSurfaceVariant),
                       ),
                     ),
                   ],

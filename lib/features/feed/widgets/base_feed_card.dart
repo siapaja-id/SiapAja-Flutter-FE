@@ -72,10 +72,10 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
         child: AnimatedScale(
           scale: scale,
           duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
+          curve: AppTheme.curveOut,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
+            curve: AppTheme.curveOut,
             decoration: BoxDecoration(
               color: active ? widget.hoverColor : Colors.transparent,
               border: active
@@ -284,15 +284,7 @@ class BaseFeedCard extends ConsumerWidget {
                                     _isThreadContext || isQuote
                                         ? data.author.name
                                         : data.author.handle,
-                                    style: AppTheme.scaled(
-                                      multiplier: isParent || isQuote
-                                          ? AppTheme.mxs
-                                          : isMain
-                                          ? AppTheme.m15
-                                          : AppTheme.m13,
-                                      weight: FontWeight.w600,
-                                      color: AppColors.onSurface,
-                                    ),
+                                    style: TextStyle(fontSize: 14 * (isParent || isQuote ? AppTheme.mxs : isMain ? AppTheme.m15 : AppTheme.m13), fontWeight: FontWeight.w600, color: AppColors.onSurface),
                                   ),
                                   if (data.author.verified)
                                     Icon(
@@ -304,10 +296,7 @@ class BaseFeedCard extends ConsumerWidget {
                                       !isParent)
                                     Text(
                                       '@${data.author.handle}',
-                                      style: AppTheme.scaled(
-                                        multiplier: AppTheme.mxs,
-                                        color: AppColors.onSurfaceVariant,
-                                      ),
+                                      style: TextStyle(fontSize: 14 * AppTheme.mxs, color: AppColors.onSurfaceVariant),
                                     ),
                                   if (isAuthor && !isParent && !isQuote)
                                     Container(
@@ -327,12 +316,7 @@ class BaseFeedCard extends ConsumerWidget {
                                       ),
                                       child: Text(
                                         'You',
-                                        style: AppTheme.scaled(
-                                          multiplier: AppTheme.m3xs,
-                                          color: AppColors.primary,
-                                          weight: FontWeight.w900,
-                                          letterSpacing: 2,
-                                        ),
+                                        style: AppTheme.sectionLabel.copyWith(fontSize: 14 * AppTheme.m3xs, color: AppColors.primary),
                                       ),
                                     ),
                                   if (headerMeta != null) headerMeta!,
@@ -348,11 +332,7 @@ class BaseFeedCard extends ConsumerWidget {
                                   FollowButton(handle: data.author.handle),
                                 Text(
                                   data.timestamp,
-                                  style: AppTheme.scaled(
-                                    multiplier: AppTheme.mxs,
-                                    color: AppColors.onSurfaceVariant
-                                        .withOpacity(0.6),
-                                  ),
+                                  style: TextStyle(fontSize: 14 * AppTheme.mxs, color: AppColors.onSurfaceVariant.withOpacity(0.6)),
                                 ),
                                 if (!isParent && !isQuote) ...[
                                   const SizedBox(width: 4),
@@ -413,11 +393,7 @@ class BaseFeedCard extends ConsumerWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
-                                    style: AppTheme.scaled(
-                                      multiplier: AppTheme.m1sm,
-                                      color: AppColors.primary.p80,
-                                      weight: FontWeight.bold,
-                                    ),
+                                    style: AppTheme.caption.copyWith(color: AppColors.primary.p80),
                                   ),
                                 ],
                               ),
@@ -483,14 +459,9 @@ class FollowButton extends ConsumerWidget {
             const SizedBox(width: 4),
             Text(
               isFollowing ? 'Following' : 'Follow',
-              style: AppTheme.scaled(
-                multiplier: AppTheme.m2sm,
-                color: isFollowing
+              style: AppTheme.smallLabel.copyWith(color: isFollowing
                     ? AppColors.onSurfaceVariant
-                    : AppColors.primaryForeground,
-                weight: FontWeight.bold,
-                letterSpacing: 1,
-              ),
+                    : AppColors.primaryForeground),
             ),
           ],
         ),
@@ -523,11 +494,7 @@ class FirstItemBadge extends StatelessWidget {
     child: Badge(
       backgroundColor: bgColor,
       textColor: fgColor,
-      textStyle: AppTheme.scaled(
-        multiplier: AppTheme.m2xs,
-        weight: FontWeight.w900,
-        letterSpacing: 2,
-      ),
+      textStyle: AppTheme.sectionLabel,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       largeSize: 18,
       label: Row(

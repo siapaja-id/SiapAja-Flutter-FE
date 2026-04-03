@@ -5,6 +5,7 @@ import '../../../../shared/utils/color_extensions.dart';
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
 import '../../../../shared/widgets/base_sheet.dart';
+import '../../../../shared/utils/decorations.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
 
 class BidSheet extends StatefulWidget {
@@ -95,12 +96,7 @@ class _BidSheetState extends State<BidSheet> {
                       children: [
                         Text(
                           'YOUR BID',
-                          style: AppTheme.scaled(
-                            multiplier: AppTheme.m2sm,
-                            color: AppColors.onSurfaceVariant,
-                            weight: FontWeight.w900,
-                            letterSpacing: 3,
-                          ),
+                          style: AppTheme.smallLabel,
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -109,11 +105,7 @@ class _BidSheetState extends State<BidSheet> {
                           children: [
                             Text(
                               '\$',
-                              style: AppTheme.scaled(
-                                multiplier: AppTheme.m3xl,
-                                color: AppColors.emerald,
-                                weight: FontWeight.w900,
-                              ),
+                              style: AppTheme.heroTitle.copyWith(fontSize: 24, color: AppColors.emerald),
                             ),
                             SizedBox(
                               width: 112,
@@ -128,12 +120,7 @@ class _BidSheetState extends State<BidSheet> {
                                     setState(() => _bidAmount = parsed);
                                   }
                                 },
-                                style: AppTheme.scaled(
-                                  multiplier: AppTheme.m28,
-                                  color: AppColors.onSurface,
-                                  weight: FontWeight.w900,
-                                  letterSpacing: -2,
-                                ),
+                                style: AppTheme.priceDisplay,
                                 textAlign: TextAlign.center,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
@@ -184,11 +171,7 @@ class _BidSheetState extends State<BidSheet> {
                   ),
                   label: const Text('Down Bid'),
                   backgroundColor: Colors.white.w05,
-                  labelStyle: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    weight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                  ),
+                  labelStyle: AppTheme.meta,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -199,11 +182,7 @@ class _BidSheetState extends State<BidSheet> {
                       setState(() => _bidAmount = widget.defaultBid),
                   label: const Text('Match Original'),
                   backgroundColor: Colors.white.w05,
-                  labelStyle: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    weight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                  ),
+                  labelStyle: AppTheme.meta,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -218,11 +197,7 @@ class _BidSheetState extends State<BidSheet> {
                   ),
                   label: const Text('Up Bid'),
                   backgroundColor: Colors.white.w05,
-                  labelStyle: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    weight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                  ),
+                  labelStyle: AppTheme.meta,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -232,26 +207,9 @@ class _BidSheetState extends State<BidSheet> {
             const SizedBox(height: 20),
             TextField(
               controller: widget.pitchCtrl,
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                color: AppColors.onSurface,
-              ),
-              decoration: InputDecoration(
+              style: AppTheme.bodyBold,
+              decoration: glassInputArea(
                 hintText: 'Why should they choose you? (Optional)',
-                hintStyle: TextStyle(
-                  color: AppColors.onSurfaceVariant.withOpacity(0.3),
-                ),
-                filled: true,
-                fillColor: Colors.white.w05,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.white.w10),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.white.w10),
-                ),
-                contentPadding: const EdgeInsets.all(16),
               ),
               maxLines: 4,
               minLines: 4,

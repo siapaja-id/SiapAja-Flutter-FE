@@ -68,12 +68,7 @@ class BaseSheet extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.m2xl,
-                  weight: FontWeight.w900,
-                  color: AppColors.onSurface,
-                  letterSpacing: -0.5,
-                ),
+                style: AppTheme.largeTitle,
               ),
               IconButton(
                 onPressed: onClose ?? () => Navigator.pop(context),

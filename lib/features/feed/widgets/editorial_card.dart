@@ -49,11 +49,7 @@ class EditorialCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   'DS',
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.m2xs,
-                    color: AppColors.onSurfaceVariant,
-                    weight: FontWeight.bold,
-                  ),
+                  style: AppTheme.meta.copyWith(fontSize: 14 * AppTheme.m2xs),
                 ),
               ),
             ),
@@ -61,11 +57,7 @@ class EditorialCard extends StatelessWidget {
         if (isParent)
           Text(
             data.title,
-            style: AppTheme.scaled(
-              multiplier: AppTheme.m13,
-              color: AppColors.onSurface,
-              height: 1.5,
-            ),
+            style: AppTheme.bodyCardWhite,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           )
@@ -76,38 +68,19 @@ class EditorialCard extends StatelessWidget {
               children: [
                 Text(
                   data.tag,
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.m2xs,
-                    color: AppColors.primary,
-                    weight: FontWeight.w800,
-                    letterSpacing: 1.08,
-                  ),
+                  style: AppTheme.tagLabel.copyWith(color: AppColors.primary, letterSpacing: 1.08),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   data.title,
                   style: isMain
-                      ? AppTheme.scaled(
-                          multiplier: AppTheme.mxl,
-                          color: AppColors.onSurface,
-                          weight: FontWeight.bold,
-                          height: 1.25,
-                        )
-                      : AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          color: AppColors.onSurface,
-                          weight: FontWeight.bold,
-                          height: 1.25,
-                        ),
+                      ? AppTheme.valueDisplay.copyWith(letterSpacing: null)
+                      : AppTheme.bodyBold,
                 ),
                 const SizedBox(height: 6),
                 Text(
                   data.excerpt,
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    color: AppColors.onSurfaceVariant,
-                    height: 1.5,
-                  ),
+                  style: AppTheme.bodyMeta,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

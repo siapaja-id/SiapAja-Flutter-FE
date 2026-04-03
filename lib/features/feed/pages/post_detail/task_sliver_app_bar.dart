@@ -39,11 +39,7 @@ class TaskSliverAppBar extends StatelessWidget {
             Flexible(
               child: Text(
                 task.title,
-                style: AppTheme.scaled(multiplier: AppTheme.m2xs,
-                  weight: FontWeight.w900,
-                  color: AppColors.onSurfaceVariant,
-                  letterSpacing: 1.5,
-                ),
+                style: AppTheme.tagLabel.copyWith(color: AppColors.onSurfaceVariant),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -91,10 +87,7 @@ class TaskSliverAppBar extends StatelessWidget {
                 children: [
                   Text(
                     task.title,
-                    style: AppTheme.scaled(multiplier: AppTheme.m15,
-                      weight: FontWeight.w700,
-                      color: AppColors.onSurface,
-                    ),
+                    style: AppTheme.bodyBold.copyWith(fontSize: 14 * AppTheme.m15),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -122,11 +115,7 @@ class TaskSliverAppBar extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               task.category.toUpperCase(),
-                              style: AppTheme.scaled(multiplier: AppTheme.m2xl,
-                                weight: FontWeight.w900,
-                                color: AppColors.onSurface,
-                                letterSpacing: -0.5,
-                              ),
+                              style: AppTheme.largeTitle,
                             ),
                           ],
                         ),
@@ -134,11 +123,7 @@ class TaskSliverAppBar extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         task.price,
-                        style: AppTheme.scaled(multiplier: AppTheme.m2xl,
-                          weight: FontWeight.w900,
-                          color: AppColors.onSurface,
-                          letterSpacing: -0.5,
-                        ),
+                        style: AppTheme.largeTitle,
                       ),
                     ],
                   ),

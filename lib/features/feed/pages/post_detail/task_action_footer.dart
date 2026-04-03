@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../shared/utils/color_extensions.dart';
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
+import '../../../../shared/utils/decorations.dart';
 
 class TaskActionFooter extends StatelessWidget {
   final TaskData task;
@@ -76,16 +77,10 @@ class TaskActionFooter extends StatelessWidget {
                       child: TextField(
                         onChanged: onReplyChanged,
                         onSubmitted: (_) => onSend(),
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          color: AppColors.onSurface,
-                        ),
+                        style: AppTheme.bodyBold,
                         decoration: InputDecoration(
                           hintText: 'Message or ask a question...',
-                          hintStyle: AppTheme.scaled(
-                            multiplier: AppTheme.mbase,
-                            color: AppColors.onSurfaceVariant.withOpacity(0.5),
-                          ),
+                          hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -117,10 +112,7 @@ class TaskActionFooter extends StatelessWidget {
                           ),
                           child: Text(
                             'Send',
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.mxs,
-                              weight: FontWeight.w900,
-                            ),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
                           ),
                         ),
                       )
@@ -281,12 +273,7 @@ class TaskActionFooter extends StatelessWidget {
           ],
           Text(
             text,
-            style: AppTheme.scaled(
-              multiplier: AppTheme.m1sm,
-              color: labelColor,
-              weight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
+            style: AppTheme.caption.copyWith(color: labelColor),
           ),
         ],
       ),
@@ -320,11 +307,7 @@ class TaskActionFooter extends StatelessWidget {
               ),
               child: Text(
                 text,
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.m13,
-                  weight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
+                style: AppTheme.buttonLabel.copyWith(letterSpacing: 1.5),
               ),
             )
           : OutlinedButton(
@@ -342,12 +325,7 @@ class TaskActionFooter extends StatelessWidget {
               ),
               child: Text(
                 text,
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.m13,
-                  color: textColor ?? AppColors.onSurface,
-                  weight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
+                style: AppTheme.buttonLabel.copyWith(letterSpacing: 1.5, color: textColor ?? AppColors.onSurface),
               ),
             ),
     );

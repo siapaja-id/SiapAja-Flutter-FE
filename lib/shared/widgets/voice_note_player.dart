@@ -94,21 +94,11 @@ class VoiceNotePlayer extends StatelessWidget {
                   children: [
                     Text(
                       '0:12',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.m2sm,
-                        color: AppColors.onSurfaceVariant,
-                        weight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
+                      style: AppTheme.smallLabel.copyWith(color: AppColors.onSurfaceVariant),
                     ),
                     Text(
                       duration,
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.m2sm,
-                        color: AppColors.onSurfaceVariant,
-                        weight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
+                      style: AppTheme.smallLabel.copyWith(fontWeight: FontWeight.w700, letterSpacing: 1),
                     ),
                   ],
                 ),

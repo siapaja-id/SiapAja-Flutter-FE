@@ -1,4 +1,5 @@
 import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -151,18 +152,10 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                       controller: _controller,
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _handleSend(),
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mbase,
-                        color: AppColors.onSurface,
-                      ),
+                      style: AppTheme.bodyBold,
                       decoration: InputDecoration(
                         hintText: 'Reply to ${widget.handle}...',
-                        hintStyle: AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          color: AppColors.onSurfaceVariant.withOpacity(
-                            0.5,
-                          ),
-                        ),
+                        hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -222,11 +215,7 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
               ),
               child: Text(
                 'Reply',
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.mxs,
-                  weight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                ),
+                style: AppTheme.meta,
               ),
             ),
           ),

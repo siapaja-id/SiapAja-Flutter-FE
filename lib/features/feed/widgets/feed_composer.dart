@@ -1,4 +1,5 @@
 import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
 
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -189,21 +190,13 @@ class _FeedComposerState extends State<FeedComposer> {
                           TextField(
                             controller: _textController,
                             maxLines: null,
-                            decoration: const InputDecoration(
-                              hintText: '',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2xl,
-                              color: AppColors.onSurface,
-                              height: 1.8,
-                            ),
+                            decoration: borderlessInput(),
+                            style: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurface, height: 1.8),
                             onTap: () => setState(() => _isFocused = true),
                           ),
                           AnimatedSize(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOutCubic,
+                            duration: AppTheme.animNormal,
+                            curve: AppTheme.curveOut,
                             child: _attachments.isNotEmpty
                                 ? Padding(
                                     padding: const EdgeInsets.only(top: 16),
@@ -309,8 +302,8 @@ class _FeedComposerState extends State<FeedComposer> {
                 ),
               ),
               AnimatedSize(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
+                duration: AppTheme.animNormal,
+                curve: AppTheme.curveOut,
                 child: hasContent
                     ? Container(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -513,20 +506,11 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                         decoration: InputDecoration(
                           hintText:
                               'What do you need help with? Describe your task in detail...',
-                          hintStyle: AppTheme.scaled(
-                            multiplier: AppTheme.m2xl,
-                            color: AppColors.onSurfaceVariant.withOpacity(
-                              0.4,
-                            ),
-                          ),
+                          hintStyle: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurfaceVariant.withOpacity(0.4)),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                         ),
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.m2xl,
-                          color: AppColors.onSurface,
-                          height: 1.8,
-                        ),
+                        style: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurface, height: 1.8),
                         autofocus: true,
                       ),
                       if (widget.attachments.isNotEmpty)

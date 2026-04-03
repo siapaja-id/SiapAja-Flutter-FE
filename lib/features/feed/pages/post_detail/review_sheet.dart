@@ -40,11 +40,7 @@ class _ReviewSheetState extends State<ReviewSheet> {
         children: [
           Text(
             'Rate the worker',
-            style: AppTheme.scaled(
-              multiplier: AppTheme.mbase,
-              weight: FontWeight.w700,
-              color: AppColors.onSurfaceVariant,
-            ),
+            style: AppTheme.bodyBold,
           ),
           const SizedBox(height: 16),
           Row(

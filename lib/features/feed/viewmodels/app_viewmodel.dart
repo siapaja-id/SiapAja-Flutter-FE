@@ -101,24 +101,32 @@ final userVotesProvider = NotifierProvider<UserVotesNotifier, Map<String, int>>(
 );
 
 // ---------------------------------------------------------------------------
+// ToggleSetNotifier — base class for set-based toggle notifiers
+// ---------------------------------------------------------------------------
+
+abstract class ToggleSetNotifier extends Notifier<Set<String>> {
+  void toggle(String id) {
+    final newSet = Set<String>.from(state);
+    if (newSet.contains(id)) {
+      newSet.remove(id);
+    } else {
+      newSet.add(id);
+    }
+    state = newSet;
+  }
+
+  bool contains(String id) => state.contains(id);
+}
+
+// ---------------------------------------------------------------------------
 // User Reposts — set of feedItemIds that user has reposted
 // ---------------------------------------------------------------------------
 
-class UserRepostsNotifier extends Notifier<Set<String>> {
+class UserRepostsNotifier extends ToggleSetNotifier {
   @override
   Set<String> build() => {};
 
-  void toggle(String feedItemId) {
-    final newReposts = Set<String>.from(state);
-    if (newReposts.contains(feedItemId)) {
-      newReposts.remove(feedItemId);
-    } else {
-      newReposts.add(feedItemId);
-    }
-    state = newReposts;
-  }
-
-  bool hasReposted(String feedItemId) => state.contains(feedItemId);
+  bool hasReposted(String feedItemId) => contains(feedItemId);
 }
 
 final userRepostsProvider = NotifierProvider<UserRepostsNotifier, Set<String>>(
@@ -129,21 +137,11 @@ final userRepostsProvider = NotifierProvider<UserRepostsNotifier, Set<String>>(
 // Followed Handles — set of author handles that user follows
 // ---------------------------------------------------------------------------
 
-class FollowedHandlesNotifier extends Notifier<Set<String>> {
+class FollowedHandlesNotifier extends ToggleSetNotifier {
   @override
   Set<String> build() => {};
 
-  void toggle(String handle) {
-    final newFollowed = Set<String>.from(state);
-    if (newFollowed.contains(handle)) {
-      newFollowed.remove(handle);
-    } else {
-      newFollowed.add(handle);
-    }
-    state = newFollowed;
-  }
-
-  bool isFollowing(String handle) => state.contains(handle);
+  bool isFollowing(String handle) => contains(handle);
 }
 
 final followedHandlesProvider =

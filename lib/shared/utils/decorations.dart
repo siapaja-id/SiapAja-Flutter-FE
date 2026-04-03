@@ -93,3 +93,62 @@ BoxShadow shadowGlow({required Color color, double blur = 20, double opacity = 0
     blurRadius: blur,
   );
 }
+
+// ── InputDecoration presets ──────────────────────────────────────
+
+/// Glass-styled single-line input field.
+InputDecoration glassInputField({String? hintText, int maxLines = 1}) {
+  return InputDecoration(
+    filled: true,
+    fillColor: Colors.white.w05,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(color: Colors.white.w10),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(color: AppColors.primary.p50),
+    ),
+    hintText: hintText,
+    hintStyle: const TextStyle(color: Colors.white30),
+    maxLines: maxLines,
+  );
+}
+
+/// Borderless input — no visible border, dense, zero padding.
+InputDecoration borderlessInput() {
+  return const InputDecoration(
+    border: InputBorder.none,
+    enabledBorder: InputBorder.none,
+    focusedBorder: InputBorder.none,
+    isDense: true,
+    contentPadding: EdgeInsets.zero,
+  );
+}
+
+/// Glass-styled multi-line text area.
+InputDecoration glassInputArea({String? hintText}) {
+  return InputDecoration(
+    filled: true,
+    fillColor: Colors.white.w05,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(color: Colors.white.w10),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20),
+      borderSide: BorderSide(color: AppColors.primary.p50),
+    ),
+    hintText: hintText,
+    hintStyle: const TextStyle(color: Colors.white30),
+    maxLines: null,
+  );
+}

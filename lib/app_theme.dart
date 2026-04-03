@@ -265,6 +265,71 @@ class AppTheme {
     color: AppColors.onSurface,
   );
 
+  // ── Named TextStyle constants (Phase 2) ──────────────────────
+  static const TextStyle sectionLabel = TextStyle(
+    fontSize: 14 * 0.643, fontWeight: FontWeight.w900, letterSpacing: 2, color: AppColors.onSurfaceVariant);
+  static const TextStyle sectionLabelWhite = TextStyle(
+    fontSize: 14 * 0.643, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white);
+  static const TextStyle cardTitle = TextStyle(
+    fontSize: 14 * 1.143, fontWeight: FontWeight.w900, color: AppColors.onSurface, height: 1.2);
+  static const TextStyle meta = TextStyle(
+    fontSize: 14 * 0.857, fontWeight: FontWeight.w700, color: AppColors.onSurfaceVariant);
+  static const TextStyle metaMuted = TextStyle(
+    fontSize: 14 * 0.857, fontWeight: FontWeight.w700, color: Color(0xFF666670));
+  static const TextStyle sheetTitle = TextStyle(
+    fontSize: 14 * 1.286, fontWeight: FontWeight.w900, color: AppColors.onSurface, letterSpacing: -0.5);
+  static const TextStyle actionLabel = TextStyle(
+    fontSize: 14 * 1.0, fontWeight: FontWeight.w900, letterSpacing: 2);
+  static const TextStyle bodyText = TextStyle(
+    fontSize: 14 * 0.929, fontWeight: FontWeight.w500, color: AppColors.onSurfaceVariant);
+  static const TextStyle valueDisplay = TextStyle(
+    fontSize: 14 * 1.286, fontWeight: FontWeight.w900, color: AppColors.onSurface, letterSpacing: -0.5);
+  static const TextStyle buttonLabel = TextStyle(
+    fontSize: 14 * 0.929, fontWeight: FontWeight.w700, letterSpacing: 1);
+  static const TextStyle smallLabel = TextStyle(
+    fontSize: 14 * 0.714, fontWeight: FontWeight.w900, letterSpacing: 2, color: AppColors.onSurfaceVariant);
+  static const TextStyle largeTitle = TextStyle(
+    fontSize: 14 * 1.429, fontWeight: FontWeight.w900, color: AppColors.onSurface);
+  static const TextStyle largeTitleWhite = TextStyle(
+    fontSize: 14 * 1.429, fontWeight: FontWeight.w900, color: Colors.white);
+  static const TextStyle bodyBold = TextStyle(
+    fontSize: 14 * 1.0, fontWeight: FontWeight.w700, color: AppColors.onSurface);
+  static const TextStyle caption = TextStyle(
+    fontSize: 14 * 0.786, fontWeight: FontWeight.w700, color: AppColors.onSurfaceVariant);
+  static const TextStyle heroTitle = TextStyle(
+    fontSize: 14 * 1.571, fontWeight: FontWeight.w900, color: Colors.white);
+  static const TextStyle tagLabel = TextStyle(
+    fontSize: 14 * 0.714, fontWeight: FontWeight.w900, letterSpacing: 1.5);
+  static const TextStyle inputLabel = TextStyle(
+    fontSize: 14 * 0.786, fontWeight: FontWeight.w700, color: Color(0xFF666670));
+  static const TextStyle priceDisplay = TextStyle(
+    fontSize: 14 * 2.0, fontWeight: FontWeight.w900, color: AppColors.onSurface, letterSpacing: -1);
+  static const TextStyle countDisplay = TextStyle(
+    fontSize: 14 * 1.143, fontWeight: FontWeight.w900, color: Colors.white);
+
+  // ── Animation constants ───────────────────────────────────────
+  static const Duration animFast = Duration(milliseconds: 200);
+  static const Duration animNormal = Duration(milliseconds: 250);
+  static const Duration animSlide = Duration(milliseconds: 300);
+  static const Duration animSheet = Duration(milliseconds: 400);
+  static const Curve curveOut = Curves.easeOutCubic;
+  static const Curve curveOutQuart = Curves.easeOut;
+  static const Curve curveIn = Curves.easeIn;
+
+  // ── Body text with line height (card content) ─────────────────
+  static const TextStyle bodyCard = TextStyle(
+    fontSize: 14 * 0.929, fontWeight: FontWeight.w500, color: AppColors.onSurfaceVariant, height: 1.5);
+  static const TextStyle bodyCardWhite = TextStyle(
+    fontSize: 14 * 0.929, fontWeight: FontWeight.w500, color: AppColors.onSurface, height: 1.5);
+  static const TextStyle bodyMeta = TextStyle(
+    fontSize: 14 * 0.857, fontWeight: FontWeight.w500, color: AppColors.onSurfaceVariant, height: 1.5);
+  static const TextStyle metaBold = TextStyle(
+    fontSize: 14 * 0.857, fontWeight: FontWeight.w700, color: AppColors.onSurfaceVariant, height: 1.5);
+  static const TextStyle subtitle = TextStyle(
+    fontSize: 14 * 1.143, fontWeight: FontWeight.w700, color: AppColors.onSurfaceVariant, height: 1.5);
+  static const TextStyle bodyLarge = TextStyle(
+    fontSize: 14 * 1.286, fontWeight: FontWeight.w500, color: AppColors.onSurface, height: 1.5);
+
   static double textScaleFactor(TextSize textSize) {
     switch (textSize) {
       case TextSize.sm:

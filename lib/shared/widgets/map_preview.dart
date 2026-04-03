@@ -72,12 +72,7 @@ class MapPreview extends StatelessWidget {
                           const SizedBox(width: 6),
                           Text(
                             'OSRM ROUTED',
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2xs,
-                              color: Colors.white,
-                              weight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
+                            style: AppTheme.tagLabel.copyWith(color: Colors.white),
                           ),
                         ],
                       ),
@@ -168,11 +163,7 @@ class MapPreview extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           'Navigate via Google Maps',
-                          style: AppTheme.scaled(
-                            multiplier: AppTheme.mbase,
-                            color: AppColors.primary,
-                            weight: FontWeight.w900,
-                          ),
+                          style: AppTheme.actionLabel.copyWith(color: AppColors.primary),
                         ),
                         const SizedBox(width: 8),
                         const Icon(
@@ -206,21 +197,12 @@ class _RoutePoint extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTheme.scaled(
-            multiplier: AppTheme.m2xs,
-            color: AppColors.onSurfaceVariant.withOpacity(0.7),
-            weight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
+          style: AppTheme.sectionLabel.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.7)),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: AppTheme.scaled(
-            multiplier: AppTheme.m13,
-            color: AppColors.onSurface,
-            weight: FontWeight.w700,
-          ),
+          style: AppTheme.bodyBold,
         ),
       ],
     );

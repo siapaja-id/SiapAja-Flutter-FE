@@ -106,8 +106,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
     _scrollController.animateTo(
       0,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOutCubic,
+      duration: AppTheme.animNormal,
+      curve: AppTheme.curveOut,
     );
   }
 
@@ -347,12 +347,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     ),
                     child: Text(
                       currentItem is TaskData ? 'DISCUSSION & BIDS' : 'REPLIES',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mlg,
-                        weight: FontWeight.w900,
-                        color: AppColors.onSurfaceVariant,
-                        letterSpacing: 3,
-                      ),
+                      style: AppTheme.cardTitle.copyWith(color: AppColors.onSurfaceVariant),
                     ),
                   ),
                 ),
@@ -505,11 +500,7 @@ class _DetailHeader extends StatelessWidget {
                     Flexible(
                       child: Text(
                         title,
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.m15,
-                          weight: FontWeight.w700,
-                          color: AppColors.onSurface,
-                        ),
+                        style: AppTheme.bodyBold.copyWith(fontSize: 14 * AppTheme.m15),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -528,11 +519,7 @@ class _DetailHeader extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.mlg,
-                      weight: FontWeight.w500,
-                      color: AppColors.onSurfaceVariant,
-                    ),
+                    style: AppTheme.cardTitle,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

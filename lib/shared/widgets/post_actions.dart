@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
 import '../../features/feed/providers.dart';
+import '../utils/string_extensions.dart';
 
 class PostActions extends ConsumerWidget {
   final String id;
@@ -115,7 +116,7 @@ class _ActionButton extends StatelessWidget {
             if (count != null && count! > 0) ...[
               const SizedBox(width: 4),
               Text(
-                _formatCount(count!),
+                count!.formatCompact(),
                 style: Theme.of(
                   context,
                 ).textTheme.labelMedium?.copyWith(color: color),
@@ -127,12 +128,6 @@ class _ActionButton extends StatelessWidget {
     );
   }
 
-  String _formatCount(int count) {
-    if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(1)}k';
-    }
-    return count.toString();
-  }
 }
 
 class _VotePill extends StatelessWidget {
@@ -200,9 +195,7 @@ class _VotePill extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              votes >= 1000
-                  ? '${(votes / 1000).toStringAsFixed(1)}k'
-                  : votes.toString(),
+              votes.formatCompact(),
               style: Theme.of(
                 context,
               ).textTheme.labelMedium?.copyWith(color: voteColor),

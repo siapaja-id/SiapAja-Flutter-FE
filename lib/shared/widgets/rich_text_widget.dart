@@ -90,11 +90,7 @@ class RichTextWidget extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 displayUrl,
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.mxs,
-                  weight: FontWeight.w500,
-                  color: AppColors.primary,
-                ),
+                style: AppTheme.meta,
               ),
             ],
           ),

@@ -38,10 +38,7 @@ class PrimaryActionButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: AppTheme.scaled(
-            multiplier: AppTheme.mbase,
-            weight: FontWeight.w900,
-          ),
+          style: AppTheme.actionLabel,
         ),
       ),
     );

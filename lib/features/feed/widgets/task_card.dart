@@ -72,12 +72,7 @@ class TaskCard extends StatelessWidget {
               decoration: tintedDecor(color: AppColors.primary, radius: 4),
               child: Text(
                 getStatusText(data.status),
-                style: AppTheme.scaled(
-                  multiplier: AppTheme.m2xs,
-                  color: AppColors.primary,
-                  weight: FontWeight.w800,
-                  letterSpacing: 1,
-                ),
+                style: AppTheme.sectionLabel.copyWith(color: AppColors.primary, fontWeight: FontWeight.w800, letterSpacing: 1),
               ),
             )
           : null,
@@ -86,11 +81,7 @@ class TaskCard extends StatelessWidget {
         if (isParent)
           Text(
             data.title,
-            style: AppTheme.scaled(
-              multiplier: AppTheme.m13,
-              color: AppColors.onSurfaceVariant,
-              height: 1.5,
-            ),
+            style: AppTheme.bodyCard,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           )
@@ -104,47 +95,25 @@ class TaskCard extends StatelessWidget {
                   children: [
                     Text(
                       data.category,
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.m2xs,
-                        color: AppColors.onSurfaceVariant,
-                        weight: FontWeight.w700,
-                        letterSpacing: 0.92,
-                      ),
+                      style: AppTheme.sectionLabel.copyWith(color: AppColors.onSurfaceVariant),
                     ),
                     Text(
                       data.price,
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mxs,
-                        color: AppColors.primary,
-                        weight: FontWeight.bold,
-                      ),
+                      style: AppTheme.meta.copyWith(color: AppColors.primary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   data.title,
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.m13,
-                    color: AppColors.onSurface,
-                    weight: FontWeight.bold,
-                  ),
+                  style: AppTheme.bodyBold,
                 ),
                 const SizedBox(height: 4),
                 ExpandableText(
                   text: data.description,
                   limit: 100,
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    color: AppColors.onSurfaceVariant,
-                    height: 1.5,
-                  ),
-                  buttonStyle: AppTheme.scaled(
-                    multiplier: AppTheme.m2sm,
-                    color: AppColors.onSurfaceVariant,
-                    weight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
+                  style: AppTheme.bodyMeta,
+                  buttonStyle: AppTheme.smallLabel.copyWith(color: AppColors.onSurfaceVariant),
                 ),
                 const SizedBox(height: 4),
                 if (data.mapUrl != null) ...[
@@ -161,11 +130,7 @@ class TaskCard extends StatelessWidget {
                     if (data.meta != null)
                       Text(
                         data.meta!,
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.m1sm,
-                          color: AppColors.onSurfaceVariant,
-                          weight: FontWeight.w500,
-                        ),
+                        style: AppTheme.caption.copyWith(fontWeight: FontWeight.w500),
                       )
                     else
                       const SizedBox.shrink(),
@@ -185,10 +150,7 @@ class TaskCard extends StatelessWidget {
                       ),
                       child: Text(
                         data.category == 'Repair Needed' ? 'Bid' : 'Claim',
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.mxs,
-                          weight: FontWeight.bold,
-                        ),
+                        style: AppTheme.meta,
                       ),
                     ),
                   ],
@@ -254,12 +216,7 @@ class TaskCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         'Static Route',
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.m2xs,
-                          color: AppColors.onSurface,
-                          weight: FontWeight.w800,
-                          letterSpacing: 1,
-                        ),
+                        style: AppTheme.sectionLabel.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w800, letterSpacing: 1),
                       ),
                     ],
                   ),

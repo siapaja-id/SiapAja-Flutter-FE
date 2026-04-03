@@ -129,7 +129,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
     );
     _hoverAnimation = CurvedAnimation(
       parent: _hoverController,
-      curve: Curves.easeOutCubic,
+      curve: AppTheme.curveOut,
     );
 
     if (widget.enterController == null) {
@@ -236,8 +236,8 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                     Positioned.fill(
                       child: RepaintBoundary(
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeOutCubic,
+                          duration: AppTheme.animNormal,
+                          curve: AppTheme.curveOut,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(36),
                             border: Border.all(
@@ -381,12 +381,7 @@ class _ColumnHeader extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.m1sm,
-                      weight: FontWeight.w700,
-                      color: Colors.white.w65,
-                      letterSpacing: 0.03,
-                    ),
+                    style: AppTheme.caption.copyWith(color: Colors.white.w65),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -408,12 +403,7 @@ class _ColumnHeader extends StatelessWidget {
                   ),
                   child: Text(
                     '${index + 1}/$total',
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.m2xs,
-                      weight: FontWeight.w800,
-                      color: Colors.white.w25,
-                      letterSpacing: 0.08,
-                    ),
+                    style: AppTheme.sectionLabel.copyWith(fontWeight: FontWeight.w800, color: Colors.white.w25, letterSpacing: 0.08),
                   ),
                 ),
               if (canClose) ...[

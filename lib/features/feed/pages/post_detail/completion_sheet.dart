@@ -3,9 +3,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
+import '../../../../shared/utils/color_extensions.dart';
+import '../../../../shared/utils/decorations.dart';
 import '../../../../shared/widgets/base_sheet.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
-import '../../../../shared/utils/color_extensions.dart';
 
 class CompletionSheet extends StatelessWidget {
   final TaskData task;
@@ -46,16 +47,10 @@ class CompletionSheet extends StatelessWidget {
         children: [
           TextField(
             controller: notesCtrl,
-            style: AppTheme.scaled(
-              multiplier: AppTheme.mbase,
-              color: AppColors.onSurface,
-            ),
+            style: AppTheme.bodyBold,
             decoration: InputDecoration(
               hintText: 'Add completion notes or proof of work...',
-              hintStyle: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                color: AppColors.onSurfaceVariant.withOpacity(0.3),
-              ),
+              hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.3)),
               filled: true,
               fillColor: Colors.white.w05,
               border: OutlineInputBorder(
@@ -92,10 +87,7 @@ class CompletionSheet extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Upload Proof Image',
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.mxs,
-                    weight: FontWeight.w700,
-                  ),
+                  style: AppTheme.meta,
                 ),
               ],
             ),

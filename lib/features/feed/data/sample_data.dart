@@ -7,7 +7,6 @@ final List<Author> mockAuthors = [
     name: 'Alice Smith',
     handle: 'alicesmith',
     avatar: 'https://picsum.photos/seed/alice/100/100',
-    verified: false,
     isOnline: true,
   ),
   Author(
@@ -21,8 +20,6 @@ final List<Author> mockAuthors = [
     name: 'Charlie Day',
     handle: 'charlie_day',
     avatar: 'https://picsum.photos/seed/charlie/100/100',
-    verified: false,
-    isOnline: false,
   ),
   Author(
     name: 'Diana Prince',
@@ -35,8 +32,6 @@ final List<Author> mockAuthors = [
     name: 'Evan Wright',
     handle: 'evanw',
     avatar: 'https://picsum.photos/seed/evan/100/100',
-    verified: false,
-    isOnline: false,
   ),
 ];
 
@@ -51,10 +46,6 @@ final List<FeedItem> sampleData = [
     content:
         '🚀 Excited to announce our new platform features! Check the docs at https://docs.siapaja.com. We\'ve been working hard on making the experience better for everyone. What do you think @bobjones? #updates #newfeatures \n\nP.S. The new secret code is ||launch2025||.',
     timestamp: 'Just now',
-    replies: 0,
-    reposts: 0,
-    shares: 0,
-    votes: 0,
     images: ['https://picsum.photos/seed/announcement/600/400'],
     isFirstPost: true,
   ),
@@ -69,10 +60,6 @@ final List<FeedItem> sampleData = [
     timestamp: 'Just now',
     status: TaskStatus.open,
     iconType: TaskIconType.palette,
-    replies: 0,
-    reposts: 0,
-    shares: 0,
-    votes: 0,
     isFirstTask: true,
   ),
 
@@ -85,9 +72,6 @@ final List<FeedItem> sampleData = [
     content:
         'Taking a break from coding to enjoy this beautiful sunset. Sometimes you just need to step away from the screen! 🌅',
     timestamp: '2m',
-    replies: 0,
-    reposts: 0,
-    shares: 0,
     votes: 5,
   ),
   SocialPostData(
@@ -139,7 +123,6 @@ final List<FeedItem> sampleData = [
       iconType: TaskIconType.repair,
       replies: 5,
       reposts: 1,
-      shares: 0,
       votes: 8,
     ),
   ),
@@ -150,7 +133,6 @@ final List<FeedItem> sampleData = [
         'Anyone know good mechanics in the area? My car needs brake repair.',
     timestamp: '8h',
     replies: 7,
-    reposts: 0,
     shares: 2,
     votes: 12,
   ),
@@ -201,7 +183,6 @@ final List<FeedItem> sampleData = [
     tags: ['Premium', 'VIP', 'Airport'],
     replies: 5,
     reposts: 1,
-    shares: 0,
     votes: 8,
     mapUrl:
         'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&h=400&auto=format&fit=crop',
@@ -218,8 +199,6 @@ final List<FeedItem> sampleData = [
     status: TaskStatus.open,
     iconType: TaskIconType.package,
     replies: 2,
-    reposts: 0,
-    shares: 0,
     votes: 3,
     mapUrl:
         'https://images.unsplash.com/photo-1554310603-d39d43033735?q=80&w=800&h=400&auto=format&fit=crop',
@@ -299,7 +278,6 @@ final List<FeedItem> sampleData = [
     tags: ['Tour', 'VIP', 'Photography'],
     replies: 6,
     reposts: 2,
-    shares: 0,
     votes: 18,
     assignedWorker: mockAuthors[4],
     acceptedBidAmount: '\$120',
@@ -343,7 +321,6 @@ final List<FeedItem> sampleData = [
     tags: ['Heavy', 'Vehicle Required'],
     replies: 4,
     reposts: 1,
-    shares: 0,
     votes: 9,
     assignedWorker: mockAuthors[1],
     acceptedBidAmount: '\$80',

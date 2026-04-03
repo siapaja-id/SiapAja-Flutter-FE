@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/utils/decorations.dart';
 import '../../../shared/widgets/user_avatar.dart';
 
 const int _maxChars = 280;
@@ -44,7 +45,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
+          curve: AppTheme.curveOutQuart,
         );
       }
     });
@@ -182,13 +183,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
           Expanded(
             child: Text(
               widget.parentItem != null ? 'REPLY' : 'NEW THREAD',
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                weight: FontWeight.w700,
-                color: AppColors.onSurface,
-                letterSpacing: 3.0,
-                height: 1.0,
-              ),
+              style: AppTheme.bodyBold.copyWith(letterSpacing: 3.0),
             ),
           ),
           TextButton(
@@ -201,11 +196,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             ),
             child: Text(
               'Drafts',
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                weight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
+              style: AppTheme.bodyBold,
             ),
           ),
           const SizedBox(width: 8),
@@ -242,14 +233,9 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
           children: [
             Text(
               label,
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                weight: FontWeight.w900,
-                color: hasText
+              style: AppTheme.actionLabel.copyWith(color: hasText
                     ? AppColors.primaryForeground
-                    : AppColors.onSurfaceVariant,
-                letterSpacing: 2.0,
-              ),
+                    : AppColors.onSurfaceVariant),
             ),
             const SizedBox(width: 6),
             Icon(
@@ -310,11 +296,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     children: [
                       Text(
                         '@${item.author.handle}',
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          weight: FontWeight.w700,
-                          color: AppColors.onSurface,
-                        ),
+                        style: AppTheme.bodyBold,
                       ),
                       if (type == 'task' && taskPrice != null) ...[
                         const SizedBox(width: 8),
@@ -332,12 +314,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                           ),
                           child: Text(
                             taskPrice,
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2sm,
-                              weight: FontWeight.w900,
-                              color: AppColors.emerald,
-                              letterSpacing: 1.5,
-                            ),
+                            style: AppTheme.smallLabel.copyWith(color: AppColors.emerald),
                           ),
                         ),
                       ],
@@ -360,22 +337,13 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                         children: [
                           Text(
                             taskTitle,
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.mbase,
-                              weight: FontWeight.w700,
-                              color: AppColors.onSurface,
-                              height: 1.3,
-                            ),
+                            style: AppTheme.bodyBold,
                           ),
                           if (content.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             Text(
                               content,
-                              style: AppTheme.scaled(
-                                multiplier: AppTheme.mxs,
-                                color: AppColors.onSurfaceVariant,
-                                height: 1.5,
-                              ),
+                              style: AppTheme.bodyMeta,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -386,11 +354,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                   else
                     Text(
                       content,
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.mlg,
-                        color: AppColors.onSurfaceVariant,
-                        height: 1.5,
-                      ),
+                      style: AppTheme.subtitle,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -456,11 +420,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     children: [
                       Text(
                         'You',
-                        style: AppTheme.scaled(
-                          multiplier: AppTheme.mbase,
-                          weight: FontWeight.w700,
-                          color: AppColors.onSurface,
-                        ),
+                        style: AppTheme.bodyBold,
                       ),
                       const Spacer(),
                       if (showDelete)
@@ -489,19 +449,12 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     focusNode: thread.focusNode,
                     onChanged: (_) => setState(() {}),
                     onTap: () => setState(() => _activeIndex = index),
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.mxl,
-                      color: AppColors.onSurface,
-                      height: 1.5,
-                    ),
+                    style: AppTheme.bodyLarge,
                     decoration: InputDecoration(
                       hintText: index == 0
                           ? "What's happening?"
                           : 'Add another thought...',
-                      hintStyle: AppTheme.scaled(
-                        multiplier: AppTheme.mxl,
-                        color: AppColors.onSurfaceVariant.withOpacity(0.4),
-                      ),
+                      hintStyle: AppTheme.bodyLarge.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.4)),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -572,11 +525,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     padding: const EdgeInsets.only(left: 2),
                     child: Text(
                       '${_maxChars - _threads[index].controller.text.length}',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.m3xs,
-                        weight: FontWeight.w700,
-                        color: Colors.red,
-                      ),
+                      style: TextStyle(fontSize: 14 * AppTheme.m3xs, fontWeight: FontWeight.w700, color: Colors.red),
                     ),
                   ),
                 Container(
@@ -642,11 +591,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             const SizedBox(width: 16),
             Text(
               'Add to thread',
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mbase,
-                weight: FontWeight.w700,
-                color: AppColors.onSurfaceVariant,
-              ),
+              style: AppTheme.bodyBold,
             ),
           ],
         ),
@@ -676,12 +621,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
           const SizedBox(width: 8),
           Text(
             'Everyone can reply',
-            style: AppTheme.scaled(
-              multiplier: AppTheme.mxs,
-              weight: FontWeight.w700,
-              color: AppColors.primary,
-              letterSpacing: 2.0,
-            ),
+            style: AppTheme.meta.copyWith(color: AppColors.primary),
           ),
         ],
       ),

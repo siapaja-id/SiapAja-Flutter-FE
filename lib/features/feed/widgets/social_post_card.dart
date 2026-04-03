@@ -7,6 +7,7 @@ import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
+import '../../../shared/widgets/voice_note_player.dart';
 import 'feed_item_card.dart';
 import 'base_feed_card.dart';
 // SocialPostCard
@@ -94,11 +95,7 @@ class SocialPostCard extends StatelessWidget {
         if (isParent)
           Text(
             data.content,
-            style: AppTheme.scaled(
-              multiplier: AppTheme.m13,
-              color: AppColors.onSurface,
-              height: 1.5,
-            ),
+            style: AppTheme.bodyCardWhite,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           )
@@ -107,16 +104,8 @@ class SocialPostCard extends StatelessWidget {
             text: data.content,
             limit: isMain ? 280 : 160,
             style: isMain
-                ? AppTheme.scaled(
-                    multiplier: AppTheme.mlg,
-                    color: AppColors.onSurface.withOpacity(0.9),
-                    height: 1.5,
-                  )
-                : AppTheme.scaled(
-                    multiplier: AppTheme.m13,
-                    color: AppColors.onSurface.withOpacity(0.9),
-                    height: 1.5,
-                  ),
+                ? AppTheme.subtitle.copyWith(color: AppColors.onSurface.withOpacity(0.9))
+                : AppTheme.bodyCardWhite.copyWith(color: AppColors.onSurface.withOpacity(0.9)),
             suffix: data.threadCount != null && data.threadCount! > 1
                 ? Container(
                     padding: const EdgeInsets.symmetric(
@@ -132,12 +121,7 @@ class SocialPostCard extends StatelessWidget {
                     ),
                     child: Text(
                       '${data.threadIndex}/${data.threadCount}',
-                      style: AppTheme.scaled(
-                        multiplier: AppTheme.m2xs,
-                        color: AppColors.primary,
-                        weight: FontWeight.w800,
-                        letterSpacing: 2,
-                      ),
+                      style: AppTheme.sectionLabel.copyWith(color: AppColors.primary),
                     ),
                   )
                 : null,
@@ -176,79 +160,7 @@ class SocialPostCard extends StatelessWidget {
         ],
         if (!isParent && data.voiceNote != null) ...[
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    PhosphorIconsRegular.play,
-                    color: AppColors.primaryForeground,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: AppColors.border,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: const FractionallySizedBox(
-                          widthFactor: 0.33,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(3),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '0:12',
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2sm,
-                              color: AppColors.onSurfaceVariant,
-                              weight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            data.voiceNote!,
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2sm,
-                              color: AppColors.onSurfaceVariant,
-                              weight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          VoiceNotePlayer(duration: data.voiceNote!),
         ],
         if (!isParent && data.quote != null) ...[
           const SizedBox(height: 8),
