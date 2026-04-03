@@ -506,7 +506,7 @@ plan:
           - lib/features/settings/pages/settings_page.dart
 
     - uuid: 'e6f7a8b9-0c1d-4e2f-3a4b-5c6d7e8f9a0b'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 11: Bid Controls Unification — Radar + BidSheet'
       reason: |
         radar_page.dart `_buildBidSheetOverlay` (lines 531-821, ~290 LOC) and bid_sheet.dart (272 LOC) implement nearly identical bid UI:
@@ -519,7 +519,7 @@ plan:
         The radar version uses GestureDetector while bid_sheet uses Inkwell, but the visual structure is identical. Extracting shared bid control widgets eliminates ~250 LOC of duplication.
       steps:
         - uuid: 'f7a8b9c0-1d2e-4f3a-4b5c-6d7e8f9a0b1c'
-          status: 'pending'
+          status: 'completed'
           name: 'Create Shared Bid Control Widgets'
           reason: 'Extract the common bid UI into reusable shared widgets'
           files:
@@ -530,7 +530,7 @@ plan:
             - 'Create `BidPitchField({required ValueChanged<String> onChanged, String? hintText})` widget: renders the glass-styled multi-line TextField with glassInputArea decoration'
             - 'Create `BidSubmitButton({required VoidCallback onPressed, String label = "PLACE BID"})` widget: renders full-width emerald button with glow shadow and paperPlaneTilt icon'
         - uuid: 'a8b9c0d1-2e3f-4a4b-5c6d-7e8f9a0b1c2d'
-          status: 'pending'
+          status: 'completed'
           name: 'Refactor Radar and BidSheet to Use Shared Bid Controls'
           reason: 'Replace ~500 lines of duplicated bid UI with shared widget calls'
           files:
@@ -560,7 +560,7 @@ plan:
           - lib/features/feed/pages/post_detail/completion_sheet.dart
 
     - uuid: 'f7a8b9c0-1d2e-4f3a-4b5c-6d7e8f9a0b1c'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 12: FeedComposer Attachment Grid Deduplication'
       reason: |
         feed_composer.dart (688 LOC) contains two nearly identical attachment preview grids:
@@ -570,7 +570,7 @@ plan:
         The toolbar row of `_attachmentIconButton` calls is also duplicated (lines 325-350 and 647-680).
       steps:
         - uuid: 'a8b9c0d1-2e3f-4a4b-5c6d-7e8f9a0b1c2d'
-          status: 'pending'
+          status: 'completed'
           name: 'Extract AttachmentThumbnail and Shared Toolbar'
           reason: 'Remove ~100 lines of duplicated attachment UI from feed_composer.dart'
           files:
