@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
@@ -112,12 +113,9 @@ class SocialPostCard extends StatelessWidget {
                       horizontal: 6,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.p10,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: AppColors.primary.p20,
-                      ),
+                    decoration: tintedDecorHalf(
+                      color: AppColors.primary,
+                      radius: 6,
                     ),
                     child: Text(
                       '${data.threadIndex}/${data.threadCount}',
@@ -183,10 +181,9 @@ class _BidCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: const Color(0xFF10B981).withOpacity(0.1),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFF10B981).withOpacity(0.2)),
+    decoration: tintedDecorHalf(
+      color: const Color(0xFF10B981),
+      radius: 16,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
