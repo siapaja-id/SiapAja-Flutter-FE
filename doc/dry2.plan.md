@@ -336,13 +336,13 @@ plan:
           - lib/features/feed/pages/feed_page.dart
 
     - uuid: 'a2b3c4d5-6e7f-4a8b-9c0d-1e2f3a4b5c6d'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 7: Utility Extractions — formatCount, parsePrice, CloseButton'
       reason: |
         Small utility functions are duplicated or repeated inline across multiple files. Extracting them saves lines and centralizes logic.
       steps:
         - uuid: 'b3c4d5e6-7f8a-4b9c-0d1e-2f3a4b5c6d7e'
-          status: 'pending'
+          status: 'completed'
           name: 'Create Shared Utility Extensions'
           reason: 'Extract duplicated utility functions into shared location'
           files:
@@ -354,7 +354,7 @@ plan:
             - 'Create `int parsePrice(String price)` utility that extracts numeric value from price string — used in radar_page.dart line 534, bid_sheet.dart, and post_detail_page.dart — pattern: `int.tryParse(price.replaceAll(RegExp(r"[^0-9]"), "")) ?? 0`'
             - 'Create `CloseButton({required VoidCallback onTap})` widget that renders the standard close button: Container(36x36, white.w05 bg, radius 18) > Icon(PhosphorIconsRegular.x, size 20, white.w50) — used in radar_page.dart bid sheet, BaseSheet, kanban_column_widget.dart'
         - uuid: 'c4d5e6f7-8a9b-4c0d-1e2f-3a4b5c6d7e8f'
-          status: 'pending'
+          status: 'completed'
           name: 'Apply Utility Extractions'
           reason: 'Replace inline duplicated patterns with shared utilities'
           files:
@@ -389,13 +389,13 @@ plan:
           - lib/features/feed/pages/radar_page.dart
 
     - uuid: 'b3c4d5e6-7f8a-4b9c-0d1e-2f3a4b5c6d7e'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 8: VoiceNotePlayer Reuse in SocialPostCard'
       reason: |
         `social_post_card.dart` lines 177-252 contain a hand-coded voice note player (play circle button, progress bar with FractionallySizedBox, time labels) that duplicates the purpose of the existing `VoiceNotePlayer` widget (122 LOC) at `shared/widgets/voice_note_player.dart`. The social_post_card version is a simplified but structurally identical implementation — 75 lines of duplicated UI code.
       steps:
         - uuid: 'c4d5e6f7-8a9b-4c0d-1e2f-3a4b5c6d7e8f'
-          status: 'pending'
+          status: 'completed'
           name: 'Replace Inline VoiceNote with Shared Widget'
           reason: 'Remove 75 lines of duplicated voice note UI from social_post_card.dart'
           files:

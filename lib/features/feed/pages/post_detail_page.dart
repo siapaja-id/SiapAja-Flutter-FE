@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
+import '../../../shared/utils/price_utils.dart';
 import '../../../shared/utils/scroll_helpers.dart';
 import '../../../shared/widgets/tag_pill.dart';
 import '../../../shared/widgets/view_stats_badge.dart';
@@ -79,7 +80,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   void _initBidState(FeedItem post) {
     if (post is TaskData) {
       final priceStr = post.price;
-      final parsed = int.tryParse(priceStr.replaceAll(RegExp(r'[^0-9]'), ''));
+      final parsed = parsePrice(priceStr);
       _defaultBid = parsed ?? 50;
       _isNegotiable = priceStr.contains('-');
     }

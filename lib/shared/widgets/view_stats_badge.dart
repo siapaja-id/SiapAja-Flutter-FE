@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
+import '../utils/string_extensions.dart';
 import 'glass_pill.dart';
 import 'pulsing_dot.dart';
 
@@ -24,7 +25,7 @@ class ViewStatsBadge extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            _formatCount(viewCount),
+            viewCount.formatCompact(),
             style: AppTheme.scaled(
               multiplier: AppTheme.m1sm,
               weight: FontWeight.w700,
@@ -58,8 +59,4 @@ class ViewStatsBadge extends StatelessWidget {
     );
   }
 
-  String _formatCount(int count) {
-    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}k';
-    return count.toString();
-  }
 }

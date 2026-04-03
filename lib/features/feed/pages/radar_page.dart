@@ -14,6 +14,8 @@ import '../../../app_theme.dart';
 import '../../../models/gig.dart';
 import '../../../shared/constants/mock_gigs.dart';
 import '../../../shared/settings_provider.dart';
+import '../../../shared/utils/price_utils.dart';
+import '../../../shared/widgets/close_button.dart';
 import '../providers.dart';
 
 class RadarPage extends ConsumerStatefulWidget {
@@ -71,9 +73,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
       if (!mounted) return;
 
       if (direction == 'up') {
-        _bidAmount =
-            int.tryParse(currentGig.price.replaceAll(RegExp(r'[^0-9]'), '')) ??
-            50;
+        _bidAmount = parsePrice(currentGig.price) ?? 50;
         setState(() {
           _showBidSheet = true;
         });
@@ -522,8 +522,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
 
   Widget _buildBidSheetOverlay() {
     final gig = _getCurrentGig()!;
-    final defaultBid =
-        int.tryParse(gig.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 50;
+    final defaultBid = parsePrice(gig.price) ?? 50;
 
     return GestureDetector(
       onTap: () {
@@ -584,7 +583,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                   color: AppColors.onSurface,
                                 ),
                               ),
-                              GestureDetector(
+                              CloseButton(
                                 onTap: () {
                                   _bidSheetController.reverse().then((_) {
                                     if (mounted) {
@@ -592,19 +591,6 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                     }
                                   });
                                 },
-                                child: Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.w05,
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: Icon(
-                                    PhosphorIconsRegular.x,
-                                    size: 20,
-                                    color: Colors.white.w50,
-                                  ),
-                                ),
                               ),
                             ],
                           ),

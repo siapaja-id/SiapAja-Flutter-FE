@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
 import '../utils/color_extensions.dart';
 import '../utils/decorations.dart';
+import 'close_button.dart';
 
 /// Shared bottom-sheet scaffold used by all modal sheets in the app.
 ///
@@ -70,16 +70,8 @@ class BaseSheet extends StatelessWidget {
                 title,
                 style: AppTheme.largeTitle,
               ),
-              IconButton(
-                onPressed: onClose ?? () => Navigator.pop(context),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.w05,
-                ),
-                icon: const Icon(
-                  PhosphorIconsRegular.x,
-                  size: 20,
-                  color: AppColors.onSurfaceVariant,
-                ),
+              CloseButton(
+                onTap: onClose ?? () => Navigator.pop(context),
               ),
             ],
           ),
