@@ -652,9 +652,9 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
 
   late AnimationController _exitController;
   late Animation<double> _exitOpacity;
-  late Animation<double> _exitX;
-  late Animation<double> _exitY;
-  late Animation<double> _exitRotate;
+  Animation<double> _exitX = const AlwaysStoppedAnimation(0);
+  Animation<double> _exitY = const AlwaysStoppedAnimation(0);
+  Animation<double> _exitRotate = const AlwaysStoppedAnimation(0);
 
   late AnimationController _enterController;
   late Animation<double> _enterScale;
@@ -664,19 +664,12 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _setupExitAnimations();
-    _setupEnterAnimations();
-  }
-
-  void _setupExitAnimations() {
     _exitController = AnimationController(
       duration: AppTheme.animSheet,
       vsync: this,
     );
     _exitOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(_exitController);
-    _exitX = Tween<double>(begin: 0, end: 0).animate(_exitController);
-    _exitY = Tween<double>(begin: 0, end: 0).animate(_exitController);
-    _exitRotate = Tween<double>(begin: 0, end: 0).animate(_exitController);
+    _setupEnterAnimations();
   }
 
   void _setupEnterAnimations() {
@@ -705,32 +698,21 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
   }
 
   void _runExitAnimation(String direction) {
-    if (direction == 'up') {
-      _exitX = Tween<double>(begin: 0.0, end: 0.0).animate(_exitController);
-      _exitY = Tween<double>(
-        begin: 0.0,
-        end: -500,
-      ).animate(CurvedAnimation(parent: _exitController, curve: AppTheme.curveIn));
-      _exitRotate = Tween<double>(
-        begin: 0.0,
-        end: 0.0,
-      ).animate(_exitController);
-    } else if (direction == 'right') {
-      _exitX = Tween<double>(begin: 0.0, end: 400).animate(
-        CurvedAnimation(parent: _exitController, curve: AppTheme.curveOut),
-      );
-      _exitY = Tween<double>(begin: 0.0, end: 50).animate(_exitController);
-      _exitRotate = Tween<double>(begin: 0.0, end: 15).animate(_exitController);
-    } else if (direction == 'left') {
-      _exitX = Tween<double>(begin: 0.0, end: -400).animate(
-        CurvedAnimation(parent: _exitController, curve: AppTheme.curveOut),
-      );
-      _exitY = Tween<double>(begin: 0.0, end: 50).animate(_exitController);
-      _exitRotate = Tween<double>(
-        begin: 0.0,
-        end: -15,
-      ).animate(_exitController);
-    }
+    final isHorizontal = direction == 'left' || direction == 'right';
+    final sign = direction == 'left' ? -1.0 : (direction == 'right' ? 1.0 : 0.0);
+
+    _exitX = Tween<double>(begin: 0.0, end: 400 * sign).animate(
+      isHorizontal
+          ? CurvedAnimation(parent: _exitController, curve: AppTheme.curveOut)
+          : _exitController,
+    );
+    _exitY = Tween<double>(begin: 0.0, end: direction == 'up' ? -500.0 : 50.0).animate(
+      direction == 'up'
+          ? CurvedAnimation(parent: _exitController, curve: AppTheme.curveIn)
+          : _exitController,
+    );
+    _exitRotate = Tween<double>(begin: 0.0, end: 15 * sign).animate(_exitController);
+
     _exitController.forward().then((_) {
       widget.onSwipe(direction);
     });
