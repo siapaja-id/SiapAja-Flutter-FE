@@ -13,9 +13,9 @@ import '../providers.dart';
 const _navItems = [
   NavItem(icon: PhosphorIconsRegular.house, label: 'Home', route: '/'),
   NavItem(
-    icon: PhosphorIconsRegular.magnifyingGlass,
-    label: 'Explore',
-    route: '/explore',
+    icon: PhosphorIconsRegular.lightning,
+    label: 'Radar',
+    route: '/radar',
   ),
   NavItem(
     icon: PhosphorIconsRegular.chatCircle,

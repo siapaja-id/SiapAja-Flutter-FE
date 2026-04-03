@@ -9,6 +9,20 @@ we want strict file naming convention like *.widget.dart , *.constants.dart , *.
 
 ===
 
+
+
+
+this flutter project is basically ported version of react https://github.com/siapaja-id/SiapAja-React-FE so please temporarily clone it to learn bellow git commit.
+
+7306585
+
+. 
+
+
+because you need to do the same treatment to this flutter project. we want identical UI UX without regressions
+
+===
+
 before commit ddcfe17 , linux dekstop mode like ctrl + +/- zoom feature was fine doing the zoom properly where every leaf components adjusted automatically not causing blank/cut area even on zoom out 
  
 ===

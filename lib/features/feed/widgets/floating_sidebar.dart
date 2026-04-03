@@ -29,9 +29,9 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
         route: '/',
       ),
       const NavItem(
-        icon: PhosphorIconsRegular.magnifyingGlass,
-        label: 'Explore',
-        route: '/explore',
+        icon: PhosphorIconsRegular.lightning,
+        label: 'Radar',
+        route: '/radar',
       ),
       NavItem(
         icon: PhosphorIconsRegular.plus,

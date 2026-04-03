@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../models/author.dart';
+import '../../../models/gig.dart';
 
 part 'app_viewmodel.freezed.dart';
 
@@ -21,6 +22,9 @@ abstract class UiState with _$UiState {
     Author? currentUser,
     @Default(true) bool headerVisible,
     @Default(true) bool bottomNavVisible,
+    Gig? activeGig,
+    @Default([]) List<Gig> queuedGigs,
+    @Default(false) bool isAutoPilot,
   }) = _UiState;
 }
 
@@ -32,6 +36,9 @@ class UiStateNotifier extends Notifier<UiState> {
       currentUser: _mockCurrentUser,
       headerVisible: true,
       bottomNavVisible: true,
+      activeGig: null,
+      queuedGigs: [],
+      isAutoPilot: false,
     );
   }
 
@@ -41,6 +48,18 @@ class UiStateNotifier extends Notifier<UiState> {
 
   void setBarsVisible({required bool header, required bool bottomNav}) {
     state = state.copyWith(headerVisible: header, bottomNavVisible: bottomNav);
+  }
+
+  void setActiveGig(Gig? gig) {
+    state = state.copyWith(activeGig: gig);
+  }
+
+  void addQueuedGig(Gig gig) {
+    state = state.copyWith(queuedGigs: [...state.queuedGigs, gig]);
+  }
+
+  void setIsAutoPilot(bool isAuto) {
+    state = state.copyWith(isAutoPilot: isAuto);
   }
 }
 

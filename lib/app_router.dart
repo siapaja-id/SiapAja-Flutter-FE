@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'features/feed/pages/feed_page.dart';
 import 'features/feed/pages/main_shell.dart';
 import 'features/feed/pages/post_detail_page.dart';
+import 'features/feed/pages/radar_page.dart';
 import 'features/settings/pages/settings_page.dart';
 
 /// GoRouter configuration
@@ -20,11 +21,10 @@ class AppRouter {
           // Home / Feed page
           GoRoute(path: '/', builder: (context, state) => const FeedPage()),
           GoRoute(path: '/feed', builder: (context, state) => const FeedPage()),
-          // Explore page (stub)
+          // Radar page
           GoRoute(
-            path: '/explore',
-            builder: (context, state) =>
-                const ScaffoldPageStub(title: 'Explore'),
+            path: '/radar',
+            builder: (context, state) => const RadarPage(),
           ),
           // Messages page (stub)
           GoRoute(
