@@ -13,3 +13,11 @@ IconData getIconForTaskType(TaskIconType type) => switch (type) {
   TaskIconType.package => PhosphorIconsRegular.package,
   TaskIconType.location => PhosphorIconsRegular.mapPin,
 };
+
+String getStatusText(TaskStatus status) => switch (status) {
+  TaskStatus.open => 'OPEN',
+  TaskStatus.assigned => 'ASSIGNED',
+  TaskStatus.inProgress => 'IN PROGRESS',
+  TaskStatus.completed => 'COMPLETED',
+  TaskStatus.finished => 'FINISHED',
+};

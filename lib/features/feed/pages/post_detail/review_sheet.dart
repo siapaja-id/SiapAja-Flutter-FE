@@ -3,6 +3,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
+import '../../../../shared/widgets/base_sheet.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
 
 class ReviewSheet extends StatefulWidget {
@@ -16,15 +17,10 @@ class ReviewSheet extends StatefulWidget {
     required TaskData task,
     required void Function(int rating) onReview,
   }) {
-    showModalBottomSheet(
+    BaseSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder: (context) {
-        return ReviewSheet(task: task, onReview: onReview);
-      },
+      title: 'Review Work',
+      builder: (_) => ReviewSheet(task: task, onReview: onReview),
     );
   }
 
@@ -37,48 +33,15 @@ class _ReviewSheetState extends State<ReviewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildContent(context);
-  }
-
-  Widget _buildContent(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return BaseSheet(
+      title: 'Review Work',
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Review Work',
-                style: AppTheme.scaled(multiplier: AppTheme.m2xl,
-                  weight: FontWeight.w900,
-                  color: AppColors.onSurface,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                ),
-                icon: const Icon(
-                  PhosphorIconsRegular.x,
-                  size: 20,
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
           Text(
             'Rate the worker',
-            style: AppTheme.scaled(multiplier: AppTheme.mbase,
+            style: AppTheme.scaled(
+              multiplier: AppTheme.mbase,
               weight: FontWeight.w700,
               color: AppColors.onSurfaceVariant,
             ),

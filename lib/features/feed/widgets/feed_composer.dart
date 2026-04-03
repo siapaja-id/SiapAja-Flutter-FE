@@ -1,10 +1,11 @@
-import 'dart:ui';
+import '../../../shared/utils/color_extensions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/widgets/user_avatar.dart';
+import 'glass_card.dart';
 
 // ---------------------------------------------------------------------------
 // Shared types & helpers
@@ -66,7 +67,7 @@ IconButton _attachmentIconButton({
 }) => IconButton(
   onPressed: onPressed,
   style: IconButton.styleFrom(
-    backgroundColor: tinted ? AppColors.primary.withOpacity(0.1) : null,
+    backgroundColor: tinted ? AppColors.primary.p10 : null,
     padding: const EdgeInsets.all(8),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
   ),
@@ -160,25 +161,13 @@ class _FeedComposerState extends State<FeedComposer> {
         _textController.text.isNotEmpty ||
         _attachments.isNotEmpty;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.glassTint,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AppColors.glassBorder),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: GlassCard(
+        borderRadius: 28,
+        padding: EdgeInsets.zero,
+        showGlow: false,
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
@@ -441,267 +430,258 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.glassTint,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            border: Border.all(color: AppColors.glassBorder),
-          ),
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: AppColors.border)),
+    return GlassCard(
+      customBorderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      showGlow: false,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: AppColors.border)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    PhosphorIconsRegular.x,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        PhosphorIconsRegular.x,
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                    Text(
-                      'CREATE TASK',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.onSurface,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: widget.textController.text.isEmpty
-                          ? null
-                          : widget.onSubmit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.primaryForeground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                      ),
-                      child: Text(
-                        'Continue',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(color: AppColors.primaryForeground),
-                      ),
-                    ),
-                  ],
+                Text(
+                  'CREATE TASK',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.onSurface,
+                    letterSpacing: 2,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(right: 12),
-                      child: UserAvatar(
-                        src: 'https://picsum.photos/seed/user/100/100',
-                        size: AvatarSize.md,
-                      ),
+                ElevatedButton(
+                  onPressed: widget.textController.text.isEmpty
+                      ? null
+                      : widget.onSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.primaryForeground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Current User',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(color: AppColors.onSurface),
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: widget.textController,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              hintText:
-                                  'What do you need help with? Describe your task in detail...',
-                              hintStyle: AppTheme.scaled(
-                                multiplier: AppTheme.m2xl,
-                                color: AppColors.onSurfaceVariant.withOpacity(
-                                  0.4,
-                                ),
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: Text(
+                    'Continue',
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: AppColors.primaryForeground),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: UserAvatar(
+                    src: 'https://picsum.photos/seed/user/100/100',
+                    size: AvatarSize.md,
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Current User',
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(color: AppColors.onSurface),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: widget.textController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText:
+                              'What do you need help with? Describe your task in detail...',
+                          hintStyle: AppTheme.scaled(
+                            multiplier: AppTheme.m2xl,
+                            color: AppColors.onSurfaceVariant.withOpacity(
+                              0.4,
                             ),
-                            style: AppTheme.scaled(
-                              multiplier: AppTheme.m2xl,
-                              color: AppColors.onSurface,
-                              height: 1.8,
-                            ),
-                            autofocus: true,
                           ),
-                          if (widget.attachments.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  ...List.generate(widget.attachments.length, (
-                                    index,
-                                  ) {
-                                    final attachment =
-                                        widget.attachments[index];
-                                    return Stack(
-                                      children: [
-                                        Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                AppColors.surfaceContainerHigh,
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            border: Border.all(
-                                              color: AppColors.border,
-                                            ),
-                                          ),
-                                          child: _buildAttachmentPreview(
-                                            attachment,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: -4,
-                                          right: -4,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                widget.onRemoveAttachment(
-                                                  index,
-                                                );
-                                              });
-                                            },
-                                            child: Container(
-                                              width: 24,
-                                              height: 24,
-                                              decoration: const BoxDecoration(
-                                                color: AppColors.primary,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                PhosphorIconsRegular.x,
-                                                size: 14,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        widget.onAddAttachment(
-                                          _AttachmentType.image,
-                                        );
-                                      });
-                                    },
-                                    child: Container(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: AppTheme.scaled(
+                          multiplier: AppTheme.m2xl,
+                          color: AppColors.onSurface,
+                          height: 1.8,
+                        ),
+                        autofocus: true,
+                      ),
+                      if (widget.attachments.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              ...List.generate(widget.attachments.length, (
+                                index,
+                              ) {
+                                final attachment =
+                                    widget.attachments[index];
+                                return Stack(
+                                  children: [
+                                    Container(
                                       width: 80,
                                       height: 80,
                                       decoration: BoxDecoration(
+                                        color:
+                                            AppColors.surfaceContainerHigh,
+                                        borderRadius: BorderRadius.circular(
+                                          12,
+                                        ),
                                         border: Border.all(
                                           color: AppColors.border,
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            PhosphorIconsRegular.plus,
-                                            color: AppColors.onSurfaceVariant,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Add More',
-                                            style: AppTheme.labelTiny.copyWith(
-                                              color: AppColors.onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ],
+                                      child: _buildAttachmentPreview(
+                                        attachment,
                                       ),
                                     ),
+                                    Positioned(
+                                      top: -4,
+                                      right: -4,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            widget.onRemoveAttachment(
+                                              index,
+                                            );
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.primary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            PhosphorIconsRegular.x,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    widget.onAddAttachment(
+                                      _AttachmentType.image,
+                                    );
+                                  });
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: AppColors.border,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                ],
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        PhosphorIconsRegular.plus,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Add More',
+                                        style: AppTheme.labelTiny.copyWith(
+                                          color: AppColors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: AppColors.border)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        _attachmentIconButton(
-                          icon: PhosphorIconsRegular.image,
-                          onPressed: () {
-                            setState(() {
-                              widget.onAddAttachment(_AttachmentType.image);
-                            });
-                          },
-                        ),
-                        _attachmentIconButton(
-                          icon: PhosphorIconsRegular.filmStrip,
-                          onPressed: () {
-                            setState(() {
-                              widget.onAddAttachment(_AttachmentType.video);
-                            });
-                          },
-                        ),
-                        _attachmentIconButton(
-                          icon: PhosphorIconsRegular.microphone,
-                          onPressed: () {
-                            setState(() {
-                              widget.onAddAttachment(_AttachmentType.voice);
-                            });
-                          },
-                        ),
-                        _attachmentIconButton(
-                          icon: PhosphorIconsRegular.paperclip,
-                          onPressed: () {
-                            setState(() {
-                              widget.onAddAttachment(_AttachmentType.file);
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.border)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    _attachmentIconButton(
+                      icon: PhosphorIconsRegular.image,
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.image);
+                        });
+                      },
+                    ),
+                    _attachmentIconButton(
+                      icon: PhosphorIconsRegular.filmStrip,
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.video);
+                        });
+                      },
+                    ),
+                    _attachmentIconButton(
+                      icon: PhosphorIconsRegular.microphone,
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.voice);
+                        });
+                      },
+                    ),
+                    _attachmentIconButton(
+                      icon: PhosphorIconsRegular.paperclip,
+                      onPressed: () {
+                        setState(() {
+                          widget.onAddAttachment(_AttachmentType.file);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

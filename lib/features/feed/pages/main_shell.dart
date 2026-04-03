@@ -1,4 +1,4 @@
-import 'dart:ui';
+import '../../../shared/utils/color_extensions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +9,7 @@ import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
 import '../../../shared/settings_provider.dart';
 import '../providers.dart';
+import '../widgets/glass_card.dart';
 
 const _navItems = [
   NavItem(icon: PhosphorIconsRegular.house, label: 'Home', route: '/'),
@@ -87,15 +88,13 @@ class _MainShellState extends ConsumerState<MainShell> {
               offset: bottomNavVisible ? Offset.zero : const Offset(0, 1),
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutCubic,
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: NavigationBar(
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (i) =>
-                        context.go(_navItems[i].route),
-                    backgroundColor: AppColors.glassTint,
-                    indicatorColor: AppColors.primary.withOpacity(0.2),
+              child: GlassCard.bar(
+                child: NavigationBar(
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (i) =>
+                      context.go(_navItems[i].route),
+                  backgroundColor: Colors.transparent,
+                  indicatorColor: AppColors.primary.p20,
                     height: 64,
                     labelBehavior:
                         NavigationDestinationLabelBehavior.alwaysShow,
@@ -112,7 +111,6 @@ class _MainShellState extends ConsumerState<MainShell> {
                         ),
                     ],
                   ),
-                ),
               ),
             ),
           ),

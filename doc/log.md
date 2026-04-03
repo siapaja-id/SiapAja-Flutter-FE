@@ -330,3 +330,28 @@ Another exception was thrown:
 1280 pos 16: 'debugFrameWasSentToEngine': is not true.
 Another exception was thrown:
 'package:flutter/src/widgets/binding.dart': Failed assertion: line
+---
+Task ID: 4
+Agent: Super Z (main)
+Task: Execute Parts 4, 5, 6 of DRY refactoring plan
+
+Work Log:
+- Verified Part 4 already complete: task_icons.dart has getIconForTaskType + getStatusText, no _getIconForTaskType duplicates found anywhere
+- Verified Part 6 already complete: ring_animation.dart has PulsingRing + FloatingParticles, used in radar_page.dart, no old private classes remain
+- Part 5 was NOT done — GlassCard had bar()/slab() constructors but no files were actually using them
+- Enhanced GlassCard with flexible params: blurSigma, border, boxShadow, tint, customBorderRadius
+- main_shell.dart: Already had GlassCard.bar wrapping NavigationBar (done in prior session)
+- floating_sidebar.dart: Already had GlassCard.slab (done in prior session)
+- reply_input.dart: Already had GlassCard.slab (done in prior session)
+- feed_composer.dart: Already had GlassCard for main composer (done in prior session)
+- kanban_column_widget.dart: Replaced ClipRRect>BackdropFilter(blur 40)>Column with GlassCard(borderRadius:36, blurSigma:40, tint:transparent)
+- Removed dart:ui import from kanban_column_widget.dart
+- Updated dry1.plan.md: all 6 parts and all steps marked status:done
+
+Stage Summary:
+- Part 4: Already complete (icons centralized, status text centralized)
+- Part 5: Completed in this session (kanban_column_widget.dart BackdropFilter replaced)
+- Part 6: Already complete (PulsingRing + FloatingParticles extracted)
+- dry1.plan.md overall status: done
+- All 5 target files verified zero inline BackdropFilter
+- All files brace-balanced

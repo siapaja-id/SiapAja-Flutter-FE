@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../shared/utils/color_extensions.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
@@ -48,10 +49,10 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
     final scale = _isPressed ? 0.985 : (_isHovering ? 1.008 : 1.0);
 
     final glowColor = _isPressed
-        ? AppColors.primary.withOpacity(0.06)
-        : AppColors.primary.withOpacity(0.03);
+        ? AppColors.primary.p06
+        : AppColors.primary.p03;
     final glowColorEnd = _isPressed
-        ? AppColors.primary.withOpacity(0.02)
+        ? AppColors.primary.p02
         : Colors.transparent;
 
     return MouseRegion(
@@ -80,7 +81,7 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
               border: active
                   ? Border(
                       left: BorderSide(
-                        color: AppColors.primary.withOpacity(0.5),
+                        color: AppColors.primary.p50,
                         width: 2,
                       ),
                     )
@@ -110,7 +111,7 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
                           end: Alignment.centerRight,
                           colors: [
                             Colors.transparent,
-                            AppColors.primary.withOpacity(0.6),
+                            AppColors.primary.p60,
                             AppColors.primary.withOpacity(0.0),
                           ],
                           stops: const [0.0, 0.5, 1.0],
@@ -316,14 +317,12 @@ class BaseFeedCard extends ConsumerWidget {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(
-                                          0.2,
-                                        ),
+                                        color: AppColors.primary.p20,
+                                      
                                         borderRadius: BorderRadius.circular(4),
                                         border: Border.all(
-                                          color: AppColors.primary.withOpacity(
-                                            0.2,
-                                          ),
+                                          color: AppColors.primary.p20,
+                                        
                                         ),
                                       ),
                                       child: Text(
@@ -409,14 +408,14 @@ class BaseFeedCard extends ConsumerWidget {
                                   Icon(
                                     PhosphorIconsRegular.chatCircle,
                                     size: 12,
-                                    color: AppColors.primary.withOpacity(0.8),
+                                    color: AppColors.primary.p80,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
                                     style: AppTheme.scaled(
                                       multiplier: AppTheme.m1sm,
-                                      color: AppColors.primary.withOpacity(0.8),
+                                      color: AppColors.primary.p80,
                                       weight: FontWeight.bold,
                                     ),
                                   ),
@@ -464,7 +463,7 @@ class FollowButton extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
           color: isFollowing
-              ? Colors.white.withOpacity(0.1)
+              ? Colors.white.w10
               : AppColors.primary,
           borderRadius: BorderRadius.circular(20),
           border: isFollowing ? Border.all(color: AppColors.border) : null,

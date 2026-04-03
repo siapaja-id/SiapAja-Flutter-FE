@@ -1,4 +1,4 @@
-import 'dart:ui';
+import '../../../shared/utils/color_extensions.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +11,7 @@ import '../../../features/settings/pages/settings_page.dart';
 import '../providers.dart';
 import '../pages/feed_page.dart';
 import '../pages/post_detail_page.dart';
+import 'glass_card.dart';
 
 /// InheritedWidget that provides column context to descendants
 class KanbanColumnContext extends InheritedWidget {
@@ -241,8 +242,8 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                             borderRadius: BorderRadius.circular(36),
                             border: Border.all(
                               color: _isHovering
-                                  ? Colors.white.withOpacity(0.18)
-                                  : Colors.white.withOpacity(0.1),
+                                  ? Colors.white.w18
+                                  : Colors.white.w10,
                             ),
                             color: _isResizing
                                 ? const Color(0x661F1F1F)
@@ -258,11 +259,15 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                             ],
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(36),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                              child: Column(
+                          child: GlassCard(
+                            borderRadius: 36,
+                            blurSigma: 40,
+                            tint: Colors.transparent,
+                            border: Border.none,
+                            boxShadow: const [],
+                            padding: EdgeInsets.zero,
+                            showGlow: false,
+                            child: Column(
                                 children: [
                                   _ColumnHeader(
                                     icon: meta.icon,
@@ -285,7 +290,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                                   ),
                                 ],
                               ),
-                            ),
                           ),
                         ),
                       ),
@@ -308,7 +312,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                               decoration: BoxDecoration(
                                 color: _isResizing
                                     ? AppColors.primary
-                                    : Colors.white.withOpacity(0.2),
+                                    : Colors.white.w20,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),
@@ -350,9 +354,9 @@ class _ColumnHeader extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.w03,
         border: Border(
-          bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
+          bottom: BorderSide(color: Colors.white.w06),
         ),
       ),
       child: Row(
@@ -364,13 +368,13 @@ class _ColumnHeader extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.06),
+                    color: Colors.white.w06,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     icon,
                     size: 14,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.w50,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -380,7 +384,7 @@ class _ColumnHeader extends StatelessWidget {
                     style: AppTheme.scaled(
                       multiplier: AppTheme.m1sm,
                       weight: FontWeight.w700,
-                      color: Colors.white.withOpacity(0.65),
+                      color: Colors.white.w65,
                       letterSpacing: 0.03,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -399,7 +403,7 @@ class _ColumnHeader extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
+                    color: Colors.white.w04,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -407,7 +411,7 @@ class _ColumnHeader extends StatelessWidget {
                     style: AppTheme.scaled(
                       multiplier: AppTheme.m2xs,
                       weight: FontWeight.w800,
-                      color: Colors.white.withOpacity(0.25),
+                      color: Colors.white.w25,
                       letterSpacing: 0.08,
                     ),
                   ),
@@ -418,7 +422,7 @@ class _ColumnHeader extends StatelessWidget {
                   icon: Icon(
                     PhosphorIconsRegular.x,
                     size: 14,
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.w25,
                   ),
                   onPressed: onClose,
                   padding: EdgeInsets.zero,

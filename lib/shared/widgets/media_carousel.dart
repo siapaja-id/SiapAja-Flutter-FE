@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../utils/color_extensions.dart';
 import '../../app_theme.dart';
 
 /// Media carousel widget for displaying multiple images with snap scrolling
@@ -51,7 +52,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.borderSubtle),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+            BoxShadow(color: Colors.black.black05, blurRadius: 8),
           ],
         ),
         child: ClipRRect(
@@ -118,7 +119,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                             decoration: BoxDecoration(
                               color: index == activeIndex
                                   ? Colors.white
-                                  : Colors.white.withOpacity(0.4),
+                                  : Colors.white.w40,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -214,10 +215,10 @@ class _ArrowButtonState extends State<_ArrowButton> {
           height: 32,
           decoration: BoxDecoration(
             color: _hovered
-                ? Colors.black.withOpacity(0.6)
-                : Colors.black.withOpacity(0.4),
+                ? Colors.black.black60
+                : Colors.black.black40,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.w10),
           ),
           child: Icon(widget.icon, color: Colors.white, size: 18),
         ),

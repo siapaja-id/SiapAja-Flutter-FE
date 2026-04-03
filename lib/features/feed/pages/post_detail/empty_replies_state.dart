@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../shared/utils/color_extensions.dart';
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
 class EmptyRepliesState extends StatelessWidget {
@@ -36,7 +37,7 @@ class EmptyRepliesState extends StatelessWidget {
                   height: 256,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primary.withOpacity(0.05),
+                    color: AppColors.primary.p05,
                   ),
                 ),
                 Container(
@@ -45,10 +46,10 @@ class EmptyRepliesState extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.surfaceContainer,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: Colors.white.w05),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.black30,
                         blurRadius: 10,
                       ),
                     ],
@@ -107,8 +108,8 @@ class EmptyRepliesState extends StatelessWidget {
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.emerald,
-                side: BorderSide(color: AppColors.emerald.withOpacity(0.2)),
-                backgroundColor: AppColors.emerald.withOpacity(0.1),
+                side: BorderSide(color: AppColors.emerald.e20),
+                backgroundColor: AppColors.emerald.e10,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 10,
@@ -135,8 +136,8 @@ class EmptyRepliesState extends StatelessWidget {
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                side: BorderSide(color: AppColors.primary.withOpacity(0.2)),
-                backgroundColor: AppColors.primary.withOpacity(0.1),
+                side: BorderSide(color: AppColors.primary.p20),
+                backgroundColor: AppColors.primary.p10,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 10,

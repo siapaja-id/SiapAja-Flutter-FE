@@ -1,3 +1,7 @@
+import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
+import '../../../shared/widgets/ring_animation.dart';
+import '../../../shared/utils/task_icons.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -189,7 +193,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.p20,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
@@ -214,7 +218,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
             decoration: BoxDecoration(
               color: AppColors.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              border: Border.all(color: Colors.white.w05),
             ),
             child: Row(
               children: [
@@ -240,12 +244,12 @@ class _RadarPageState extends ConsumerState<RadarPage>
                     decoration: BoxDecoration(
                       color: isAutoPilot
                           ? AppColors.primary
-                          : Colors.white.withOpacity(0.1),
+                          : Colors.white.w10,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isAutoPilot
                             ? AppColors.primary
-                            : Colors.white.withOpacity(0.2),
+                            : Colors.white.w20,
                       ),
                     ),
                     child: Stack(
@@ -263,7 +267,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.black20,
                                   blurRadius: 4,
                                 ),
                               ],
@@ -341,7 +345,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                 style: AppTheme.scaled(
                   multiplier: AppTheme.mxs,
                   weight: FontWeight.w700,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.w50,
                   letterSpacing: 1,
                 ),
               ),
@@ -418,7 +422,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.5),
+                        color: AppColors.primary.p50,
                         blurRadius: 30,
                       ),
                     ],
@@ -447,7 +451,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
             style: AppTheme.scaled(
               multiplier: AppTheme.mbase,
               weight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.w50,
             ),
             textAlign: TextAlign.center,
           ),
@@ -457,7 +461,10 @@ class _RadarPageState extends ConsumerState<RadarPage>
   }
 
   List<Widget> _buildRadarRings() {
-    return List.generate(3, (i) => _RadarRingAnimation(delay: i * 600));
+    return List.generate(3, (i) => PulsingRing(
+      delay: i * 600,
+      color: AppColors.primary.p40,
+    ));
   }
 
   Widget _buildEmptyView() {
@@ -469,13 +476,13 @@ class _RadarPageState extends ConsumerState<RadarPage>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.w05,
               borderRadius: BorderRadius.circular(40),
             ),
             child: Icon(
               PhosphorIconsRegular.magnifyingGlass,
               size: 32,
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.w20,
             ),
           ),
           const SizedBox(height: 24),
@@ -493,7 +500,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
             style: AppTheme.scaled(
               multiplier: AppTheme.mbase,
               weight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.w50,
             ),
           ),
           const SizedBox(height: 32),
@@ -502,7 +509,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.w10,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Text(
@@ -565,7 +572,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                         ),
                         border: Border(
                           top: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.w10,
                             width: 1,
                           ),
                         ),
@@ -597,13 +604,13 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                   width: 36,
                                   height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.05),
+                                    color: Colors.white.w05,
                                     borderRadius: BorderRadius.circular(18),
                                   ),
                                   child: Icon(
                                     PhosphorIconsRegular.x,
                                     size: 20,
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.w50,
                                   ),
                                 ),
                               ),
@@ -616,7 +623,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                               color: AppColors.surfaceContainer,
                               borderRadius: BorderRadius.circular(28),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.w10,
                               ),
                             ),
                             child: Row(
@@ -630,13 +637,13 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                     width: 64,
                                     height: 64,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.05),
+                                      color: Colors.white.w05,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Icon(
                                       PhosphorIconsRegular.minus,
                                       size: 28,
-                                      color: Colors.white.withOpacity(0.5),
+                                      color: Colors.white.w50,
                                     ),
                                   ),
                                 ),
@@ -648,7 +655,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                         multiplier: AppTheme.m2xs,
                                         weight: FontWeight.w900,
                                         letterSpacing: 2,
-                                        color: Colors.white.withOpacity(0.5),
+                                        color: Colors.white.w50,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -703,13 +710,13 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                     width: 64,
                                     height: 64,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.05),
+                                      color: Colors.white.w05,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Icon(
                                       PhosphorIconsRegular.plus,
                                       size: 28,
-                                      color: Colors.white.withOpacity(0.5),
+                                      color: Colors.white.w50,
                                     ),
                                   ),
                                 ),
@@ -735,26 +742,26 @@ class _RadarPageState extends ConsumerState<RadarPage>
                               hintText:
                                   'Why should they choose you? (Optional)',
                               hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.w30,
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
+                              fillColor: Colors.white.w05,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.w10,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: Colors.white.w10,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide(
-                                  color: AppColors.primary.withOpacity(0.5),
+                                  color: AppColors.primary.p50,
                                 ),
                               ),
                             ),
@@ -817,7 +824,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
     final isDown = delta < 0;
     final isUp = delta > 0;
 
-    Color bgColor = Colors.white.withOpacity(0.05);
+    Color bgColor = Colors.white.w05;
     Color textColor = Colors.white;
 
     if (isDown) {
@@ -857,74 +864,6 @@ class _RadarPageState extends ConsumerState<RadarPage>
           ],
         ),
       ),
-    );
-  }
-}
-
-class _RadarRingAnimation extends StatefulWidget {
-  final int delay;
-
-  const _RadarRingAnimation({required this.delay});
-
-  @override
-  State<_RadarRingAnimation> createState() => _RadarRingAnimationState();
-}
-
-class _RadarRingAnimationState extends State<_RadarRingAnimation>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 2.5,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _opacityAnimation = Tween<double>(
-      begin: 0.5,
-      end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) {
-        _controller.repeat();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.primary.withOpacity(0.4),
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(96),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
@@ -1153,18 +1092,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                         },
                   child: Container(
                     margin: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
+                    decoration: surfaceCardDecor(radius: 32, shadows: [shadowBlack()]),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(32),
                       child: Stack(
@@ -1176,7 +1104,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
-                                    Colors.white.withOpacity(0.03),
+                                    Colors.white.w03,
                                     Colors.transparent,
                                   ],
                                 ),
@@ -1273,9 +1201,8 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                       color: Colors.black54,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.primary.withOpacity(
-                                            0.5,
-                                          ),
+                                          color: AppColors.primary.p50,
+                                        
                                           blurRadius: 50,
                                         ),
                                       ],
@@ -1317,14 +1244,14 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                       width: 56,
                                       height: 56,
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.05),
+                                        color: Colors.white.w05,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(0.1),
+                                          color: Colors.white.w10,
                                         ),
                                       ),
                                       child: Icon(
-                                        _getIconForType(widget.gig.iconType),
+                                        getIconForTaskType(widget.gig.iconType),
                                         color: Colors.white,
                                         size: 24,
                                       ),
@@ -1348,8 +1275,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                               vertical: 2,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: AppColors.primary
-                                                  .withOpacity(0.2),
+                                              color: AppColors.primary.p20,
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
@@ -1376,7 +1302,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                         multiplier: AppTheme.m2sm,
                                         weight: FontWeight.w900,
                                         letterSpacing: 2,
-                                        color: Colors.white.withOpacity(0.5),
+                                        color: Colors.white.w50,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -1384,7 +1310,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                       width: 4,
                                       height: 4,
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white.w20,
                                         borderRadius: BorderRadius.circular(2),
                                       ),
                                     ),
@@ -1402,9 +1328,8 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                           style: AppTheme.scaled(
                                             multiplier: AppTheme.m2sm,
                                             weight: FontWeight.w700,
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
+                                            color: Colors.white.w50,
+                                          
                                           ),
                                         ),
                                       ],
@@ -1448,7 +1373,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                     multiplier: AppTheme.m2xs,
                                     weight: FontWeight.w900,
                                     letterSpacing: 2,
-                                    color: Colors.white.withOpacity(0.4),
+                                    color: Colors.white.w40,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -1466,7 +1391,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                 const SizedBox(height: 16),
                                 Container(
                                   height: 1,
-                                  color: Colors.white.withOpacity(0.05),
+                                  color: Colors.white.w05,
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
@@ -1475,7 +1400,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                                   children: [
                                     _buildActionButton(
                                       icon: PhosphorIconsRegular.x,
-                                      color: Colors.white.withOpacity(0.5),
+                                      color: Colors.white.w50,
                                       onTap: () => widget.onSwipe('left'),
                                     ),
                                     _buildBidButton(),
@@ -1517,16 +1442,16 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.w03,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.w05),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: Colors.white.withOpacity(0.4)),
+              Icon(icon, size: 12, color: Colors.white.w40),
               const SizedBox(width: 4),
               Text(
                 label.toUpperCase(),
@@ -1534,7 +1459,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
                   multiplier: AppTheme.m2xs,
                   weight: FontWeight.w900,
                   letterSpacing: 2,
-                  color: Colors.white.withOpacity(0.4),
+                  color: Colors.white.w40,
                 ),
               ),
             ],
@@ -1564,9 +1489,9 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.w05,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.w10),
         ),
         child: Icon(icon, size: 24, color: color),
       ),
@@ -1580,14 +1505,11 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.2),
+          color: AppColors.primary.p20,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.primary.withOpacity(0.5)),
+          border: Border.all(color: AppColors.primary.p50),
           boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 20,
-            ),
+            shadowGlow(color: AppColors.primary),
           ],
         ),
         child: Column(
@@ -1613,22 +1535,6 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
     );
   }
 
-  IconData _getIconForType(dynamic iconType) {
-    switch (iconType.toString()) {
-      case 'TaskIconType.palette':
-        return PhosphorIconsRegular.palette;
-      case 'TaskIconType.code':
-        return PhosphorIconsRegular.code;
-      case 'TaskIconType.car':
-        return PhosphorIconsRegular.car;
-      case 'TaskIconType.truck':
-        return PhosphorIconsRegular.truck;
-      case 'TaskIconType.writing':
-        return PhosphorIconsRegular.pencil;
-      default:
-        return PhosphorIconsRegular.briefcase;
-    }
-  }
 }
 
 class MatchSuccessSheet extends StatefulWidget {
@@ -1724,7 +1630,11 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                   ),
                 ),
                 Positioned.fill(
-                  child: IgnorePointer(child: const _Particles()),
+                  child: IgnorePointer(
+                    child: FloatingParticles(
+                      color: const Color(0xFF10B981).withOpacity(0.4),
+                    ),
+                  ),
                 ),
                 SafeArea(
                   child: Padding(
@@ -1735,7 +1645,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                         decoration: BoxDecoration(
                           border: Border.symmetric(
                             vertical: BorderSide(
-                              color: Colors.white.withOpacity(0.05),
+                              color: Colors.white.w05,
                             ),
                           ),
                         ),
@@ -1848,7 +1758,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                     style: AppTheme.scaled(
                                       multiplier: AppTheme.mbase,
                                       weight: FontWeight.w500,
-                                      color: Colors.white.withOpacity(0.6),
+                                      color: Colors.white.w60,
                                     ),
                                   ),
                                 ],
@@ -1860,10 +1770,10 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                               child: Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.03),
+                                  color: Colors.white.w03,
                                   borderRadius: BorderRadius.circular(32),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.white.w10,
                                   ),
                                 ),
                                 child: Stack(
@@ -1899,14 +1809,12 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               width: 48,
                                               height: 48,
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                  0.1,
-                                                ),
+                                                color: Colors.white.w10,
                                                 borderRadius:
                                                     BorderRadius.circular(16),
                                               ),
                                               child: Icon(
-                                                _getIconForType(
+                                                getIconForTaskType(
                                                   widget.gig.iconType,
                                                 ),
                                                 color: Colors.white,
@@ -1946,9 +1854,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               style: AppTheme.scaled(
                                                 multiplier: AppTheme.m13,
                                                 weight: FontWeight.w700,
-                                                color: Colors.white.withOpacity(
-                                                  0.5,
-                                                ),
+                                                color: Colors.white.w50,
                                               ),
                                             ),
                                             const SizedBox(width: 16),
@@ -1956,9 +1862,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               width: 6,
                                               height: 6,
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                  0.2,
-                                                ),
+                                                color: Colors.white.w20,
                                                 borderRadius:
                                                     BorderRadius.circular(3),
                                               ),
@@ -1975,9 +1879,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               style: AppTheme.scaled(
                                                 multiplier: AppTheme.m13,
                                                 weight: FontWeight.w700,
-                                                color: Colors.white.withOpacity(
-                                                  0.5,
-                                                ),
+                                                color: Colors.white.w50,
                                               ),
                                             ),
                                           ],
@@ -2036,9 +1938,8 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                           Icon(
                                             PhosphorIconsRegular.arrowSquareOut,
                                             size: 14,
-                                            color: Colors.black.withOpacity(
-                                              0.5,
-                                            ),
+                                            color: Colors.black.black50,
+                                          
                                           ),
                                         ],
                                       ),
@@ -2053,10 +1954,10 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                         vertical: 14,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.05),
+                                        color: Colors.white.w05,
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(0.1),
+                                          color: Colors.white.w10,
                                         ),
                                       ),
                                       child: Row(
@@ -2099,9 +2000,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               borderRadius:
                                                   BorderRadius.circular(16),
                                               border: Border.all(
-                                                color: Colors.white.withOpacity(
-                                                  0.1,
-                                                ),
+                                                color: Colors.white.w10,
                                               ),
                                             ),
                                             child: Center(
@@ -2131,9 +2030,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               borderRadius:
                                                   BorderRadius.circular(16),
                                               border: Border.all(
-                                                color: Colors.white.withOpacity(
-                                                  0.1,
-                                                ),
+                                                color: Colors.white.w10,
                                               ),
                                             ),
                                             child: Center(
@@ -2170,218 +2067,15 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
   }
 
   List<Widget> _buildRadarRings() {
-    return List.generate(3, (i) => _MatchRadarRing(delay: i * 800));
-  }
-
-  IconData _getIconForType(dynamic iconType) {
-    switch (iconType.toString()) {
-      case 'TaskIconType.palette':
-        return PhosphorIconsRegular.palette;
-      case 'TaskIconType.code':
-        return PhosphorIconsRegular.code;
-      case 'TaskIconType.car':
-        return PhosphorIconsRegular.car;
-      case 'TaskIconType.truck':
-        return PhosphorIconsRegular.truck;
-      case 'TaskIconType.writing':
-        return PhosphorIconsRegular.pencil;
-      default:
-        return PhosphorIconsRegular.briefcase;
-    }
-  }
-}
-
-class _MatchRadarRing extends StatefulWidget {
-  final int delay;
-
-  const _MatchRadarRing({required this.delay});
-
-  @override
-  State<_MatchRadarRing> createState() => _MatchRadarRingState();
-}
-
-class _MatchRadarRingState extends State<_MatchRadarRing>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
+    return List.generate(3, (i) => PulsingRing(
+      delay: i * 800,
       duration: const Duration(milliseconds: 2500),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 2.5,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _opacityAnimation = Tween<double>(
-      begin: 0.3,
-      end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) {
-        _controller.repeat();
-      }
-    });
+      beginScale: 0.8,
+      beginOpacity: 0.3,
+      color: const Color(0xFF34D399).withOpacity(0.5),
+      borderWidth: 1,
+      borderRadius: 64,
+    ));
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFF34D399).withOpacity(0.5),
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(64),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Particles extends StatefulWidget {
-  const _Particles();
-
-  @override
-  State<_Particles> createState() => _ParticlesState();
-}
-
-class _ParticlesState extends State<_Particles> {
-  final Random _random = Random();
-  final List<_ParticleData> _particles = [];
-
-  @override
-  void initState() {
-    super.initState();
-    for (int i = 0; i < 30; i++) {
-      _particles.add(
-        _ParticleData(
-          x: _random.nextDouble() * 400,
-          delay: _random.nextDouble() * 2,
-          duration: _random.nextDouble() * 3 + 2,
-          rotation: _random.nextDouble() * 360,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: _particles
-          .map((p) => _Particle(key: ValueKey(p.x), data: p))
-          .toList(),
-    );
-  }
-}
-
-class _ParticleData {
-  final double x;
-  final double delay;
-  final double duration;
-  final double rotation;
-
-  _ParticleData({
-    required this.x,
-    required this.delay,
-    required this.duration,
-    required this.rotation,
-  });
-}
-
-class _Particle extends StatefulWidget {
-  final _ParticleData data;
-
-  const _Particle({super.key, required this.data});
-
-  @override
-  State<_Particle> createState() => _ParticleState();
-}
-
-class _ParticleState extends State<_Particle>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _yAnim;
-  late Animation<double> _opacityAnim;
-  late Animation<double> _rotationAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: (widget.data.duration * 1000).toInt()),
-      vsync: this,
-    );
-    _yAnim = Tween<double>(begin: 800, end: -50).animate(_controller);
-    _opacityAnim = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 20),
-      TweenSequenceItem(tween: ConstantTween(1.0), weight: 60),
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 20),
-    ]).animate(_controller);
-    _rotationAnim = Tween<double>(
-      begin: 0,
-      end: widget.data.rotation,
-    ).animate(_controller);
-    Future.delayed(
-      Duration(milliseconds: (widget.data.delay * 1000).toInt()),
-      () {
-        if (mounted) {
-          _controller.repeat();
-        }
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Positioned(
-          left: widget.data.x,
-          top: _yAnim.value,
-          child: Transform.rotate(
-            angle: _rotationAnim.value * (pi / 180),
-            child: Opacity(
-              opacity: _opacityAnim.value,
-              child: Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 }

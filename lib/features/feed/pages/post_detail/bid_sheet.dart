@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../shared/utils/color_extensions.dart';
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
+import '../../../../shared/widgets/base_sheet.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
 
 class BidSheet extends StatefulWidget {
@@ -29,20 +31,15 @@ class BidSheet extends StatefulWidget {
     required TextEditingController pitchCtrl,
     required void Function(int bidAmount, String pitch) onSubmit,
   }) {
-    showModalBottomSheet(
+    BaseSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder: (context) {
-        return BidSheet(
-          task: task,
-          defaultBid: defaultBid,
-          pitchCtrl: pitchCtrl,
-          onSubmit: onSubmit,
-        );
-      },
+      title: 'Submit Your Bid',
+      builder: (_) => BidSheet(
+        task: task,
+        defaultBid: defaultBid,
+        pitchCtrl: pitchCtrl,
+        onSubmit: onSubmit,
+      ),
     );
   }
 }
@@ -58,50 +55,19 @@ class _BidSheetState extends State<BidSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return BaseSheet(
+      title: 'Submit Your Bid',
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Submit Your Bid',
-                  style: AppTheme.scaled(
-                    multiplier: AppTheme.m2xl,
-                    color: AppColors.onSurface,
-                    weight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.05),
-                  ),
-                  icon: const Icon(
-                    PhosphorIconsRegular.x,
-                    size: 20,
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainer,
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.w10),
               ),
               child: Row(
                 children: [
@@ -114,7 +80,7 @@ class _BidSheetState extends State<BidSheet> {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.w05,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
@@ -190,7 +156,7 @@ class _BidSheetState extends State<BidSheet> {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.w05,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
@@ -217,7 +183,7 @@ class _BidSheetState extends State<BidSheet> {
                     color: AppColors.onSurface,
                   ),
                   label: const Text('Down Bid'),
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: Colors.white.w05,
                   labelStyle: AppTheme.scaled(
                     multiplier: AppTheme.mxs,
                     weight: FontWeight.w700,
@@ -232,7 +198,7 @@ class _BidSheetState extends State<BidSheet> {
                   onPressed: () =>
                       setState(() => _bidAmount = widget.defaultBid),
                   label: const Text('Match Original'),
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: Colors.white.w05,
                   labelStyle: AppTheme.scaled(
                     multiplier: AppTheme.mxs,
                     weight: FontWeight.w700,
@@ -251,7 +217,7 @@ class _BidSheetState extends State<BidSheet> {
                     color: AppColors.onSurface,
                   ),
                   label: const Text('Up Bid'),
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: Colors.white.w05,
                   labelStyle: AppTheme.scaled(
                     multiplier: AppTheme.mxs,
                     weight: FontWeight.w700,
@@ -276,14 +242,14 @@ class _BidSheetState extends State<BidSheet> {
                   color: AppColors.onSurfaceVariant.withOpacity(0.3),
                 ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: Colors.white.w05,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  borderSide: BorderSide(color: Colors.white.w10),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  borderSide: BorderSide(color: Colors.white.w10),
                 ),
                 contentPadding: const EdgeInsets.all(16),
               ),

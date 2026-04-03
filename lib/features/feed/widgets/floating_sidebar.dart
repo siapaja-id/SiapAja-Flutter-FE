@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -7,6 +6,7 @@ import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../providers.dart';
+import 'glass_card.dart';
 
 class FloatingSidebar extends ConsumerStatefulWidget {
   const FloatingSidebar({super.key});
@@ -68,139 +68,131 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
       width: _expanded ? 240 : 80,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.glassTint,
-              border: const Border(
-                right: BorderSide(color: AppColors.glassBorder),
+      child: GlassCard.slab(
+        border: const Border(
+          right: BorderSide(color: AppColors.glassBorder),
+        ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black54, blurRadius: 40),
+        ],
+        child: Column(
+          children: [
+            const SizedBox(height: 24),
+            GestureDetector(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: _expanded ? 16 : 0,
+                ),
+                child: Align(
+                  alignment: _expanded
+                      ? Alignment.centerRight
+                      : Alignment.center,
+                  child: Icon(
+                    _expanded
+                        ? PhosphorIconsRegular.sidebarSimple
+                        : PhosphorIconsRegular.sidebar,
+                    size: 24,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
               ),
-              boxShadow: const [
-                BoxShadow(color: Colors.black54, blurRadius: 40),
-              ],
             ),
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                GestureDetector(
-                  onTap: () => setState(() => _expanded = !_expanded),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: _expanded ? 16 : 0,
-                    ),
-                    child: Align(
-                      alignment: _expanded
-                          ? Alignment.centerRight
-                          : Alignment.center,
-                      child: Icon(
-                        _expanded
-                            ? PhosphorIconsRegular.sidebarSimple
-                            : PhosphorIconsRegular.sidebar,
-                        size: 24,
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: navItems.map((item) {
-                      return _NavButton(
-                        item: item,
-                        expanded: _expanded,
-                        onTap: () {
-                          if (item.action != null) {
-                            item.action!();
-                          } else {
-                            ref
-                                .read(kanbanProvider.notifier)
-                                .openColumn(item.route);
-                          }
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: navItems.map((item) {
+                  return _NavButton(
+                    item: item,
+                    expanded: _expanded,
+                    onTap: () {
+                      if (item.action != null) {
+                        item.action!();
+                      } else {
+                        ref
+                            .read(kanbanProvider.notifier)
+                            .openColumn(item.route);
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GestureDetector(
+                onTap: () => ref
+                    .read(kanbanProvider.notifier)
+                    .openColumn(
+                      '/profile',
+                      routeState: {
+                        'user': {
+                          'name': currentUser?.name ?? 'You',
+                          'handle': currentUser?.handle ?? 'currentuser',
+                          'avatar':
+                              currentUser?.avatar ??
+                              'https://picsum.photos/seed/currentuser/100/100',
+                          'karma': currentUser?.karma ?? 98,
+                          'isOnline': currentUser?.isOnline ?? true,
                         },
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: GestureDetector(
-                    onTap: () => ref
-                        .read(kanbanProvider.notifier)
-                        .openColumn(
-                          '/profile',
-                          routeState: {
-                            'user': {
-                              'name': currentUser?.name ?? 'You',
-                              'handle': currentUser?.handle ?? 'currentuser',
-                              'avatar':
-                                  currentUser?.avatar ??
-                                  'https://picsum.photos/seed/currentuser/100/100',
-                              'karma': currentUser?.karma ?? 98,
-                              'isOnline': currentUser?.isOnline ?? true,
-                            },
-                          },
-                        ),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: _expanded
-                            ? MainAxisAlignment.start
-                            : MainAxisAlignment.center,
-                        children: [
-                          UserAvatar(
-                            src:
-                                currentUser?.avatar ??
-                                'https://picsum.photos/seed/currentuser/100/100',
-                            size: AvatarSize.sm,
-                            isOnline: true,
-                          ),
-                          if (_expanded) ...[
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    currentUser?.name ?? 'You',
-                                    style: AppTheme.scaled(
-                                      multiplier: AppTheme.mxs,
-                                      weight: FontWeight.bold,
-                                      color: AppColors.onSurface,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    '${currentUser?.karma ?? 98} karma',
-                                    style: AppTheme.scaled(
-                                      multiplier: AppTheme.m2sm,
-                                      weight: FontWeight.w900,
-                                      color: Color(0xFF34D399),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                      },
                     ),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: _expanded
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center,
+                    children: [
+                      UserAvatar(
+                        src:
+                            currentUser?.avatar ??
+                            'https://picsum.photos/seed/currentuser/100/100',
+                        size: AvatarSize.sm,
+                        isOnline: true,
+                      ),
+                      if (_expanded) ...[
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                currentUser?.name ?? 'You',
+                                style: AppTheme.scaled(
+                                  multiplier: AppTheme.mxs,
+                                  weight: FontWeight.bold,
+                                  color: AppColors.onSurface,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                '${currentUser?.karma ?? 98} karma',
+                                style: AppTheme.scaled(
+                                  multiplier: AppTheme.m2sm,
+                                  weight: FontWeight.w900,
+                                  color: Color(0xFF34D399),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );

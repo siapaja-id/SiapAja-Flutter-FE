@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../shared/utils/color_extensions.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
@@ -123,10 +124,10 @@ class SocialPostCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.p10,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: AppColors.primary.p20,
                       ),
                     ),
                     child: Text(
@@ -319,7 +320,7 @@ class _BidCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: data.bidStatus == BidStatus.accepted
                     ? const Color(0xFF10B981)
-                    : Colors.white.withOpacity(0.1),
+                    : Colors.white.w10,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

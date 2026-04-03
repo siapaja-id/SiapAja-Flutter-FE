@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../utils/color_extensions.dart';
+import '../utils/decorations.dart';
 import '../../app_theme.dart';
 import '../widgets/pulsing_dot.dart';
 
@@ -15,9 +17,9 @@ class MapPreview extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.w10),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+          shadowSm(),
         ],
       ),
       child: ClipRRect(
@@ -57,10 +59,10 @@ class MapPreview extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
+                        color: Colors.black.black80,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.w10,
                         ),
                       ),
                       child: Row(
@@ -108,7 +110,7 @@ class MapPreview extends StatelessWidget {
                           Container(
                             width: 2,
                             height: 32,
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.w10,
                           ),
                           Container(
                             width: 10,
@@ -118,7 +120,7 @@ class MapPreview extends StatelessWidget {
                               color: AppColors.emerald,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.emerald.withOpacity(0.5),
+                                  color: AppColors.emerald.e50,
                                   blurRadius: 10,
                                 ),
                               ],
@@ -149,10 +151,10 @@ class MapPreview extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.p10,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: AppColors.primary.p20,
                       ),
                     ),
                     child: Row(

@@ -1,3 +1,4 @@
+import '../../../../shared/utils/color_extensions.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -63,9 +64,9 @@ class TaskSliverAppBar extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.emerald.withOpacity(0.12),
-                    AppColors.primary.withOpacity(0.08),
-                    AppColors.indigo.withOpacity(0.04),
+                    AppColors.emerald.e12,
+                    AppColors.primary.p08,
+                    AppColors.indigo.i04,
                     AppColors.surfaceContainerHigh,
                   ],
                   stops: const [0.0, 0.35, 0.65, 1.0],
@@ -78,7 +79,7 @@ class TaskSliverAppBar extends StatelessWidget {
               child: Icon(
                 getIconForTaskType(task.iconType),
                 size: 160,
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.w03,
               ),
             ),
             Positioned(

@@ -1,3 +1,5 @@
+import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -42,7 +44,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.white.withOpacity(0.08),
+                  Colors.white.w08,
                   Colors.white.withOpacity(0.02),
                 ],
               ),
@@ -128,12 +130,12 @@ class _TaskMainContentState extends State<TaskMainContent> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.w10,
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.black40,
                       blurRadius: 16,
                     ),
                   ],
@@ -245,7 +247,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.p20,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -328,7 +330,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
             border: Border.all(color: AppColors.glassBorder),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.black25,
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -362,7 +364,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.emerald.withOpacity(0.1),
+                        AppColors.emerald.e10,
                         Colors.transparent,
                       ],
                     ),
@@ -379,7 +381,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                     gradient: LinearGradient(
                       colors: [
                         AppColors.emerald.withOpacity(0),
-                        AppColors.emerald.withOpacity(0.15),
+                        AppColors.emerald.e15,
                         AppColors.emerald.withOpacity(0),
                       ],
                     ),
@@ -438,7 +440,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   Container(
                     width: 1,
                     height: 40,
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.w10,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -501,9 +503,9 @@ class _TaskMainContentState extends State<TaskMainContent> {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.w05),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+          shadowSm(),
         ],
       ),
       child: Stack(
@@ -518,7 +520,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.emerald.withOpacity(0.05),
+                    AppColors.emerald.e05,
                     Colors.transparent,
                   ],
                 ),
@@ -539,7 +541,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                       child: Container(
                         height: 3,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.w10,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -581,10 +583,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.emerald.withOpacity(0.5),
-                                      blurRadius: 20,
-                                    ),
+                                    shadowGlow(color: AppColors.emerald),
                                   ],
                                 ),
                                 child: const PulsingDot(
@@ -604,16 +603,12 @@ class _TaskMainContentState extends State<TaskMainContent> {
                                   border: Border.all(
                                     color: isActive
                                         ? AppColors.emerald
-                                        : Colors.white.withOpacity(0.2),
+                                        : Colors.white.w20,
                                     width: 2.5,
                                   ),
                                   boxShadow: isActive
                                       ? [
-                                          BoxShadow(
-                                            color: AppColors.emerald
-                                                .withOpacity(0.5),
-                                            blurRadius: 20,
-                                          ),
+                                          shadowGlow(color: AppColors.emerald),
                                         ]
                                       : null,
                                 ),
@@ -650,7 +645,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   padding: const EdgeInsets.only(top: 16),
                   decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(0.05)),
+                      top: BorderSide(color: Colors.white.w05),
                     ),
                   ),
                   child: Row(
@@ -816,13 +811,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
 
   Widget _buildVideoModule() {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
-        ],
-      ),
+      decoration: surfaceCardDecor(radius: 24, shadows: [shadowSm()]),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Container(
@@ -881,7 +870,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
             gradient: LinearGradient(
               colors: [
                 Colors.white.withOpacity(0),
-                Colors.white.withOpacity(0.08),
+                Colors.white.w08,
                 Colors.white.withOpacity(0),
               ],
             ),

@@ -1,4 +1,4 @@
-import 'dart:ui';
+import '../../../shared/utils/color_extensions.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -7,6 +7,7 @@ import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../pages/create_reply_page.dart';
+import 'glass_card.dart';
 
 /// Bottom fixed reply input bar — matches React ReplyInput exactly.
 /// Glass container, avatar on left, auto-grow textarea, send button, expand icon.
@@ -106,138 +107,130 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
   Widget build(BuildContext context) {
     final hasText = _controller.text.trim().isNotEmpty;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: EdgeInsets.only(
-            left: 12,
-            right: 12,
-            top: 12,
-            bottom: MediaQuery.of(context).padding.bottom + 12,
+    return GlassCard.slab(
+      padding: EdgeInsets.only(
+        left: 12,
+        right: 12,
+        top: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+      ),
+      border: const Border(top: BorderSide(color: AppColors.glassBorder)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.black50,
+          blurRadius: 40,
+          offset: const Offset(0, -10),
+        ),
+      ],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // Avatar on left
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: UserAvatar(src: widget.avatarUrl, size: AvatarSize.md),
           ),
-          decoration: BoxDecoration(
-            color: AppColors.glassTint,
-            border: const Border(top: BorderSide(color: AppColors.glassBorder)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 40,
-                offset: const Offset(0, -10),
+          const SizedBox(width: 12),
+          // Text area in rounded container
+          Expanded(
+            child: Container(
+              constraints: const BoxConstraints(
+                minHeight: _minHeight,
+                maxHeight: _maxHeight,
               ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // Avatar on left
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: UserAvatar(src: widget.avatarUrl, size: AvatarSize.md),
+              decoration: BoxDecoration(
+                color: Colors.white.w05,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.w10),
               ),
-              const SizedBox(width: 12),
-              // Text area in rounded container
-              Expanded(
-                child: Container(
-                  constraints: const BoxConstraints(
-                    minHeight: _minHeight,
-                    maxHeight: _maxHeight,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _controller,
-                          onChanged: (_) => setState(() {}),
-                          onSubmitted: (_) => _handleSend(),
-                          style: AppTheme.scaled(
-                            multiplier: AppTheme.mbase,
-                            color: AppColors.onSurface,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      onChanged: (_) => setState(() {}),
+                      onSubmitted: (_) => _handleSend(),
+                      style: AppTheme.scaled(
+                        multiplier: AppTheme.mbase,
+                        color: AppColors.onSurface,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Reply to ${widget.handle}...',
+                        hintStyle: AppTheme.scaled(
+                          multiplier: AppTheme.mbase,
+                          color: AppColors.onSurfaceVariant.withOpacity(
+                            0.5,
                           ),
-                          decoration: InputDecoration(
-                            hintText: 'Reply to ${widget.handle}...',
-                            hintStyle: AppTheme.scaled(
-                              multiplier: AppTheme.mbase,
-                              color: AppColors.onSurfaceVariant.withOpacity(
-                                0.5,
-                              ),
-                            ),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            filled: false,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          maxLines: null,
-                          minLines: 1,
-                          textInputAction: TextInputAction.send,
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
                       ),
-                      // Expand button when empty
-                      if (!hasText)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2, right: 2),
-                          child: IconButton(
-                            onPressed: _openFullscreen,
-                            icon: Icon(
-                              PhosphorIconsRegular.arrowsOutSimple,
-                              size: 18,
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            constraints: const BoxConstraints(),
-                          ),
+                      maxLines: null,
+                      minLines: 1,
+                      textInputAction: TextInputAction.send,
+                    ),
+                  ),
+                  // Expand button when empty
+                  if (!hasText)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2, right: 2),
+                      child: IconButton(
+                        onPressed: _openFullscreen,
+                        icon: Icon(
+                          PhosphorIconsRegular.arrowsOutSimple,
+                          size: 18,
+                          color: AppColors.onSurfaceVariant,
                         ),
-                    ],
-                  ),
-                ),
+                        padding: const EdgeInsets.all(10),
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(width: 8),
-              // Send Button
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: FilledButton(
-                  onPressed: hasText ? _handleSend : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: hasText
-                        ? AppColors.primary
-                        : AppColors.surfaceContainerHigh,
-                    foregroundColor: hasText
-                        ? AppColors.primaryForeground
-                        : AppColors.onSurfaceVariant,
-                    disabledBackgroundColor: AppColors.surfaceContainerHigh,
-                    disabledForegroundColor: AppColors.onSurfaceVariant,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Reply',
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.mxs,
-                      weight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          // Send Button
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: FilledButton(
+              onPressed: hasText ? _handleSend : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: hasText
+                    ? AppColors.primary
+                    : AppColors.surfaceContainerHigh,
+                foregroundColor: hasText
+                    ? AppColors.primaryForeground
+                    : AppColors.onSurfaceVariant,
+                disabledBackgroundColor: AppColors.surfaceContainerHigh,
+                disabledForegroundColor: AppColors.onSurfaceVariant,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Reply',
+                style: AppTheme.scaled(
+                  multiplier: AppTheme.mxs,
+                  weight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

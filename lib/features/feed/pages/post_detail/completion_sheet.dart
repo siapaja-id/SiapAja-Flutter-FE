@@ -3,7 +3,9 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
+import '../../../../shared/widgets/base_sheet.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
+import '../../../../shared/utils/color_extensions.dart';
 
 class CompletionSheet extends StatelessWidget {
   final TaskData task;
@@ -23,83 +25,46 @@ class CompletionSheet extends StatelessWidget {
     required TextEditingController notesCtrl,
     required VoidCallback onComplete,
   }) {
-    showModalBottomSheet(
+    BaseSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder: (context) {
-        return CompletionSheet(
-          task: task,
-          notesCtrl: notesCtrl,
-          onComplete: onComplete,
-        );
-      },
+      title: 'Complete Task',
+      builder: (_) => CompletionSheet(
+        task: task,
+        notesCtrl: notesCtrl,
+        onComplete: onComplete,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildContent(context);
-  }
-
-  Widget _buildContent(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
+    return BaseSheet(
+      title: 'Complete Task',
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Complete Task',
-                style: AppTheme.scaled(multiplier: AppTheme.m2xl,
-                  weight: FontWeight.w900,
-                  color: AppColors.onSurface,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                ),
-                icon: const Icon(
-                  PhosphorIconsRegular.x,
-                  size: 20,
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
           TextField(
             controller: notesCtrl,
-            style: AppTheme.scaled(multiplier: AppTheme.mbase,
+            style: AppTheme.scaled(
+              multiplier: AppTheme.mbase,
               color: AppColors.onSurface,
             ),
             decoration: InputDecoration(
               hintText: 'Add completion notes or proof of work...',
-              hintStyle: AppTheme.scaled(multiplier: AppTheme.mbase,
+              hintStyle: AppTheme.scaled(
+                multiplier: AppTheme.mbase,
                 color: AppColors.onSurfaceVariant.withOpacity(0.3),
               ),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
+              fillColor: Colors.white.w05,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                borderSide: BorderSide(color: Colors.white.w10),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                borderSide: BorderSide(color: Colors.white.w10),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -111,7 +76,7 @@ class CompletionSheet extends StatelessWidget {
             onPressed: () {},
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.onSurfaceVariant,
-              side: BorderSide(color: Colors.white.withOpacity(0.2)),
+              side: BorderSide(color: Colors.white.w20),
               padding: const EdgeInsets.symmetric(vertical: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -127,7 +92,8 @@ class CompletionSheet extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Upload Proof Image',
-                  style: AppTheme.scaled(multiplier: AppTheme.mxs,
+                  style: AppTheme.scaled(
+                    multiplier: AppTheme.mxs,
                     weight: FontWeight.w700,
                   ),
                 ),

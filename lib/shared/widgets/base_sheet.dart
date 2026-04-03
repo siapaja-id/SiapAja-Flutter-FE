@@ -1,32 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../utils/color_extensions.dart';
 import '../../app_theme.dart';
+import '../utils/color_extensions.dart';
+import '../utils/decorations.dart';
 
-class BottomSheetContainer extends StatelessWidget {
+/// Shared bottom-sheet scaffold used by all modal sheets in the app.
+///
+/// Provides the standard chrome — surface decoration, title row with close
+/// button, and consistent padding — so that each sheet only needs to supply
+/// its own body content.
+///
+/// Usage:
+/// ```dart
+/// BaseSheet.show(
+///   context: context,
+///   title: 'Submit Your Bid',
+///   builder: (_) => BidContent(...),
+/// );
+/// ```
+class BaseSheet extends StatelessWidget {
   final String title;
   final Widget child;
   final VoidCallback? onClose;
 
-  const BottomSheetContainer({
+  const BaseSheet({
     super.key,
     required this.title,
     required this.child,
     this.onClose,
   });
 
+  /// Convenience method for `showModalBottomSheet` with the standard
+  /// sheet configuration (transparent background, scroll-controlled).
   static Future<T?> show<T>({
     required BuildContext context,
     required String title,
     required WidgetBuilder builder,
+    VoidCallback? onClose,
   }) {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => BottomSheetContainer(
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) => BaseSheet(
         title: title,
-        onClose: () => Navigator.pop(context),
+        onClose: onClose ?? () => Navigator.pop(context),
         child: builder(context),
       ),
     );
@@ -36,15 +57,12 @@ class BottomSheetContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: Colors.white.w10),
-      ),
+      decoration: surfaceSheetDecor(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Title row ──────────────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -63,14 +81,15 @@ class BottomSheetContainer extends StatelessWidget {
                   backgroundColor: Colors.white.w05,
                 ),
                 icon: const Icon(
-                  Icons.close,
+                  PhosphorIconsRegular.x,
                   size: 20,
                   color: AppColors.onSurfaceVariant,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          // ── Sheet body ────────────────────────────────────────
           child,
         ],
       ),

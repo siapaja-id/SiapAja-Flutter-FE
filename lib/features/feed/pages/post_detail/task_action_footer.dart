@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../shared/utils/color_extensions.dart';
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
 
@@ -46,10 +47,10 @@ class TaskActionFooter extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.glassTint,
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+        border: Border(top: BorderSide(color: Colors.white.w05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.black50,
             blurRadius: 40,
             offset: const Offset(0, -10),
           ),
@@ -64,9 +65,9 @@ class TaskActionFooter extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.w05,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: Colors.white.w10),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -180,9 +181,9 @@ class TaskActionFooter extends StatelessWidget {
               Expanded(
                 child: _buildActionButton(
                   'BID',
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.w05,
                   textColor: AppColors.onSurface,
-                  borderColor: Colors.white.withOpacity(0.1),
+                  borderColor: Colors.white.w10,
                   onTap: onBid,
                 ),
               ),
@@ -227,7 +228,7 @@ class TaskActionFooter extends StatelessWidget {
         if (isAssignedToMe) {
           return _buildActionLabel(
             'WAITING FOR REVIEW...',
-            borderColor: Colors.white.withOpacity(0.1),
+            borderColor: Colors.white.w10,
           );
         } else {
           return _buildActionLabel('COMPLETED');
@@ -261,14 +262,14 @@ class TaskActionFooter extends StatelessWidget {
       decoration: BoxDecoration(
         color: color != null
             ? color.withOpacity(0.1)
-            : Colors.white.withOpacity(0.05),
+            : Colors.white.w05,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color:
               borderColor ??
               (color != null
                   ? color.withOpacity(0.2)
-                  : Colors.white.withOpacity(0.1)),
+                  : Colors.white.w10),
         ),
       ),
       child: Row(

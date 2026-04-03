@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../utils/color_extensions.dart';
+import '../utils/decorations.dart';
 import '../../app_theme.dart';
 
 class VoiceNotePlayer extends StatelessWidget {
@@ -22,9 +24,9 @@ class VoiceNotePlayer extends StatelessWidget {
           colors: [AppColors.surfaceContainerHigh, AppColors.surfaceContainer],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.w05),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
+          shadowSm(),
         ],
       ),
       child: Row(
@@ -36,10 +38,7 @@ class VoiceNotePlayer extends StatelessWidget {
               color: AppColors.primary,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
-                  blurRadius: 20,
-                ),
+                shadowGlow(color: AppColors.primary),
               ],
             ),
             child: const Center(
@@ -57,7 +56,7 @@ class VoiceNotePlayer extends StatelessWidget {
                 Container(
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.w10,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Stack(

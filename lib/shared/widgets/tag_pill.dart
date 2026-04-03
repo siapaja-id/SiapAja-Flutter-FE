@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../utils/color_extensions.dart';
 import '../../app_theme.dart';
 
 class TagPill extends StatelessWidget {
@@ -27,7 +28,7 @@ class TagPill extends StatelessWidget {
   }) : color = Colors.transparent;
 
   Color get _borderColor => color == Colors.transparent
-      ? Colors.white.withOpacity(0.1)
+      ? Colors.white.w10
       : color.withOpacity(0.2);
 
   Color get _textColor =>
@@ -40,7 +41,7 @@ class TagPill extends StatelessWidget {
           padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color == Colors.transparent
-            ? Colors.white.withOpacity(0.05)
+            ? Colors.white.w05
             : color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: _borderColor),

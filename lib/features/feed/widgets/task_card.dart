@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../shared/utils/color_extensions.dart';
+import '../../../shared/utils/decorations.dart';
+import '../../../shared/utils/task_icons.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/widgets/user_avatar.dart';
@@ -9,17 +12,6 @@ import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
 import 'base_feed_card.dart';
 import 'glass_card.dart';
-
-IconData _getIconForTaskType(TaskIconType type) => switch (type) {
-  TaskIconType.palette => PhosphorIconsRegular.palette,
-  TaskIconType.code => PhosphorIconsRegular.code,
-  TaskIconType.car => PhosphorIconsRegular.car,
-  TaskIconType.truck => PhosphorIconsRegular.truck,
-  TaskIconType.writing => PhosphorIconsRegular.pencilSimple,
-  TaskIconType.repair => PhosphorIconsRegular.wrench,
-  TaskIconType.package => PhosphorIconsRegular.package,
-  TaskIconType.location => PhosphorIconsRegular.mapPin,
-};
 
 class TaskCard extends StatelessWidget {
   final TaskData data;
@@ -67,7 +59,7 @@ class TaskCard extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  _getIconForTaskType(data.iconType),
+                  getIconForTaskType(data.iconType),
                   size: 12,
                   color: AppColors.primary,
                 ),
@@ -77,13 +69,9 @@ class TaskCard extends StatelessWidget {
       headerMeta: data.status != TaskStatus.open && !isParent
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-              ),
+              decoration: tintedDecor(color: AppColors.primary, radius: 4),
               child: Text(
-                _getStatusText(data.status),
+                getStatusText(data.status),
                 style: AppTheme.scaled(
                   multiplier: AppTheme.m2xs,
                   color: AppColors.primary,
@@ -251,7 +239,7 @@ class TaskCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.black60,
                     borderRadius: BorderRadius.circular(9999),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -279,13 +267,7 @@ class TaskCard extends StatelessWidget {
                 Container(
                   width: 24,
                   height: 24,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.2),
-                    ),
-                  ),
+                  decoration: tintedDecor(color: AppColors.primary, radius: 12),
                   child: const Icon(
                     PhosphorIconsRegular.compass,
                     size: 10,
@@ -300,11 +282,4 @@ class TaskCard extends StatelessWidget {
     ),
   );
 
-  String _getStatusText(TaskStatus s) => switch (s) {
-    TaskStatus.open => 'OPEN',
-    TaskStatus.assigned => 'ASSIGNED',
-    TaskStatus.inProgress => 'IN PROGRESS',
-    TaskStatus.completed => 'COMPLETED',
-    TaskStatus.finished => 'FINISHED',
-  };
 }
