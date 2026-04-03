@@ -1,5 +1,3 @@
-import '../../../shared/utils/color_extensions.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
 import '../../../shared/settings_provider.dart';
+import '../../../shared/widgets/themed_background.dart';
 import '../providers.dart';
 import '../widgets/glass_card.dart';
 
@@ -63,22 +62,13 @@ class _MainShellState extends ConsumerState<MainShell> {
     final bottomNavVisible = ref.watch(
       uiStateProvider.select((s) => s.bottomNavVisible),
     );
-    final themeColor = ref.watch(settingsProvider.select((s) => s.themeColor));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: AppTheme.backgroundGradient(themeColor),
-                ),
-              ),
-            ),
-          ),
+          const ThemedBackground(),
           widget.child,
           Positioned(
             left: 0,

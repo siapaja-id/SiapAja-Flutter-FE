@@ -1,9 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../app_theme.dart';
+import 'glass_pill.dart';
 
 class KarmaBadge extends StatelessWidget {
   final int karma;
@@ -19,13 +17,7 @@ class KarmaBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.glassTint,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.glassBorder),
-            ),
+          child: GlassPill(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

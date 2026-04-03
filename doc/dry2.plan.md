@@ -1,7 +1,7 @@
 ```yaml
 plan:
   uuid: 'b1c2d3e4-5f6a-4b7c-8d9e-0f1a2b3c4d5e'
-  status: 'pending'
+  status: 'in-progress'
   title: 'Deep DRY Phase 2: Comprehensive Code Deduplication to -5000 LOC'
   introduction: |
     Phase 1 (dry1) removed ~500 LOC by extracting color extensions, decoration presets, BaseSheet, icon centralization, glass consolidation, and radar micro-extractions. This plan targets the remaining ~4500 LOC reduction through 15 aggressive but safe refactoring parts.
@@ -119,13 +119,13 @@ plan:
           - lib/features/feed/pages/post_detail/bid_sheet.dart
 
     - uuid: 'f5a6b7c8-9d0e-4f1a-2b3c-4d5e6f7a8b9c'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 2: Shared Widgets — ThemedBackground, GlassPill, SectionLabel, GradientDivider'
       reason: |
         Four small but widely-used widget patterns are inlined repeatedly. Extracting each into a shared widget yields a clean LOC reduction since each inline usage is 5-10 lines but each widget is 1 line to use.
       steps:
         - uuid: 'a6b7c8d9-0e1f-4a2b-3c4d-5e6f7a8b9c0d'
-          status: 'pending'
+          status: 'completed'
           name: 'Create Shared Micro-Widgets'
           reason: 'Extract 4 repeated inline patterns into named shared widgets'
           files:
@@ -139,7 +139,7 @@ plan:
             - 'Create `SectionLabel({required String label, Color? color})` widget: renders the `_buildSectionLabel` pattern — `Text(label, style: AppTheme.sectionLabel.copyWith(color: ...))`'
             - 'Create `GradientDivider({double height = 1, Color? color})` widget: renders a `Container(height: h, decoration: BoxDecoration(gradient: LinearGradient(colors: [transparent, color ?? white.w08, transparent])))`'
         - uuid: 'b7c8d9e0-1f2a-4b3c-4d5e-6f7a8b9c0d1e'
-          status: 'pending'
+          status: 'completed'
           name: 'Apply Shared Micro-Widgets Across Codebase'
           reason: 'Replace ~60+ inline usages with 1-line widget calls'
           files:

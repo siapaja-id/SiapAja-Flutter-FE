@@ -14,6 +14,9 @@ import '../../../shared/widgets/pulsing_dot.dart';
 import '../../../shared/widgets/tag_pill.dart';
 import '../../../shared/widgets/voice_note_player.dart';
 import '../../../shared/widgets/map_preview.dart';
+import '../../../shared/widgets/glass_pill.dart';
+import '../../../shared/widgets/section_label.dart';
+import '../../../shared/widgets/gradient_divider.dart';
 import '../widgets/base_feed_card.dart';
 
 class TaskMainContent extends StatefulWidget {
@@ -39,17 +42,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
         children: [
           _buildHeader(context),
           const SizedBox(height: 16),
-          Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.w08,
-                  Colors.white.withOpacity(0.02),
-                ],
-              ),
-            ),
-          ),
+          const GradientDivider(),
           const SizedBox(height: 24),
 
           if (data.isFirstPost == true) ...[
@@ -78,7 +71,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
           const SizedBox(height: 24),
           _buildStatusTracker(context),
           const SizedBox(height: 24),
-          _buildSectionLabel('DESCRIPTION'),
+          const SectionLabel(label: 'DESCRIPTION'),
           const SizedBox(height: 10),
           _buildDescription(context),
           if (data.mapUrl != null ||
@@ -86,13 +79,13 @@ class _TaskMainContentState extends State<TaskMainContent> {
               data.video != null ||
               data.voiceNote != null) ...[
             const SizedBox(height: 32),
-            _buildSectionLabel('ATTACHMENTS'),
+            const SectionLabel(label: 'ATTACHMENTS'),
             const SizedBox(height: 10),
             _buildMediaModules(context),
           ],
           if (data.tags != null && data.tags!.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _buildSectionLabel('TAGS'),
+            const SectionLabel(label: 'TAGS'),
             const SizedBox(height: 10),
             _buildTags(context),
           ],
@@ -107,17 +100,6 @@ class _TaskMainContentState extends State<TaskMainContent> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
-    return Text(
-      label,
-      style: AppTheme.scaled(
-        multiplier: AppTheme.m2xs,
-        color: AppColors.onSurfaceVariant.withOpacity(0.4),
-        weight: FontWeight.w900,
-        letterSpacing: 2.5,
-      ),
-    );
-  }
 
   Widget _buildHeader(BuildContext context) {
     return Row(
@@ -233,13 +215,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
   }
 
   Widget _buildInfoPill(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.glassTint,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
+    return GlassPill(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -864,18 +840,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
   Widget _buildPostActions(BuildContext context) {
     return Column(
       children: [
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withOpacity(0),
-                Colors.white.w08,
-                Colors.white.withOpacity(0),
-              ],
-            ),
-          ),
-        ),
+        const GradientDivider(),
         const SizedBox(height: 16),
         PostActions(
           id: data.id,
