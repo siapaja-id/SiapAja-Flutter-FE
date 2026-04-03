@@ -672,11 +672,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                               fontWeight: FontWeight.w900,
                                               color: Colors.white,
                                             ),
-                                            decoration: const InputDecoration(
-                                              border: InputBorder.none,
-                                              isDense: true,
-                                              contentPadding: EdgeInsets.zero,
-                                            ),
+                                            decoration: borderlessInput,
                                             controller: TextEditingController(
                                               text: '$_bidAmount',
                                             ),
@@ -730,32 +726,9 @@ class _RadarPageState extends ConsumerState<RadarPage>
                           TextField(
                             maxLines: 3,
                             style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
+                            decoration: glassInputArea(
                               hintText:
                                   'Why should they choose you? (Optional)',
-                              hintStyle: TextStyle(
-                                color: Colors.white.w30,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.w05,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: Colors.white.w10,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: Colors.white.w10,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: AppColors.primary.p50,
-                                ),
-                              ),
                             ),
                             onChanged: (value) => _replyText = value,
                           ),

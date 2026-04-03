@@ -450,16 +450,11 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     onChanged: (_) => setState(() {}),
                     onTap: () => setState(() => _activeIndex = index),
                     style: AppTheme.bodyLarge,
-                    decoration: InputDecoration(
+                    decoration: borderlessInput.copyWith(
                       hintText: index == 0
                           ? "What's happening?"
                           : 'Add another thought...',
                       hintStyle: AppTheme.bodyLarge.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.4)),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      filled: false,
-                      contentPadding: EdgeInsets.zero,
                     ),
                     maxLines: null,
                     minLines: 1,

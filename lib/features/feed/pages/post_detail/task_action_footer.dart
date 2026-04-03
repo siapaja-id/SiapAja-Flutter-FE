@@ -78,13 +78,9 @@ class TaskActionFooter extends StatelessWidget {
                         onChanged: onReplyChanged,
                         onSubmitted: (_) => onSend(),
                         style: AppTheme.bodyBold,
-                        decoration: InputDecoration(
+                        decoration: borderlessInput.copyWith(
                           hintText: 'Message or ask a question...',
                           hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          filled: false,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
