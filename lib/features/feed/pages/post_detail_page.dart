@@ -152,14 +152,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   }
 
   void _incrementReplyCount(FeedItem parent) {
-    FeedItem? updated;
-    if (parent is SocialPostData) {
-      updated = parent.copyWith(replies: parent.replies + 1);
-    } else if (parent is TaskData) {
-      updated = parent.copyWith(replies: parent.replies + 1);
-    } else if (parent is EditorialData) {
-      updated = parent.copyWith(replies: parent.replies + 1);
-    }
+    final FeedItem? updated = switch (parent) {
+      SocialPostData p => p.copyWith(replies: p.replies + 1),
+      TaskData p => p.copyWith(replies: p.replies + 1),
+      EditorialData p => p.copyWith(replies: p.replies + 1),
+      _ => null,
+    };
     if (updated != null && updated != parent) {
       ref
           .read(feedNotifierProvider.notifier)

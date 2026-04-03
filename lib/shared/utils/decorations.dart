@@ -66,6 +66,23 @@ BoxDecoration tintedDecor({
   );
 }
 
+/// Soft tinted decoration with half-opacity fill and full-opacity border.
+///
+/// Fill uses `tintOpacity * 0.5`, border uses `tintOpacity`.
+/// Common pattern for bid cards, price badges, and thread-count chips
+/// where the border should be more prominent than the fill.
+BoxDecoration tintedDecorHalf({
+  required Color color,
+  double radius = 16,
+  double tintOpacity = 0.2,
+}) {
+  return BoxDecoration(
+    color: color.withOpacity(tintOpacity * 0.5),
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: color.withOpacity(tintOpacity)),
+  );
+}
+
 // ── BoxShadow presets ─────────────────────────────────────────────
 
 /// Standard dark shadow. Default matches the most common elevation

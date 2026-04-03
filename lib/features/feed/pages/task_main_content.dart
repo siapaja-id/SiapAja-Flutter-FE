@@ -1,6 +1,5 @@
 import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/utils/decorations.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -18,6 +17,7 @@ import '../../../shared/widgets/glass_pill.dart';
 import '../../../shared/widgets/section_label.dart';
 import '../../../shared/widgets/gradient_divider.dart';
 import '../widgets/base_feed_card.dart';
+import '../widgets/glass_card.dart';
 
 class TaskMainContent extends StatefulWidget {
   final TaskData data;
@@ -204,14 +204,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
   }
 
   Widget _buildStatusTag(TaskStatus status) {
-    final label = switch (status) {
-      TaskStatus.open => 'Open',
-      TaskStatus.assigned => 'Assigned',
-      TaskStatus.inProgress => 'In Progress',
-      TaskStatus.completed => 'Completed',
-      TaskStatus.finished => 'Finished',
-    };
-    return TagPill(label: label);
+    return TagPill(label: getStatusText(status));
   }
 
   Widget _buildInfoPill(BuildContext context) {
@@ -294,172 +287,139 @@ class _TaskMainContentState extends State<TaskMainContent> {
   }
 
   Widget _buildTrustCard(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.glassTint,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.glassBorder),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.black25,
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+    return GlassCard(
+      borderRadius: 24,
+      padding: const EdgeInsets.all(20),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -40,
+            right: -40,
+            child: Container(
+              width: 128,
+              height: 128,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.emerald.e10,
+                    Colors.transparent,
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-          child: Stack(
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.emerald.withOpacity(0),
+                    AppColors.emerald.e15,
+                    AppColors.emerald.withOpacity(0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Row(
             children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                height: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.glassGlow,
-                        AppColors.glassGlow.withOpacity(0),
-                      ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'REQUESTER RATING',
+                      style: AppTheme.scaled(
+                        multiplier: AppTheme.m2sm,
+                        color: AppColors.onSurfaceVariant,
+                        weight: FontWeight.w900,
+                        letterSpacing: 2,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: -40,
-                right: -40,
-                child: Container(
-                  width: 128,
-                  height: 128,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.emerald.e10,
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.emerald.withOpacity(0),
-                        AppColors.emerald.e15,
-                        AppColors.emerald.withOpacity(0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 6),
+                    Row(
                       children: [
+                        const Icon(
+                          PhosphorIconsFill.star,
+                          size: 18,
+                          color: Color(0xFFFBBF24),
+                        ),
+                        const SizedBox(width: 6),
                         Text(
-                          'REQUESTER RATING',
+                          '4.9',
                           style: AppTheme.scaled(
-                            multiplier: AppTheme.m2sm,
-                            color: AppColors.onSurfaceVariant,
+                            multiplier: AppTheme.mxl,
+                            color: AppColors.onSurface,
                             weight: FontWeight.w900,
-                            letterSpacing: 2,
+                            letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              PhosphorIconsFill.star,
-                              size: 18,
-                              color: Color(0xFFFBBF24),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '4.9',
-                              style: AppTheme.scaled(
-                                multiplier: AppTheme.mxl,
-                                color: AppColors.onSurface,
-                                weight: FontWeight.w900,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '(124)',
-                              style: AppTheme.scaled(
-                                multiplier: AppTheme.m1sm,
-                                color: AppColors.onSurfaceVariant.withOpacity(
-                                  0.6,
-                                ),
-                                weight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: Colors.white.w10,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                        const SizedBox(width: 4),
                         Text(
-                          'PAYMENT',
+                          '(124)',
                           style: AppTheme.scaled(
-                            multiplier: AppTheme.m2sm,
-                            color: AppColors.onSurfaceVariant.withOpacity(0.6),
-                            weight: FontWeight.w900,
-                            letterSpacing: 2,
+                            multiplier: AppTheme.m1sm,
+                            color: AppColors.onSurfaceVariant.withOpacity(
+                              0.6,
+                            ),
+                            weight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              PhosphorIconsRegular.shieldCheck,
-                              size: 18,
-                              color: AppColors.emerald,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Verified',
-                              style: AppTheme.scaled(
-                                multiplier: AppTheme.mbase,
-                                color: AppColors.emerald,
-                                weight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: Colors.white.w10,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PAYMENT',
+                      style: AppTheme.scaled(
+                        multiplier: AppTheme.m2sm,
+                        color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                        weight: FontWeight.w900,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(
+                          PhosphorIconsRegular.shieldCheck,
+                          size: 18,
+                          color: AppColors.emerald,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Verified',
+                          style: AppTheme.scaled(
+                            multiplier: AppTheme.mbase,
+                            color: AppColors.emerald,
+                            weight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -720,17 +680,13 @@ class _TaskMainContentState extends State<TaskMainContent> {
             onTap: () => setState(() => _isDescExpanded = !_isDescExpanded),
             child: Container(
               margin: EdgeInsets.only(top: _isDescExpanded ? 16 : 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.glassTint,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.glassBorder),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _isDescExpanded ? 'Show Less' : 'Show Full Description',
+              child: GlassPill(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _isDescExpanded ? 'Show Less' : 'Show Full Description',
                     style: AppTheme.scaled(
                       multiplier: AppTheme.m2sm,
                       color: _isDescExpanded

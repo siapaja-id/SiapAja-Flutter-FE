@@ -1663,11 +1663,9 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                         color: const Color(0xFF10B981),
                                         borderRadius: BorderRadius.circular(16),
                                         boxShadow: [
-                                          BoxShadow(
-                                            color: const Color(
-                                              0xFF10B981,
-                                            ).withOpacity(0.3),
-                                            blurRadius: 40,
+                                          shadowGlow(
+                                            color: const Color(0xFF10B981),
+                                            blur: 40,
                                           ),
                                         ],
                                       ),
