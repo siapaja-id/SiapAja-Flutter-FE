@@ -153,13 +153,9 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _handleSend(),
                       style: AppTheme.bodyBold,
-                      decoration: InputDecoration(
+                      decoration: borderlessInput.copyWith(
                         hintText: 'Reply to ${widget.handle}...',
                         hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        filled: false,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,

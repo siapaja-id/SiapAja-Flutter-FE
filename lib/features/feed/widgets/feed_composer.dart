@@ -505,12 +505,10 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                       TextField(
                         controller: widget.textController,
                         maxLines: null,
-                        decoration: InputDecoration(
+                        decoration: borderlessInput.copyWith(
                           hintText:
                               'What do you need help with? Describe your task in detail...',
                           hintStyle: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurfaceVariant.withOpacity(0.4)),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
                         ),
                         style: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurface, height: 1.8),
                         autofocus: true,

@@ -179,13 +179,13 @@ plan:
           - lib/shared/widgets/karma_badge.dart
 
     - uuid: 'c8d9e0f1-2a3b-4c4d-5e6f-7a8b9c0d1e2f'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 3: InputDecoration Presets & InputDecorationTheme Enhancement'
       reason: |
         InputDecoration is constructed with verbose repeated patterns across 8+ files. The app already has an InputDecorationTheme in AppTheme.darkTheme but many widgets override it with inline InputDecoration that has the same border/fill patterns. Creating preset InputDecoration factories and enhancing the global theme eliminates this duplication.
       steps:
         - uuid: 'd9e0f1a2-3b4c-4d5e-6f7a-8b9c0d1e2f3a'
-          status: 'pending'
+          status: 'completed'
           name: 'Create InputDecoration Presets in AppDecorations'
           reason: 'Standardize input decoration patterns used in sheets, replies, and forms'
           files:
