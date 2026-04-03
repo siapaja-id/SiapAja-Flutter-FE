@@ -2,6 +2,7 @@ import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/utils/decorations.dart';
 import '../../../shared/widgets/ring_animation.dart';
 import '../../../shared/widgets/themed_background.dart';
+import '../../../shared/widgets/bid_controls.dart';
 import '../../../shared/utils/task_icons.dart';
 import 'dart:async';
 import 'dart:math';
@@ -524,14 +525,16 @@ class _RadarPageState extends ConsumerState<RadarPage>
     final gig = _getCurrentGig()!;
     final defaultBid = parsePrice(gig.price) ?? 50;
 
+    void _closeBidSheet() {
+      _bidSheetController.reverse().then((_) {
+        if (mounted) {
+          setState(() => _showBidSheet = false);
+        }
+      });
+    }
+
     return GestureDetector(
-      onTap: () {
-        _bidSheetController.reverse().then((_) {
-          if (mounted) {
-            setState(() => _showBidSheet = false);
-          }
-        });
-      },
+      onTap: _closeBidSheet,
       child: Stack(
         children: [
           Positioned.fill(
@@ -584,206 +587,29 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                 ),
                               ),
                               CloseButton(
-                                onTap: () {
-                                  _bidSheetController.reverse().then((_) {
-                                    if (mounted) {
-                                      setState(() => _showBidSheet = false);
-                                    }
-                                  });
-                                },
+                                onTap: _closeBidSheet,
                               ),
                             ],
                           ),
                           const SizedBox(height: 20),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceContainer,
-                              borderRadius: BorderRadius.circular(28),
-                              border: Border.all(
-                                color: Colors.white.w10,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                GestureDetector(
-                                  onTap: () => setState(() {
-                                    _bidAmount = max(1, _bidAmount - 5);
-                                  }),
-                                  child: Container(
-                                    width: 64,
-                                    height: 64,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.w05,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Icon(
-                                      PhosphorIconsRegular.minus,
-                                      size: 28,
-                                      color: Colors.white.w50,
-                                    ),
-                                  ),
-                                ),
-                                Column(
-                                  children: [
-                                    Text(
-                                      'YOUR BID',
-                                      style: AppTheme.scaled(
-                                        multiplier: AppTheme.m2xs,
-                                        weight: FontWeight.w900,
-                                        letterSpacing: 2,
-                                        color: Colors.white.w50,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '\$',
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w900,
-                                            color: const Color(0xFF10B981),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 80,
-                                          child: TextField(
-                                            keyboardType: TextInputType.number,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 48,
-                                              fontWeight: FontWeight.w900,
-                                              color: Colors.white,
-                                            ),
-                                            decoration: const InputDecoration(
-                                              border: InputBorder.none,
-                                              isDense: true,
-                                              contentPadding: EdgeInsets.zero,
-                                            ),
-                                            controller: TextEditingController(
-                                              text: '$_bidAmount',
-                                            ),
-                                            onChanged: (value) {
-                                              final parsed = int.tryParse(
-                                                value,
-                                              );
-                                              if (parsed != null) {
-                                                _bidAmount = parsed;
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                GestureDetector(
-                                  onTap: () => setState(() {
-                                    _bidAmount += 5;
-                                  }),
-                                  child: Container(
-                                    width: 64,
-                                    height: 64,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.w05,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Icon(
-                                      PhosphorIconsRegular.plus,
-                                      size: 28,
-                                      color: Colors.white.w50,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          BidAmountStepper(
+                            amount: _bidAmount,
+                            onChanged: (v) => setState(() => _bidAmount = v),
                           ),
                           const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildQuickBidButton('Down Bid', -15, defaultBid),
-                              const SizedBox(width: 8),
-                              _buildQuickBidButton('Match', 0, defaultBid),
-                              const SizedBox(width: 8),
-                              _buildQuickBidButton('Up Bid', 15, defaultBid),
-                            ],
+                          QuickBidRow(
+                            defaultBid: defaultBid,
+                            currentBid: _bidAmount,
+                            onBidChanged: (v) =>
+                                setState(() => _bidAmount = v),
                           ),
                           const SizedBox(height: 16),
-                          TextField(
-                            maxLines: 3,
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText:
-                                  'Why should they choose you? (Optional)',
-                              hintStyle: TextStyle(
-                                color: Colors.white.w30,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white.w05,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: Colors.white.w10,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: Colors.white.w10,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                  color: AppColors.primary.p50,
-                                ),
-                              ),
-                            ),
-                            onChanged: (value) => _replyText = value,
+                          BidPitchField(
+                            onChanged: (v) => _replyText = v,
                           ),
                           const SizedBox(height: 16),
-                          GestureDetector(
-                            onTap: _handleBidSubmit,
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFF10B981,
-                                    ).withOpacity(0.2),
-                                    blurRadius: 20,
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    PhosphorIconsRegular.paperPlaneTilt,
-                                    size: 18,
-                                    color: Colors.black,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'PLACE BID',
-                                    style: AppTheme.scaled(
-                                      multiplier: AppTheme.mbase,
-                                      weight: FontWeight.w900,
-                                      color: Colors.black,
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          BidSubmitButton(
+                            onPressed: _handleBidSubmit,
                           ),
                         ],
                       ),
@@ -794,53 +620,6 @@ class _RadarPageState extends ConsumerState<RadarPage>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQuickBidButton(String label, int delta, int defaultBid) {
-    final isDown = delta < 0;
-    final isUp = delta > 0;
-
-    Color bgColor = Colors.white.w05;
-    Color textColor = Colors.white;
-
-    if (isDown) {
-      bgColor = const Color(0xFFDC2626).withOpacity(0.1);
-      textColor = const Color(0xFFDC2626);
-    } else if (isUp) {
-      bgColor = const Color(0xFF10B981).withOpacity(0.1);
-      textColor = const Color(0xFF10B981);
-    }
-
-    return GestureDetector(
-      onTap: () => setState(() {
-        _bidAmount = delta == 0 ? defaultBid : max(1, _bidAmount + delta);
-      }),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isDown)
-              Icon(PhosphorIconsRegular.trendDown, size: 14, color: textColor),
-            if (isUp)
-              Icon(PhosphorIconsRegular.trendUp, size: 14, color: textColor),
-            if (isDown || isUp) const SizedBox(width: 4),
-            Text(
-              '$label${delta != 0 ? ' \$${delta.abs()}' : ''}',
-              style: AppTheme.scaled(
-                multiplier: AppTheme.mxs,
-                weight: FontWeight.w700,
-                color: textColor,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

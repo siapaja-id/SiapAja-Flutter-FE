@@ -76,6 +76,118 @@ IconButton _attachmentIconButton({
 );
 
 // ---------------------------------------------------------------------------
+// Shared attachment grid & toolbar (used by both FeedComposer & FullscreenComposerSheet)
+// ---------------------------------------------------------------------------
+
+Widget _attachmentGrid({
+  required List<_Attachment> attachments,
+  required void Function(int) onRemove,
+  required VoidCallback onAdd,
+}) {
+  return Wrap(
+    spacing: 8,
+    runSpacing: 8,
+    children: [
+      ...List.generate(attachments.length, (index) {
+        final attachment = attachments[index];
+        return Stack(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: _buildAttachmentPreview(attachment),
+            ),
+            Positioned(
+              top: -4,
+              right: -4,
+              child: GestureDetector(
+                onTap: () => onRemove(index),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    PhosphorIconsRegular.x,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+      GestureDetector(
+        onTap: onAdd,
+        child: Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(PhosphorIconsRegular.plus, color: AppColors.onSurfaceVariant),
+              const SizedBox(height: 4),
+              Text(
+                'Add More',
+                style: AppTheme.labelTiny.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _attachmentToolbar({
+  required void Function(_AttachmentType) onAdd,
+  bool showExpand = false,
+  VoidCallback? onExpand,
+}) {
+  return Row(
+    children: [
+      _attachmentIconButton(
+        icon: PhosphorIconsRegular.image,
+        onPressed: () => onAdd(_AttachmentType.image),
+      ),
+      _attachmentIconButton(
+        icon: PhosphorIconsRegular.filmStrip,
+        onPressed: () => onAdd(_AttachmentType.video),
+      ),
+      _attachmentIconButton(
+        icon: PhosphorIconsRegular.microphone,
+        onPressed: () => onAdd(_AttachmentType.voice),
+      ),
+      _attachmentIconButton(
+        icon: PhosphorIconsRegular.paperclip,
+        onPressed: () => onAdd(_AttachmentType.file),
+      ),
+      if (showExpand && onExpand != null)
+        _attachmentIconButton(
+          icon: PhosphorIconsRegular.arrowsOutCardinal,
+          iconColor: AppColors.onSurfaceVariant,
+          tinted: false,
+          onPressed: onExpand,
+        ),
+    ],
+  );
+}
+
+// ---------------------------------------------------------------------------
 // FeedComposer
 // ---------------------------------------------------------------------------
 
@@ -200,97 +312,12 @@ class _FeedComposerState extends State<FeedComposer> {
                             child: _attachments.isNotEmpty
                                 ? Padding(
                                     padding: const EdgeInsets.only(top: 16),
-                                    child: Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        ...List.generate(_attachments.length, (
-                                          index,
-                                        ) {
-                                          final attachment =
-                                              _attachments[index];
-                                          return Stack(
-                                            children: [
-                                              Container(
-                                                width: 80,
-                                                height: 80,
-                                                decoration: BoxDecoration(
-                                                  color: AppColors
-                                                      .surfaceContainerHigh,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  border: Border.all(
-                                                    color: AppColors.border,
-                                                  ),
-                                                ),
-                                                child: _buildAttachmentPreview(
-                                                  attachment,
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: -4,
-                                                right: -4,
-                                                child: GestureDetector(
-                                                  onTap: () =>
-                                                      _removeAttachment(index),
-                                                  child: Container(
-                                                    width: 24,
-                                                    height: 24,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                          color:
-                                                              AppColors.primary,
-                                                          shape:
-                                                              BoxShape.circle,
-                                                        ),
-                                                    child: const Icon(
-                                                      PhosphorIconsRegular.x,
-                                                      size: 14,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                        GestureDetector(
-                                          onTap: () => _addMockAttachment(
-                                            _AttachmentType.image,
-                                          ),
-                                          child: Container(
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: AppColors.border,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  PhosphorIconsRegular.plus,
-                                                  color: AppColors
-                                                      .onSurfaceVariant,
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  'Add More',
-                                                  style: AppTheme.labelTiny
-                                                      .copyWith(
-                                                        color: AppColors
-                                                            .onSurfaceVariant,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                    child: _attachmentGrid(
+                                      attachments: _attachments,
+                                      onRemove: _removeAttachment,
+                                      onAdd: () => _addMockAttachment(
+                                        _AttachmentType.image,
+                                      ),
                                     ),
                                   )
                                 : const SizedBox.shrink(),
@@ -313,35 +340,10 @@ class _FeedComposerState extends State<FeedComposer> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                _attachmentIconButton(
-                                  icon: PhosphorIconsRegular.image,
-                                  onPressed: () =>
-                                      _addMockAttachment(_AttachmentType.image),
-                                ),
-                                _attachmentIconButton(
-                                  icon: PhosphorIconsRegular.filmStrip,
-                                  onPressed: () =>
-                                      _addMockAttachment(_AttachmentType.video),
-                                ),
-                                _attachmentIconButton(
-                                  icon: PhosphorIconsRegular.microphone,
-                                  onPressed: () =>
-                                      _addMockAttachment(_AttachmentType.voice),
-                                ),
-                                _attachmentIconButton(
-                                  icon: PhosphorIconsRegular.paperclip,
-                                  onPressed: () =>
-                                      _addMockAttachment(_AttachmentType.file),
-                                ),
-                                _attachmentIconButton(
-                                  icon: PhosphorIconsRegular.arrowsOutCardinal,
-                                  iconColor: AppColors.onSurfaceVariant,
-                                  tinted: false,
-                                  onPressed: _openFullscreenComposer,
-                                ),
-                              ],
+                            _attachmentToolbar(
+                              onAdd: (type) => _addMockAttachment(type),
+                              showExpand: true,
+                              onExpand: _openFullscreenComposer,
                             ),
                             ElevatedButton(
                               onPressed: _textController.text.isEmpty
@@ -516,100 +518,14 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                       if (widget.attachments.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 16),
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              ...List.generate(widget.attachments.length, (
-                                index,
-                              ) {
-                                final attachment =
-                                    widget.attachments[index];
-                                return Stack(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            AppColors.surfaceContainerHigh,
-                                        borderRadius: BorderRadius.circular(
-                                          12,
-                                        ),
-                                        border: Border.all(
-                                          color: AppColors.border,
-                                        ),
-                                      ),
-                                      child: _buildAttachmentPreview(
-                                        attachment,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: -4,
-                                      right: -4,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            widget.onRemoveAttachment(
-                                              index,
-                                            );
-                                          });
-                                        },
-                                        child: Container(
-                                          width: 24,
-                                          height: 24,
-                                          decoration: const BoxDecoration(
-                                            color: AppColors.primary,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            PhosphorIconsRegular.x,
-                                            size: 14,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    widget.onAddAttachment(
-                                      _AttachmentType.image,
-                                    );
-                                  });
-                                },
-                                child: Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AppColors.border,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        PhosphorIconsRegular.plus,
-                                        color: AppColors.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Add More',
-                                        style: AppTheme.labelTiny.copyWith(
-                                          color: AppColors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: _attachmentGrid(
+                            attachments: widget.attachments,
+                            onRemove: (index) => setState(() {
+                              widget.onRemoveAttachment(index);
+                            }),
+                            onAdd: () => setState(() {
+                              widget.onAddAttachment(_AttachmentType.image);
+                            }),
                           ),
                         ),
                     ],
@@ -623,46 +539,10 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: AppColors.border)),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    _attachmentIconButton(
-                      icon: PhosphorIconsRegular.image,
-                      onPressed: () {
-                        setState(() {
-                          widget.onAddAttachment(_AttachmentType.image);
-                        });
-                      },
-                    ),
-                    _attachmentIconButton(
-                      icon: PhosphorIconsRegular.filmStrip,
-                      onPressed: () {
-                        setState(() {
-                          widget.onAddAttachment(_AttachmentType.video);
-                        });
-                      },
-                    ),
-                    _attachmentIconButton(
-                      icon: PhosphorIconsRegular.microphone,
-                      onPressed: () {
-                        setState(() {
-                          widget.onAddAttachment(_AttachmentType.voice);
-                        });
-                      },
-                    ),
-                    _attachmentIconButton(
-                      icon: PhosphorIconsRegular.paperclip,
-                      onPressed: () {
-                        setState(() {
-                          widget.onAddAttachment(_AttachmentType.file);
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+            child: _attachmentToolbar(
+              onAdd: (type) => setState(() {
+                widget.onAddAttachment(type);
+              }),
             ),
           ),
         ],
