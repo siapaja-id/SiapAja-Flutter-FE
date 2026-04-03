@@ -305,13 +305,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                             horizontal: 8,
                             vertical: 2,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.emerald.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: AppColors.emerald.withOpacity(0.2),
-                            ),
-                          ),
+                          decoration: tintedDecorHalf(color: AppColors.emerald, radius: 4),
                           child: Text(
                             taskPrice,
                             style: AppTheme.smallLabel.copyWith(color: AppColors.emerald),
@@ -450,16 +444,11 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     onChanged: (_) => setState(() {}),
                     onTap: () => setState(() => _activeIndex = index),
                     style: AppTheme.bodyLarge,
-                    decoration: InputDecoration(
+                    decoration: borderlessInput.copyWith(
                       hintText: index == 0
                           ? "What's happening?"
                           : 'Add another thought...',
                       hintStyle: AppTheme.bodyLarge.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.4)),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      filled: false,
-                      contentPadding: EdgeInsets.zero,
                     ),
                     maxLines: null,
                     minLines: 1,
@@ -607,11 +596,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.1)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
+          shadowBlack(opacity: 0.4, blur: 24),
         ],
       ),
       child: Row(

@@ -66,6 +66,23 @@ BoxDecoration tintedDecor({
   );
 }
 
+/// Soft tinted decoration with half-opacity fill and full-opacity border.
+///
+/// Fill uses `tintOpacity * 0.5`, border uses `tintOpacity`.
+/// Common pattern for bid cards, price badges, and thread-count chips
+/// where the border should be more prominent than the fill.
+BoxDecoration tintedDecorHalf({
+  required Color color,
+  double radius = 16,
+  double tintOpacity = 0.2,
+}) {
+  return BoxDecoration(
+    color: color.withOpacity(tintOpacity * 0.5),
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: color.withOpacity(tintOpacity)),
+  );
+}
+
 // ── BoxShadow presets ─────────────────────────────────────────────
 
 /// Standard dark shadow. Default matches the most common elevation
@@ -96,59 +113,65 @@ BoxShadow shadowGlow({required Color color, double blur = 20, double opacity = 0
 
 // ── InputDecoration presets ──────────────────────────────────────
 
-/// Glass-styled single-line input field.
-InputDecoration glassInputField({String? hintText, int maxLines = 1}) {
+/// Glass-styled input field decoration.
+///
+/// Standard input decoration with a frosted-glass appearance:
+/// `white.w05` fill, rounded outline border (configurable [radius]),
+/// `white.w10` enabled border, and `primary.p50` focus ring.
+/// Use [.copyWith] to override `hintText`, `hintStyle`, or `contentPadding`.
+InputDecoration glassInputField({
+  String? hintText,
+  TextStyle? hintStyle,
+  double radius = 20,
+  EdgeInsetsGeometry? contentPadding,
+}) {
   return InputDecoration(
+    hintText: hintText,
+    hintStyle: hintStyle ?? const TextStyle(color: Colors.white30),
     filled: true,
     fillColor: Colors.white.w05,
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(radius),
       borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(radius),
       borderSide: BorderSide(color: Colors.white.w10),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(radius),
       borderSide: BorderSide(color: AppColors.primary.p50),
     ),
-    hintText: hintText,
-    hintStyle: const TextStyle(color: Colors.white30),
-    maxLines: maxLines,
+    contentPadding: contentPadding ?? const EdgeInsets.all(16),
   );
 }
 
 /// Borderless input — no visible border, dense, zero padding.
-InputDecoration borderlessInput() {
-  return const InputDecoration(
-    border: InputBorder.none,
-    enabledBorder: InputBorder.none,
-    focusedBorder: InputBorder.none,
-    isDense: true,
-    contentPadding: EdgeInsets.zero,
-  );
-}
+///
+/// Ideal for text fields placed inside pre-styled containers
+/// (e.g. glass cards, pill boxes).
+/// Use [.copyWith] to override `hintText`, `hintStyle`, or `contentPadding`.
+const InputDecoration borderlessInput = InputDecoration(
+  border: InputBorder.none,
+  enabledBorder: InputBorder.none,
+  focusedBorder: InputBorder.none,
+  filled: false,
+  isDense: true,
+  contentPadding: EdgeInsets.zero,
+);
 
 /// Glass-styled multi-line text area.
-InputDecoration glassInputArea({String? hintText}) {
-  return InputDecoration(
-    filled: true,
-    fillColor: Colors.white.w05,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
-      borderSide: BorderSide.none,
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
-      borderSide: BorderSide(color: Colors.white.w10),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20),
-      borderSide: BorderSide(color: AppColors.primary.p50),
-    ),
+///
+/// Same visual treatment as [glassInputField] but semantically named
+/// for multi-line text areas. Pair with `TextField(maxLines: null, …)`.
+InputDecoration glassInputArea({
+  String? hintText,
+  TextStyle? hintStyle,
+  double radius = 20,
+}) {
+  return glassInputField(
     hintText: hintText,
-    hintStyle: const TextStyle(color: Colors.white30),
-    maxLines: null,
+    hintStyle: hintStyle,
+    radius: radius,
   );
 }

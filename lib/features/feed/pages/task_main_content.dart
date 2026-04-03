@@ -16,8 +16,24 @@ import '../../../shared/widgets/glass_pill.dart';
 import '../../../shared/widgets/section_label.dart';
 import '../../../shared/widgets/gradient_divider.dart';
 import '../widgets/base_feed_card.dart';
-import '../widgets/trust_card.dart';
-import '../widgets/status_tracker.dart';
+.dart';
+import '../../../shared/utils/decorations.dart';
+import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../../app_theme.dart';
+import '../../../models/feed_item.dart';
+import '../../../shared/utils/task_icons.dart';
+import '../../../shared/widgets/user_avatar.dart';
+import '../../../shared/widgets/media_carousel.dart';
+import '../../../shared/widgets/post_actions.dart';
+import '../../../shared/widgets/tag_pill.dart';
+import '../../../shared/widgets/voice_note_player.dart';
+import '../../../shared/widgets/map_preview.dart';
+import '../../../shared/widgets/glass_pill.dart';
+import '../../../shared/widgets/section_label.dart';
+import '../../../shared/widgets/gradient_divider.dart';
+import '../widgets/base_feed_card.dart';
 
 class TaskMainContent extends StatefulWidget {
   final TaskData data;
@@ -209,14 +225,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
   }
 
   Widget _buildStatusTag(TaskStatus status) {
-    final label = switch (status) {
-      TaskStatus.open => 'Open',
-      TaskStatus.assigned => 'Assigned',
-      TaskStatus.inProgress => 'In Progress',
-      TaskStatus.completed => 'Completed',
-      TaskStatus.finished => 'Finished',
-    };
-    return TagPill(label: label);
+    return TagPill(label: getStatusText(status));
   }
 
   Widget _buildInfoPill(BuildContext context) {
@@ -319,17 +328,13 @@ class _TaskMainContentState extends State<TaskMainContent> {
             onTap: () => setState(() => _isDescExpanded = !_isDescExpanded),
             child: Container(
               margin: EdgeInsets.only(top: _isDescExpanded ? 16 : 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.glassTint,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.glassBorder),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _isDescExpanded ? 'Show Less' : 'Show Full Description',
+              child: GlassPill(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _isDescExpanded ? 'Show Less' : 'Show Full Description',
                     style: AppTheme.scaled(
                       multiplier: AppTheme.m2sm,
                       color: _isDescExpanded

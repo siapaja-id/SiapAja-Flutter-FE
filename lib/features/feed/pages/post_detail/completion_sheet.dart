@@ -48,20 +48,10 @@ class CompletionSheet extends StatelessWidget {
           TextField(
             controller: notesCtrl,
             style: AppTheme.bodyBold,
-            decoration: InputDecoration(
+            decoration: glassInputField(
               hintText: 'Add completion notes or proof of work...',
               hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.3)),
-              filled: true,
-              fillColor: Colors.white.w05,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.white.w10),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.white.w10),
-              ),
-              contentPadding: const EdgeInsets.all(16),
+              radius: 16,
             ),
             maxLines: 5,
             minLines: 5,

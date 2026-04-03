@@ -37,9 +37,7 @@ final List<Author> mockAuthors = [
 
 /// Sample feed data ported from React domain constant
 final List<FeedItem> sampleData = [
-  // ============================================================================
   // FIRST POST / TASK (Special markers for empty states)
-  // ============================================================================
   SocialPostData(
     id: 'first-post-1',
     author: mockAuthors[0],
@@ -62,10 +60,7 @@ final List<FeedItem> sampleData = [
     iconType: TaskIconType.palette,
     isFirstTask: true,
   ),
-
-  // ============================================================================
   // SOCIAL POSTS
-  // ============================================================================
   SocialPostData(
     id: 'social-empty-1',
     author: mockAuthors[4],
@@ -164,10 +159,7 @@ final List<FeedItem> sampleData = [
     shares: 12,
     votes: 234,
   ),
-
-  // ============================================================================
-  // TASKS - OPEN STATUS
-  // ============================================================================
+  // TASKS - OPEN
   TaskData(
     id: '2',
     author: mockAuthors[3],
@@ -239,10 +231,7 @@ final List<FeedItem> sampleData = [
     shares: 3,
     votes: 28,
   ),
-
-  // ============================================================================
-  // TASKS - ASSIGNED STATUS
-  // ============================================================================
+  // TASKS - ASSIGNED
   TaskData(
     id: 'task-assigned-1',
     author: mockAuthors[1],
@@ -282,10 +271,7 @@ final List<FeedItem> sampleData = [
     assignedWorker: mockAuthors[4],
     acceptedBidAmount: '\$120',
   ),
-
-  // ============================================================================
-  // TASKS - IN PROGRESS STATUS
-  // ============================================================================
+  // TASKS - IN PROGRESS
   TaskData(
     id: 'task-progress-1',
     author: mockAuthors[3],
@@ -325,10 +311,7 @@ final List<FeedItem> sampleData = [
     assignedWorker: mockAuthors[1],
     acceptedBidAmount: '\$80',
   ),
-
-  // ============================================================================
-  // TASKS - COMPLETED STATUS
-  // ============================================================================
+  // TASKS - COMPLETED
   TaskData(
     id: 'task-completed-1',
     author: mockAuthors[4],
@@ -370,10 +353,7 @@ final List<FeedItem> sampleData = [
     assignedWorker: mockAuthors[3],
     acceptedBidAmount: '\$450',
   ),
-
-  // ============================================================================
-  // TASKS - FINISHED STATUS
-  // ============================================================================
+  // TASKS - FINISHED
   TaskData(
     id: 'task-finished-1',
     author: mockAuthors[0],
@@ -415,10 +395,7 @@ final List<FeedItem> sampleData = [
     assignedWorker: mockAuthors[1],
     acceptedBidAmount: '\$400',
   ),
-
-  // ============================================================================
   // EDITORIAL POSTS
-  // ============================================================================
   EditorialData(
     id: '3',
     author: mockAuthors[2],
