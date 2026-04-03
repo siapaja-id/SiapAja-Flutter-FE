@@ -1,11 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/utils/task_icons.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/media_carousel.dart';
@@ -16,29 +14,28 @@ import '../../../shared/widgets/voice_note_player.dart';
 import '../../../shared/widgets/map_preview.dart';
 import '../widgets/base_feed_card.dart';
 
-class TaskMainContent extends ConsumerStatefulWidget {
+class TaskMainContent extends StatefulWidget {
   final TaskData data;
 
   const TaskMainContent({super.key, required this.data});
 
   @override
-  ConsumerState<TaskMainContent> createState() => _TaskMainContentState();
+  State<TaskMainContent> createState() => _TaskMainContentState();
 }
 
-class _TaskMainContentState extends ConsumerState<TaskMainContent> {
+class _TaskMainContentState extends State<TaskMainContent> {
   bool _isDescExpanded = false;
 
   TaskData get data => widget.data;
 
   @override
   Widget build(BuildContext context) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context, textSize),
+          _buildHeader(context),
           const SizedBox(height: 16),
           Container(
             height: 1,
@@ -55,7 +52,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
 
           if (data.isFirstPost == true) ...[
             FirstItemBadge(
-              textSize: textSize,
               label: 'First Post',
               bgColor: const Color(0xFF10B981),
               fgColor: Colors.black,
@@ -65,7 +61,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
           ],
           if (data.isFirstTask == true) ...[
             FirstItemBadge(
-              textSize: textSize,
               label: 'First Task',
               bgColor: AppColors.primary,
               fgColor: AppColors.primaryForeground,
@@ -73,35 +68,35 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
             ),
             const SizedBox(height: 16),
           ],
-          _buildInfoPill(context, textSize),
+          _buildInfoPill(context),
           const SizedBox(height: 20),
-          _buildTitle(context, textSize),
+          _buildTitle(context),
           const SizedBox(height: 24),
-          _buildTrustCard(context, textSize),
+          _buildTrustCard(context),
           const SizedBox(height: 24),
-          _buildStatusTracker(context, textSize),
+          _buildStatusTracker(context),
           const SizedBox(height: 24),
-          _buildSectionLabel('DESCRIPTION', textSize),
+          _buildSectionLabel('DESCRIPTION'),
           const SizedBox(height: 10),
-          _buildDescription(context, textSize),
+          _buildDescription(context),
           if (data.mapUrl != null ||
               (data.images != null && data.images!.isNotEmpty) ||
               data.video != null ||
               data.voiceNote != null) ...[
             const SizedBox(height: 32),
-            _buildSectionLabel('ATTACHMENTS', textSize),
+            _buildSectionLabel('ATTACHMENTS'),
             const SizedBox(height: 10),
-            _buildMediaModules(context, textSize),
+            _buildMediaModules(context),
           ],
           if (data.tags != null && data.tags!.isNotEmpty) ...[
             const SizedBox(height: 24),
-            _buildSectionLabel('TAGS', textSize),
+            _buildSectionLabel('TAGS'),
             const SizedBox(height: 10),
             _buildTags(context),
           ],
           if (data.meta != null) ...[
             const SizedBox(height: 16),
-            _buildMeta(context, textSize),
+            _buildMeta(context),
           ],
           const SizedBox(height: 24),
           _buildPostActions(context),
@@ -110,11 +105,10 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildSectionLabel(String label, TextSize textSize) {
+  Widget _buildSectionLabel(String label) {
     return Text(
       label,
       style: AppTheme.scaled(
-        textSize: textSize,
         multiplier: AppTheme.m2xs,
         color: AppColors.onSurfaceVariant.withOpacity(0.4),
         weight: FontWeight.w900,
@@ -123,7 +117,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, TextSize textSize) {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -164,7 +158,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.mlg,
                               color: AppColors.onSurface,
                               weight: FontWeight.w900,
@@ -188,7 +181,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m13,
                         color: AppColors.onSurfaceVariant,
                         weight: FontWeight.w500,
@@ -210,7 +202,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTheme.scaled(
-                  textSize: textSize,
                   multiplier: AppTheme.m28,
                   color: AppColors.onSurface,
                   weight: FontWeight.w900,
@@ -239,7 +230,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     return TagPill(label: label);
   }
 
-  Widget _buildInfoPill(BuildContext context, TextSize textSize) {
+  Widget _buildInfoPill(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -272,7 +263,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.m2sm,
                 color: AppColors.onSurfaceVariant,
                 weight: FontWeight.w900,
@@ -302,7 +292,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
           Text(
             data.timestamp,
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m1sm,
               color: AppColors.onSurfaceVariant,
               weight: FontWeight.w700,
@@ -313,11 +302,10 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildTitle(BuildContext context, TextSize textSize) {
+  Widget _buildTitle(BuildContext context) {
     return Text(
       data.title,
       style: AppTheme.scaled(
-        textSize: textSize,
         multiplier: AppTheme.m26,
         color: AppColors.onSurface,
         weight: FontWeight.w900,
@@ -327,7 +315,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildTrustCard(BuildContext context, TextSize textSize) {
+  Widget _buildTrustCard(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -407,7 +395,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                         Text(
                           'REQUESTER RATING',
                           style: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.m2sm,
                             color: AppColors.onSurfaceVariant,
                             weight: FontWeight.w900,
@@ -426,7 +413,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                             Text(
                               '4.9',
                               style: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.mxl,
                                 color: AppColors.onSurface,
                                 weight: FontWeight.w900,
@@ -437,9 +423,10 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                             Text(
                               '(124)',
                               style: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.m1sm,
-                                color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                color: AppColors.onSurfaceVariant.withOpacity(
+                                  0.6,
+                                ),
                                 weight: FontWeight.w700,
                               ),
                             ),
@@ -461,7 +448,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                         Text(
                           'PAYMENT',
                           style: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.m2sm,
                             color: AppColors.onSurfaceVariant.withOpacity(0.6),
                             weight: FontWeight.w900,
@@ -480,7 +466,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                             Text(
                               'Verified',
                               style: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.mbase,
                                 color: AppColors.emerald,
                                 weight: FontWeight.w900,
@@ -501,7 +486,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildStatusTracker(BuildContext context, TextSize textSize) {
+  Widget _buildStatusTracker(BuildContext context) {
     const statuses = [
       'Open',
       'Assigned',
@@ -641,11 +626,12 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 style: AppTheme.scaled(
-                                  textSize: textSize,
                                   multiplier: AppTheme.m2xs,
                                   color: isActive
                                       ? AppColors.emerald
-                                      : AppColors.onSurfaceVariant.withOpacity(0.4),
+                                      : AppColors.onSurfaceVariant.withOpacity(
+                                          0.4,
+                                        ),
                                   weight: FontWeight.w900,
                                   letterSpacing: 1.5,
                                 ),
@@ -684,9 +670,10 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                               Text(
                                 'ASSIGNED TO',
                                 style: AppTheme.scaled(
-                                  textSize: textSize,
                                   multiplier: AppTheme.m2xs,
-                                  color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                                  color: AppColors.onSurfaceVariant.withOpacity(
+                                    0.6,
+                                  ),
                                   weight: FontWeight.w900,
                                   letterSpacing: 2,
                                 ),
@@ -695,7 +682,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                               Text(
                                 '@${data.assignedWorker!.handle}',
                                 style: AppTheme.scaled(
-                                  textSize: textSize,
                                   multiplier: AppTheme.mbase,
                                   color: AppColors.onSurface,
                                   weight: FontWeight.w700,
@@ -711,9 +697,10 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                           Text(
                             'AGREED PRICE',
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2xs,
-                              color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                              color: AppColors.onSurfaceVariant.withOpacity(
+                                0.6,
+                              ),
                               weight: FontWeight.w900,
                               letterSpacing: 2,
                             ),
@@ -722,7 +709,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                           Text(
                             data.acceptedBidAmount ?? data.price,
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.mxl,
                               color: AppColors.emerald,
                               weight: FontWeight.w900,
@@ -742,7 +728,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildDescription(BuildContext context, TextSize textSize) {
+  Widget _buildDescription(BuildContext context) {
     final isLong = data.description.length > 500;
 
     return Column(
@@ -753,7 +739,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
               ? '${data.description.substring(0, 500)}...'
               : data.description,
           style: AppTheme.scaled(
-            textSize: textSize,
             multiplier: AppTheme.mbase,
             color: AppColors.onSurfaceVariant.withOpacity(0.9),
             height: 1.5,
@@ -776,7 +761,6 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
                   Text(
                     _isDescExpanded ? 'Show Less' : 'Show Full Description',
                     style: AppTheme.scaled(
-                      textSize: textSize,
                       multiplier: AppTheme.m2sm,
                       color: _isDescExpanded
                           ? AppColors.onSurfaceVariant
@@ -803,7 +787,7 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildMediaModules(BuildContext context, TextSize textSize) {
+  Widget _buildMediaModules(BuildContext context) {
     return Column(
       children: [
         if (data.mapUrl != null) ...[
@@ -874,12 +858,11 @@ class _TaskMainContentState extends ConsumerState<TaskMainContent> {
     );
   }
 
-  Widget _buildMeta(BuildContext context, TextSize textSize) {
+  Widget _buildMeta(BuildContext context) {
     return Center(
       child: Text(
         data.meta!,
         style: AppTheme.scaled(
-          textSize: textSize,
           multiplier: AppTheme.m1sm,
           color: AppColors.onSurfaceVariant.withOpacity(0.6),
           weight: FontWeight.w700,

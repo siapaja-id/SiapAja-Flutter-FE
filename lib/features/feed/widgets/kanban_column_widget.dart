@@ -8,7 +8,6 @@ import '../../../app_theme.dart';
 import '../../../app_router.dart';
 import '../../../models/kanban_column.dart';
 import '../../../features/settings/pages/settings_page.dart';
-import '../../../shared/settings_provider.dart';
 import '../providers.dart';
 import '../pages/feed_page.dart';
 import '../pages/post_detail_page.dart';
@@ -117,7 +116,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
   @override
   void initState() {
     super.initState();
-    // Use external controller (for exit animation) or create own (for entrance)
     _entranceController =
         widget.enterController ??
         AnimationController(
@@ -133,7 +131,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
       curve: Curves.easeOutCubic,
     );
 
-    // Only auto-play entrance when using internal controller
     if (widget.enterController == null) {
       final delay = widget.index * 80;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -152,7 +149,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
 
   @override
   void dispose() {
-    // Only dispose controllers we own (not externally provided)
     if (widget.enterController == null) {
       _entranceController.dispose();
     }
@@ -186,12 +182,10 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
   @override
   Widget build(BuildContext context) {
     final meta = _getColumnMeta(widget.column.path, widget.column.routeState);
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final isFirst = widget.index == 0;
     final canClose = !isFirst;
 
     void handleClose() {
-      // Play exit animation FIRST, then remove from provider
       _entranceController.reverse().then((_) {
         if (mounted) {
           widget.onCloseRequested?.call();
@@ -271,7 +265,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                               child: Column(
                                 children: [
                                   _ColumnHeader(
-                                    textSize: textSize,
                                     icon: meta.icon,
                                     title:
                                         widget
@@ -297,7 +290,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                         ),
                       ),
                     ),
-                    // Resizer handle
                     if (_isHovering || _isResizing)
                       Positioned(
                         right: -4,
@@ -336,7 +328,6 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
 
 /// Column header bar — matches React kanban-col-header exactly
 class _ColumnHeader extends StatelessWidget {
-  final TextSize textSize;
   final IconData icon;
   final String title;
   final int index;
@@ -345,7 +336,6 @@ class _ColumnHeader extends StatelessWidget {
   final VoidCallback onClose;
 
   const _ColumnHeader({
-    required this.textSize,
     required this.icon,
     required this.title,
     required this.index,
@@ -367,11 +357,9 @@ class _ColumnHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Left section
           Expanded(
             child: Row(
               children: [
-                // Icon container
                 Container(
                   width: 24,
                   height: 24,
@@ -386,12 +374,10 @@ class _ColumnHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Title
                 Expanded(
                   child: Text(
                     title,
                     style: AppTheme.scaled(
-                      textSize: textSize,
                       multiplier: AppTheme.m1sm,
                       weight: FontWeight.w700,
                       color: Colors.white.withOpacity(0.65),
@@ -403,7 +389,6 @@ class _ColumnHeader extends StatelessWidget {
               ],
             ),
           ),
-          // Right section
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -420,7 +405,6 @@ class _ColumnHeader extends StatelessWidget {
                   child: Text(
                     '${index + 1}/$total',
                     style: AppTheme.scaled(
-                      textSize: textSize,
                       multiplier: AppTheme.m2xs,
                       weight: FontWeight.w800,
                       color: Colors.white.withOpacity(0.25),

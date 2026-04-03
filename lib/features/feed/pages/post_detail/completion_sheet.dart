@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
-import '../../../../shared/settings_provider.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
 
 class CompletionSheet extends StatelessWidget {
@@ -43,15 +41,10 @@ class CompletionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-        return _buildContent(context, textSize);
-      },
-    );
+    return _buildContent(context);
   }
 
-  Widget _buildContent(BuildContext context, TextSize textSize) {
+  Widget _buildContent(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
       decoration: BoxDecoration(
@@ -68,9 +61,7 @@ class CompletionSheet extends StatelessWidget {
             children: [
               Text(
                 'Complete Task',
-                style: AppTheme.scaled(
-                  textSize: textSize,
-                  multiplier: AppTheme.m2xl,
+                style: AppTheme.scaled(multiplier: AppTheme.m2xl,
                   weight: FontWeight.w900,
                   color: AppColors.onSurface,
                   letterSpacing: -0.5,
@@ -92,16 +83,12 @@ class CompletionSheet extends StatelessWidget {
           const SizedBox(height: 24),
           TextField(
             controller: notesCtrl,
-            style: AppTheme.scaled(
-              textSize: textSize,
-              multiplier: AppTheme.mbase,
+            style: AppTheme.scaled(multiplier: AppTheme.mbase,
               color: AppColors.onSurface,
             ),
             decoration: InputDecoration(
               hintText: 'Add completion notes or proof of work...',
-              hintStyle: AppTheme.scaled(
-                textSize: textSize,
-                multiplier: AppTheme.mbase,
+              hintStyle: AppTheme.scaled(multiplier: AppTheme.mbase,
                 color: AppColors.onSurfaceVariant.withOpacity(0.3),
               ),
               filled: true,
@@ -140,9 +127,7 @@ class CompletionSheet extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Upload Proof Image',
-                  style: AppTheme.scaled(
-                    textSize: textSize,
-                    multiplier: AppTheme.mxs,
+                  style: AppTheme.scaled(multiplier: AppTheme.mxs,
                     weight: FontWeight.w700,
                   ),
                 ),

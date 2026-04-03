@@ -1,20 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
-import '../settings_provider.dart';
 import '../widgets/pulsing_dot.dart';
 
-class MapPreview extends ConsumerWidget {
+class MapPreview extends StatelessWidget {
   final String mapUrl;
 
   const MapPreview({super.key, required this.mapUrl});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -74,7 +71,6 @@ class MapPreview extends ConsumerWidget {
                           Text(
                             'OSRM ROUTED',
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2xs,
                               color: Colors.white,
                               weight: FontWeight.w900,
@@ -171,7 +167,6 @@ class MapPreview extends ConsumerWidget {
                         Text(
                           'Navigate via Google Maps',
                           style: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.mbase,
                             color: AppColors.primary,
                             weight: FontWeight.w900,
@@ -196,22 +191,20 @@ class MapPreview extends ConsumerWidget {
   }
 }
 
-class _RoutePoint extends ConsumerWidget {
+class _RoutePoint extends StatelessWidget {
   final String label;
   final String value;
 
   const _RoutePoint({required this.label, required this.value});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: AppTheme.scaled(
-            textSize: textSize,
             multiplier: AppTheme.m2xs,
             color: AppColors.onSurfaceVariant.withOpacity(0.7),
             weight: FontWeight.w900,
@@ -222,7 +215,6 @@ class _RoutePoint extends ConsumerWidget {
         Text(
           value,
           style: AppTheme.scaled(
-            textSize: textSize,
             multiplier: AppTheme.m13,
             color: AppColors.onSurface,
             weight: FontWeight.w700,

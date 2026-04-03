@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'shared/settings_provider.dart';
+enum ThemeColor { red, blue, emerald, violet, amber }
+
+enum TextSize { sm, md, lg }
 
 /// Design tokens ported from React index.css
 class AppColors {
@@ -83,19 +85,9 @@ class AppTheme {
   static const double m26 = 1.857;
   static const double m28 = 2.0;
 
-  static double _baseFontSize(TextSize textSize) {
-    switch (textSize) {
-      case TextSize.sm:
-        return 12;
-      case TextSize.md:
-        return 14;
-      case TextSize.lg:
-        return 16;
-    }
-  }
+  static const double _baseFontSize = 14.0;
 
   static TextStyle scaled({
-    TextSize textSize = TextSize.md,
     required double multiplier,
     FontWeight? weight,
     Color? color,
@@ -104,7 +96,7 @@ class AppTheme {
     TextDecoration? decoration,
   }) {
     return TextStyle(
-      fontSize: _baseFontSize(textSize) * multiplier,
+      fontSize: _baseFontSize * multiplier,
       fontWeight: weight,
       color: color,
       letterSpacing: letterSpacing,
@@ -113,12 +105,8 @@ class AppTheme {
     );
   }
 
-  static ThemeData darkTheme({
-    ThemeColor themeColor = ThemeColor.red,
-    TextSize textSize = TextSize.md,
-  }) {
+  static ThemeData darkTheme({ThemeColor themeColor = ThemeColor.red}) {
     final primary = AppColors.getPrimary(themeColor);
-    final base = _baseFontSize(textSize);
 
     return ThemeData(
       useMaterial3: true,
@@ -177,71 +165,74 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         displayLarge: TextStyle(
-          fontSize: base * 2.286,
+          fontSize: _baseFontSize * 2.286,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         displayMedium: TextStyle(
-          fontSize: base * 2.0,
+          fontSize: _baseFontSize * 2.0,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         displaySmall: TextStyle(
-          fontSize: base * 1.714,
+          fontSize: _baseFontSize * 1.714,
           fontWeight: FontWeight.bold,
           color: AppColors.onSurface,
         ),
         headlineLarge: TextStyle(
-          fontSize: base * 1.429,
+          fontSize: _baseFontSize * 1.429,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         headlineMedium: TextStyle(
-          fontSize: base * 1.286,
+          fontSize: _baseFontSize * 1.286,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         headlineSmall: TextStyle(
-          fontSize: base * 1.143,
+          fontSize: _baseFontSize * 1.143,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         titleLarge: TextStyle(
-          fontSize: base * 1.143,
+          fontSize: _baseFontSize * 1.143,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurface,
         ),
         titleMedium: TextStyle(
-          fontSize: base,
+          fontSize: _baseFontSize,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         titleSmall: TextStyle(
-          fontSize: base * 0.857,
+          fontSize: _baseFontSize * 0.857,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         bodyLarge: TextStyle(
-          fontSize: base * 1.143,
+          fontSize: _baseFontSize * 1.143,
           color: AppColors.onSurface,
         ),
-        bodyMedium: TextStyle(fontSize: base, color: AppColors.onSurface),
+        bodyMedium: TextStyle(
+          fontSize: _baseFontSize,
+          color: AppColors.onSurface,
+        ),
         bodySmall: TextStyle(
-          fontSize: base * 0.857,
+          fontSize: _baseFontSize * 0.857,
           color: AppColors.onSurfaceVariant,
         ),
         labelLarge: TextStyle(
-          fontSize: base,
+          fontSize: _baseFontSize,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         labelMedium: TextStyle(
-          fontSize: base * 0.857,
+          fontSize: _baseFontSize * 0.857,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurface,
         ),
         labelSmall: TextStyle(
-          fontSize: base * 0.786,
+          fontSize: _baseFontSize * 0.786,
           fontWeight: FontWeight.w500,
           color: AppColors.onSurfaceVariant,
         ),
@@ -273,6 +264,17 @@ class AppTheme {
     fontWeight: FontWeight.w800,
     color: AppColors.onSurface,
   );
+
+  static double textScaleFactor(TextSize textSize) {
+    switch (textSize) {
+      case TextSize.sm:
+        return 12 / 14;
+      case TextSize.md:
+        return 1.0;
+      case TextSize.lg:
+        return 16 / 14;
+    }
+  }
 
   static LinearGradient backgroundGradient(ThemeColor themeColor) {
     final primary = AppColors.getPrimary(themeColor);

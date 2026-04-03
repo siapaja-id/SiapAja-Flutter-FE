@@ -13,7 +13,6 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final zoom = ref.watch(zoomProvider);
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -39,7 +38,6 @@ class SettingsPage extends ConsumerWidget {
                         Text(
                           'Settings',
                           style: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.m15,
                             weight: FontWeight.bold,
                             color: AppColors.onSurface,
@@ -48,7 +46,6 @@ class SettingsPage extends ConsumerWidget {
                         Text(
                           'Preferences & Appearance',
                           style: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.m1sm,
                             color: AppColors.onSurfaceVariant,
                           ),
@@ -64,7 +61,6 @@ class SettingsPage extends ConsumerWidget {
               sliver: SliverList(
                 delegate: SliverChildListDelegate.fixed([
                   _ThemeColorSection(
-                    textSize: textSize,
                     selected: settings.themeColor,
                     onChanged: (color) => ref
                         .read(settingsProvider.notifier)
@@ -72,14 +68,12 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   _TextSizeSection(
-                    textSize: textSize,
                     selected: settings.textSize,
                     onChanged: (size) =>
                         ref.read(settingsProvider.notifier).setTextSize(size),
                   ),
                   const SizedBox(height: 16),
                   _ZoomSection(
-                    textSize: textSize,
                     selected: zoom,
                     onChanged: (value) =>
                         ref.read(zoomProvider.notifier).setZoom(value),
@@ -95,15 +89,10 @@ class SettingsPage extends ConsumerWidget {
 }
 
 class _ThemeColorSection extends StatelessWidget {
-  final TextSize textSize;
   final ThemeColor selected;
   final ValueChanged<ThemeColor> onChanged;
 
-  const _ThemeColorSection({
-    required this.textSize,
-    required this.selected,
-    required this.onChanged,
-  });
+  const _ThemeColorSection({required this.selected, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +132,6 @@ class _ThemeColorSection extends StatelessWidget {
                     Text(
                       'Theme Color',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mlg,
                         weight: FontWeight.w900,
                         color: AppColors.onSurface,
@@ -153,7 +141,6 @@ class _ThemeColorSection extends StatelessWidget {
                     Text(
                       'Choose your primary accent color',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mxs,
                         weight: FontWeight.w500,
                         color: AppColors.onSurfaceVariant,
@@ -240,15 +227,10 @@ class _ColorCircle extends StatelessWidget {
 }
 
 class _TextSizeSection extends StatelessWidget {
-  final TextSize textSize;
   final TextSize selected;
   final ValueChanged<TextSize> onChanged;
 
-  const _TextSizeSection({
-    required this.textSize,
-    required this.selected,
-    required this.onChanged,
-  });
+  const _TextSizeSection({required this.selected, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +276,6 @@ class _TextSizeSection extends StatelessWidget {
                     Text(
                       'Typography Size',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mlg,
                         weight: FontWeight.w900,
                         color: AppColors.onSurface,
@@ -304,7 +285,6 @@ class _TextSizeSection extends StatelessWidget {
                     Text(
                       'Adjust the base text scale',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mxs,
                         weight: FontWeight.w500,
                         color: AppColors.onSurfaceVariant,
@@ -317,7 +297,6 @@ class _TextSizeSection extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           _SegmentedControl(
-            textSize: textSize,
             options: options,
             selected: selected,
             onChanged: onChanged,
@@ -329,15 +308,10 @@ class _TextSizeSection extends StatelessWidget {
 }
 
 class _ZoomSection extends StatelessWidget {
-  final TextSize textSize;
   final double selected;
   final ValueChanged<double> onChanged;
 
-  const _ZoomSection({
-    required this.textSize,
-    required this.selected,
-    required this.onChanged,
-  });
+  const _ZoomSection({required this.selected, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -384,7 +358,6 @@ class _ZoomSection extends StatelessWidget {
                     Text(
                       'Display Zoom',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mlg,
                         weight: FontWeight.w900,
                         color: AppColors.onSurface,
@@ -394,7 +367,6 @@ class _ZoomSection extends StatelessWidget {
                     Text(
                       'Scale the entire interface',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mxs,
                         weight: FontWeight.w500,
                         color: AppColors.onSurfaceVariant,
@@ -407,7 +379,6 @@ class _ZoomSection extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           _SegmentedControl(
-            textSize: textSize,
             options: options,
             selected: selected,
             onChanged: onChanged,
@@ -419,13 +390,11 @@ class _ZoomSection extends StatelessWidget {
 }
 
 class _SegmentedControl<T extends Object> extends StatelessWidget {
-  final TextSize textSize;
   final List<(T, String)> options;
   final T selected;
   final ValueChanged<T> onChanged;
 
   const _SegmentedControl({
-    required this.textSize,
     required this.options,
     required this.selected,
     required this.onChanged,
@@ -461,7 +430,6 @@ class _SegmentedControl<T extends Object> extends StatelessWidget {
                             child: Text(
                               options[i].$2,
                               style: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.mbase,
                                 weight: FontWeight.bold,
                                 color: selected == options[i].$1

@@ -1,15 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
-import '../providers.dart';
 import 'base_feed_card.dart';
 import 'glass_card.dart';
 
@@ -24,7 +21,7 @@ IconData _getIconForTaskType(TaskIconType type) => switch (type) {
   TaskIconType.location => PhosphorIconsRegular.mapPin,
 };
 
-class TaskCard extends ConsumerWidget {
+class TaskCard extends StatelessWidget {
   final TaskData data;
   final bool isMain, isParent, isQuote, hasLineBelow;
   final VoidCallback? onClick;
@@ -40,12 +37,7 @@ class TaskCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-    final currentUserHandle = ref.watch(
-      uiStateProvider.select((s) => s.currentUser?.handle),
-    );
-    final isAuthor = currentUserHandle == data.author.handle;
+  Widget build(BuildContext context) {
     final isThread = isMain || isParent || hasLineBelow;
 
     return BaseFeedCard(
@@ -93,7 +85,6 @@ class TaskCard extends ConsumerWidget {
               child: Text(
                 _getStatusText(data.status),
                 style: AppTheme.scaled(
-                  textSize: textSize,
                   multiplier: AppTheme.m2xs,
                   color: AppColors.primary,
                   weight: FontWeight.w800,
@@ -108,7 +99,6 @@ class TaskCard extends ConsumerWidget {
           Text(
             data.title,
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m13,
               color: AppColors.onSurfaceVariant,
               height: 1.5,
@@ -127,7 +117,6 @@ class TaskCard extends ConsumerWidget {
                     Text(
                       data.category,
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m2xs,
                         color: AppColors.onSurfaceVariant,
                         weight: FontWeight.w700,
@@ -137,7 +126,6 @@ class TaskCard extends ConsumerWidget {
                     Text(
                       data.price,
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mxs,
                         color: AppColors.primary,
                         weight: FontWeight.bold,
@@ -149,7 +137,6 @@ class TaskCard extends ConsumerWidget {
                 Text(
                   data.title,
                   style: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.m13,
                     color: AppColors.onSurface,
                     weight: FontWeight.bold,
@@ -160,13 +147,11 @@ class TaskCard extends ConsumerWidget {
                   text: data.description,
                   limit: 100,
                   style: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.mxs,
                     color: AppColors.onSurfaceVariant,
                     height: 1.5,
                   ),
                   buttonStyle: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.m2sm,
                     color: AppColors.onSurfaceVariant,
                     weight: FontWeight.bold,
@@ -176,7 +161,7 @@ class TaskCard extends ConsumerWidget {
                 const SizedBox(height: 4),
                 if (data.mapUrl != null) ...[
                   const SizedBox(height: 8),
-                  _buildMapPreview(textSize),
+                  _buildMapPreview(),
                 ],
                 if (data.images != null && data.images!.isNotEmpty) ...[
                   const SizedBox(height: 8),
@@ -189,7 +174,6 @@ class TaskCard extends ConsumerWidget {
                       Text(
                         data.meta!,
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.m1sm,
                           color: AppColors.onSurfaceVariant,
                           weight: FontWeight.w500,
@@ -212,13 +196,8 @@ class TaskCard extends ConsumerWidget {
                         elevation: 1,
                       ),
                       child: Text(
-                        isAuthor
-                            ? 'Manage'
-                            : data.category == 'Repair Needed'
-                            ? 'Bid'
-                            : 'Claim',
+                        data.category == 'Repair Needed' ? 'Bid' : 'Claim',
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mxs,
                           weight: FontWeight.bold,
                         ),
@@ -233,7 +212,7 @@ class TaskCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildMapPreview(TextSize textSize) => ClipRRect(
+  Widget _buildMapPreview() => ClipRRect(
     borderRadius: BorderRadius.circular(12),
     child: SizedBox(
       height: 96,
@@ -288,7 +267,6 @@ class TaskCard extends ConsumerWidget {
                       Text(
                         'Static Route',
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.m2xs,
                           color: AppColors.onSurface,
                           weight: FontWeight.w800,

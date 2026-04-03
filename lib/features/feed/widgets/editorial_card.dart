@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import 'base_feed_card.dart';
 import 'glass_card.dart';
 
@@ -11,7 +9,7 @@ import 'glass_card.dart';
 // EditorialCard
 // ---------------------------------------------------------------------------
 
-class EditorialCard extends ConsumerWidget {
+class EditorialCard extends StatelessWidget {
   final EditorialData data;
   final bool isMain;
   final bool isParent;
@@ -30,8 +28,7 @@ class EditorialCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return BaseFeedCard(
       data: data,
       isMain: isMain,
@@ -53,7 +50,6 @@ class EditorialCard extends ConsumerWidget {
                 child: Text(
                   'DS',
                   style: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.m2xs,
                     color: AppColors.onSurfaceVariant,
                     weight: FontWeight.bold,
@@ -66,7 +62,6 @@ class EditorialCard extends ConsumerWidget {
           Text(
             data.title,
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m13,
               color: AppColors.onSurface,
               height: 1.5,
@@ -82,7 +77,6 @@ class EditorialCard extends ConsumerWidget {
                 Text(
                   data.tag,
                   style: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.m2xs,
                     color: AppColors.primary,
                     weight: FontWeight.w800,
@@ -94,14 +88,12 @@ class EditorialCard extends ConsumerWidget {
                   data.title,
                   style: isMain
                       ? AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mxl,
                           color: AppColors.onSurface,
                           weight: FontWeight.bold,
                           height: 1.25,
                         )
                       : AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mbase,
                           color: AppColors.onSurface,
                           weight: FontWeight.bold,
@@ -112,7 +104,6 @@ class EditorialCard extends ConsumerWidget {
                 Text(
                   data.excerpt,
                   style: AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.mxs,
                     color: AppColors.onSurfaceVariant,
                     height: 1.5,

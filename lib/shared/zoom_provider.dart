@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +12,8 @@ class ZoomNotifier extends StateNotifier<double> {
   static const double _step = 0.1;
   static const double _defaultZoom = 1.0;
 
+  Timer? _persistTimer;
+
   ZoomNotifier() : super(_defaultZoom);
 
   Future<void> init() async {
@@ -21,33 +24,32 @@ class ZoomNotifier extends StateNotifier<double> {
     }
   }
 
-  /// Zoom in by 0.1 step, capped at max 3.0
   void zoomIn() {
     state = (state + _step).clamp(_minZoom, _maxZoom);
     _persist();
   }
 
-  /// Zoom out by 0.1 step, capped at min 0.5
   void zoomOut() {
     state = (state - _step).clamp(_minZoom, _maxZoom);
     _persist();
   }
 
-  /// Reset zoom to default (1.0)
   void reset() {
     state = _defaultZoom;
     _persist();
   }
 
-  /// Set zoom to a specific value (clamped to valid range)
   void setZoom(double value) {
     state = value.clamp(_minZoom, _maxZoom);
     _persist();
   }
 
-  Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_keyZoom, state);
+  void _persist() {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(const Duration(milliseconds: 500), () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_keyZoom, state);
+    });
   }
 }
 

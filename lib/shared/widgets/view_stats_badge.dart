@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
-import '../settings_provider.dart';
 import 'pulsing_dot.dart';
 
-class ViewStatsBadge extends ConsumerWidget {
+class ViewStatsBadge extends StatelessWidget {
   final int viewCount;
   final int? viewingNow;
 
   const ViewStatsBadge({super.key, required this.viewCount, this.viewingNow});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -34,7 +31,6 @@ class ViewStatsBadge extends ConsumerWidget {
           Text(
             _formatCount(viewCount),
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m1sm,
               weight: FontWeight.w700,
               color: AppColors.onSurfaceVariant,
@@ -56,7 +52,6 @@ class ViewStatsBadge extends ConsumerWidget {
             Text(
               '$viewingNow viewing',
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.m1sm,
                 weight: FontWeight.w700,
                 color: AppColors.emerald,

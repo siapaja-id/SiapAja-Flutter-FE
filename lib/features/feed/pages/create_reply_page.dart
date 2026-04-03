@@ -1,11 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 
 const int _maxChars = 280;
@@ -103,15 +101,10 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-        return _buildContent(context, textSize);
-      },
-    );
+    return _buildContent(context);
   }
 
-  Widget _buildContent(BuildContext context, TextSize textSize) {
+  Widget _buildContent(BuildContext context) {
     final item = widget.parentItem;
     final hasContext = item != null;
     final route = ModalRoute.of(context)!;
@@ -132,7 +125,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
           ),
           child: Column(
             children: [
-              _buildHeader(textSize),
+              _buildHeader(),
               Expanded(
                 child: SingleChildScrollView(
                   controller: _scrollController,
@@ -143,12 +136,12 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (hasContext) _buildReplyContext(item, textSize),
+                          if (hasContext) _buildReplyContext(item),
                           for (int i = 0; i < _threads.length; i++)
-                            _buildThreadBlock(i, textSize),
+                            _buildThreadBlock(i),
                           if (_threads.last.controller.text.isNotEmpty &&
                               _activeIndex != _threads.length - 1)
-                            _buildAddThreadTrigger(textSize),
+                            _buildAddThreadTrigger(),
                         ],
                       ),
                     ),
@@ -158,13 +151,13 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             ],
           ),
         ),
-        floatingActionButton: _buildFloatingFooter(textSize),
+        floatingActionButton: _buildFloatingFooter(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
 
-  Widget _buildHeader(TextSize textSize) {
+  Widget _buildHeader() {
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -190,7 +183,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             child: Text(
               widget.parentItem != null ? 'REPLY' : 'NEW THREAD',
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.mbase,
                 weight: FontWeight.w700,
                 color: AppColors.onSurface,
@@ -210,7 +202,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             child: Text(
               'Drafts',
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.mbase,
                 weight: FontWeight.w700,
                 color: AppColors.primary,
@@ -218,13 +209,13 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             ),
           ),
           const SizedBox(width: 8),
-          _buildPostButton(textSize),
+          _buildPostButton(),
         ],
       ),
     );
   }
 
-  Widget _buildPostButton(TextSize textSize) {
+  Widget _buildPostButton() {
     final hasText = _threads.any((t) => t.controller.text.trim().isNotEmpty);
     final label = widget.parentItem != null ? 'Reply' : 'Post';
 
@@ -252,7 +243,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             Text(
               label,
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.mbase,
                 weight: FontWeight.w900,
                 color: hasText
@@ -275,7 +265,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     );
   }
 
-  Widget _buildReplyContext(FeedItem item, TextSize textSize) {
+  Widget _buildReplyContext(FeedItem item) {
     final type = _getReplyContextType();
     final content = _getReplyContextContent();
     final taskTitle = _getTaskTitle();
@@ -321,7 +311,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                       Text(
                         '@${item.author.handle}',
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mbase,
                           weight: FontWeight.w700,
                           color: AppColors.onSurface,
@@ -344,7 +333,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                           child: Text(
                             taskPrice,
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2sm,
                               weight: FontWeight.w900,
                               color: AppColors.emerald,
@@ -373,7 +361,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                           Text(
                             taskTitle,
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.mbase,
                               weight: FontWeight.w700,
                               color: AppColors.onSurface,
@@ -385,7 +372,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                             Text(
                               content,
                               style: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.mxs,
                                 color: AppColors.onSurfaceVariant,
                                 height: 1.5,
@@ -401,7 +387,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     Text(
                       content,
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mlg,
                         color: AppColors.onSurfaceVariant,
                         height: 1.5,
@@ -418,7 +403,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     );
   }
 
-  Widget _buildThreadBlock(int index, TextSize textSize) {
+  Widget _buildThreadBlock(int index) {
     final thread = _threads[index];
     final isActive = index == _activeIndex;
     final isLast = index == _threads.length - 1;
@@ -472,7 +457,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                       Text(
                         'You',
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mbase,
                           weight: FontWeight.w700,
                           color: AppColors.onSurface,
@@ -506,7 +490,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     onChanged: (_) => setState(() {}),
                     onTap: () => setState(() => _activeIndex = index),
                     style: AppTheme.scaled(
-                      textSize: textSize,
                       multiplier: AppTheme.mxl,
                       color: AppColors.onSurface,
                       height: 1.5,
@@ -516,7 +499,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                           ? "What's happening?"
                           : 'Add another thought...',
                       hintStyle: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mxl,
                         color: AppColors.onSurfaceVariant.withOpacity(0.4),
                       ),
@@ -531,8 +513,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
                   ),
-                  if (isActive)
-                    _buildToolbar(index, progress, isOverLimit, textSize),
+                  if (isActive) _buildToolbar(index, progress, isOverLimit),
                 ],
               ),
             ),
@@ -542,12 +523,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     );
   }
 
-  Widget _buildToolbar(
-    int index,
-    double progress,
-    bool isOverLimit,
-    TextSize textSize,
-  ) {
+  Widget _buildToolbar(int index, double progress, bool isOverLimit) {
     final hasText = _threads[index].controller.text.isNotEmpty;
     final canAddThread = index == _threads.length - 1 && hasText;
 
@@ -597,7 +573,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                     child: Text(
                       '${_maxChars - _threads[index].controller.text.length}',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m3xs,
                         weight: FontWeight.w700,
                         color: Colors.red,
@@ -634,7 +609,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     );
   }
 
-  Widget _buildAddThreadTrigger(TextSize textSize) {
+  Widget _buildAddThreadTrigger() {
     return GestureDetector(
       onTap: _addThread,
       child: Container(
@@ -668,7 +643,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
             Text(
               'Add to thread',
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.mbase,
                 weight: FontWeight.w700,
                 color: AppColors.onSurfaceVariant,
@@ -680,7 +654,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     );
   }
 
-  Widget _buildFloatingFooter(TextSize textSize) {
+  Widget _buildFloatingFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
@@ -703,7 +677,6 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
           Text(
             'Everyone can reply',
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.mxs,
               weight: FontWeight.w700,
               color: AppColors.primary,

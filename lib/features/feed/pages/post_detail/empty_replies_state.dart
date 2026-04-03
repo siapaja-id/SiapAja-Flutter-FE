@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
-import '../../../../shared/settings_provider.dart';
-
-class EmptyRepliesState extends ConsumerWidget {
+class EmptyRepliesState extends StatelessWidget {
   final FeedItem item;
   final bool isCreator;
   final VoidCallback? onBidClick;
@@ -23,8 +20,7 @@ class EmptyRepliesState extends ConsumerWidget {
   bool get _isTask => item is TaskData;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 64),
       child: Column(
@@ -73,9 +69,7 @@ class EmptyRepliesState extends ConsumerWidget {
           const SizedBox(height: 24),
           Text(
             _isTask ? 'No bids yet' : 'Quiet in here...',
-            style: AppTheme.scaled(
-              textSize: textSize,
-              multiplier: AppTheme.m3xl,
+            style: AppTheme.scaled(multiplier: AppTheme.m3xl,
               weight: FontWeight.w900,
               color: AppColors.onSurface,
               letterSpacing: -0.5,
@@ -89,9 +83,7 @@ class EmptyRepliesState extends ConsumerWidget {
                       : 'This task is waiting for a hero. Submit your bid and secure this opportunity!'
                 : 'Be the first to share your thoughts and start the conversation.',
             textAlign: TextAlign.center,
-            style: AppTheme.scaled(
-              textSize: textSize,
-              multiplier: AppTheme.mbase,
+            style: AppTheme.scaled(multiplier: AppTheme.mbase,
               weight: FontWeight.w500,
               color: AppColors.onSurfaceVariant,
               height: 1.5,
@@ -108,9 +100,7 @@ class EmptyRepliesState extends ConsumerWidget {
               ),
               label: Text(
                 'PLACE FIRST BID',
-                style: AppTheme.scaled(
-                  textSize: textSize,
-                  multiplier: AppTheme.mxs,
+                style: AppTheme.scaled(multiplier: AppTheme.mxs,
                   weight: FontWeight.w900,
                   letterSpacing: 2,
                 ),
@@ -138,9 +128,7 @@ class EmptyRepliesState extends ConsumerWidget {
               ),
               label: Text(
                 'WRITE A REPLY',
-                style: AppTheme.scaled(
-                  textSize: textSize,
-                  multiplier: AppTheme.mxs,
+                style: AppTheme.scaled(multiplier: AppTheme.mxs,
                   weight: FontWeight.w900,
                   letterSpacing: 2,
                 ),

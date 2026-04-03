@@ -1,12 +1,10 @@
 import 'dart:ui';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../pages/create_reply_page.dart';
 
@@ -34,18 +32,12 @@ class ReplyInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-        return _ReplyInputBody(
-          handle: handle,
-          parentId: parentId,
-          onSend: onSend,
-          avatarUrl: avatarUrl,
-          parentItem: parentItem,
-          textSize: textSize,
-        );
-      },
+    return _ReplyInputBody(
+      handle: handle,
+      parentId: parentId,
+      onSend: onSend,
+      avatarUrl: avatarUrl,
+      parentItem: parentItem,
     );
   }
 }
@@ -56,7 +48,6 @@ class _ReplyInputBody extends StatefulWidget {
   final ValueChanged<String> onSend;
   final String avatarUrl;
   final FeedItem? parentItem;
-  final TextSize textSize;
 
   const _ReplyInputBody({
     required this.handle,
@@ -64,7 +55,6 @@ class _ReplyInputBody extends StatefulWidget {
     required this.onSend,
     required this.avatarUrl,
     this.parentItem,
-    required this.textSize,
   });
 
   @override
@@ -167,14 +157,12 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                           onChanged: (_) => setState(() {}),
                           onSubmitted: (_) => _handleSend(),
                           style: AppTheme.scaled(
-                            textSize: widget.textSize,
                             multiplier: AppTheme.mbase,
                             color: AppColors.onSurface,
                           ),
                           decoration: InputDecoration(
                             hintText: 'Reply to ${widget.handle}...',
                             hintStyle: AppTheme.scaled(
-                              textSize: widget.textSize,
                               multiplier: AppTheme.mbase,
                               color: AppColors.onSurfaceVariant.withOpacity(
                                 0.5,
@@ -240,7 +228,6 @@ class _ReplyInputBodyState extends State<_ReplyInputBody> {
                   child: Text(
                     'Reply',
                     style: AppTheme.scaled(
-                      textSize: widget.textSize,
                       multiplier: AppTheme.mxs,
                       weight: FontWeight.w900,
                       letterSpacing: 1.5,

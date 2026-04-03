@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
-import '../../../../shared/settings_provider.dart';
 import '../../../../shared/widgets/primary_action_button.dart';
 
 class ReviewSheet extends StatefulWidget {
@@ -39,15 +37,10 @@ class _ReviewSheetState extends State<ReviewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-        return _buildContent(context, textSize);
-      },
-    );
+    return _buildContent(context);
   }
 
-  Widget _buildContent(BuildContext context, TextSize textSize) {
+  Widget _buildContent(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
       decoration: BoxDecoration(
@@ -63,9 +56,7 @@ class _ReviewSheetState extends State<ReviewSheet> {
             children: [
               Text(
                 'Review Work',
-                style: AppTheme.scaled(
-                  textSize: textSize,
-                  multiplier: AppTheme.m2xl,
+                style: AppTheme.scaled(multiplier: AppTheme.m2xl,
                   weight: FontWeight.w900,
                   color: AppColors.onSurface,
                   letterSpacing: -0.5,
@@ -87,9 +78,7 @@ class _ReviewSheetState extends State<ReviewSheet> {
           const SizedBox(height: 24),
           Text(
             'Rate the worker',
-            style: AppTheme.scaled(
-              textSize: textSize,
-              multiplier: AppTheme.mbase,
+            style: AppTheme.scaled(multiplier: AppTheme.mbase,
               weight: FontWeight.w700,
               color: AppColors.onSurfaceVariant,
             ),

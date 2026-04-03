@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
-import '../../../../shared/settings_provider.dart';
 
-class TaskActionFooter extends ConsumerWidget {
+class TaskActionFooter extends StatelessWidget {
   final TaskData task;
   final bool isCreator;
   final bool isAssignedToMe;
@@ -37,10 +35,10 @@ class TaskActionFooter extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     final tStatus = task.status;
-    final showInput = tStatus == TaskStatus.open ||
+    final showInput =
+        tStatus == TaskStatus.open ||
         tStatus == TaskStatus.assigned ||
         tStatus == TaskStatus.inProgress;
 
@@ -48,9 +46,7 @@ class TaskActionFooter extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.glassTint,
-        border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.05)),
-        ),
+        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
@@ -80,14 +76,12 @@ class TaskActionFooter extends ConsumerWidget {
                         onChanged: onReplyChanged,
                         onSubmitted: (_) => onSend(),
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mbase,
                           color: AppColors.onSurface,
                         ),
                         decoration: InputDecoration(
                           hintText: 'Message or ask a question...',
                           hintStyle: AppTheme.scaled(
-                            textSize: textSize,
                             multiplier: AppTheme.mbase,
                             color: AppColors.onSurfaceVariant.withOpacity(0.5),
                           ),
@@ -123,7 +117,6 @@ class TaskActionFooter extends ConsumerWidget {
                           child: Text(
                             'Send',
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.mxs,
                               weight: FontWeight.w900,
                             ),
@@ -147,40 +140,37 @@ class TaskActionFooter extends ConsumerWidget {
                   ],
                 ),
               ),
-            _buildActionUI(task, tStatus, textSize),
+            _buildActionUI(task, tStatus),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionUI(TaskData task, TaskStatus tStatus, TextSize textSize) {
+  Widget _buildActionUI(TaskData task, TaskStatus tStatus) {
     if (isCreator) {
       if (tStatus == TaskStatus.open) {
-        return _buildActionLabel('WAITING FOR BIDS...', textSize);
+        return _buildActionLabel('WAITING FOR BIDS...');
       } else if (tStatus == TaskStatus.assigned) {
         return _buildActionLabel(
           'AWAITING WORKER TO START',
-          textSize,
           color: AppColors.emerald,
           icon: PhosphorIconsRegular.checkCircle,
         );
       } else if (tStatus == TaskStatus.inProgress) {
         return _buildActionLabel(
           'TASK IN PROGRESS',
-          textSize,
           color: AppColors.emerald,
           icon: PhosphorIconsFill.sparkle,
         );
       } else if (tStatus == TaskStatus.completed) {
         return _buildActionButton(
           'REVIEW & RELEASE PAYMENT',
-          textSize,
           color: AppColors.emerald,
           onTap: onShowReview,
         );
       } else if (tStatus == TaskStatus.finished) {
-        return _buildActionLabel('TASK FINISHED', textSize);
+        return _buildActionLabel('TASK FINISHED');
       }
     } else {
       if (tStatus == TaskStatus.open) {
@@ -190,7 +180,6 @@ class TaskActionFooter extends ConsumerWidget {
               Expanded(
                 child: _buildActionButton(
                   'BID',
-                  textSize,
                   color: Colors.white.withOpacity(0.05),
                   textColor: AppColors.onSurface,
                   borderColor: Colors.white.withOpacity(0.1),
@@ -201,7 +190,6 @@ class TaskActionFooter extends ConsumerWidget {
               Expanded(
                 child: _buildActionButton(
                   'ACCEPT INSTANTLY',
-                  textSize,
                   color: AppColors.primary,
                   onTap: onAccept,
                 ),
@@ -211,7 +199,6 @@ class TaskActionFooter extends ConsumerWidget {
         } else {
           return _buildActionButton(
             'SUBMIT BID',
-            textSize,
             color: AppColors.primary,
             onTap: onBid,
           );
@@ -220,44 +207,40 @@ class TaskActionFooter extends ConsumerWidget {
         if (isAssignedToMe) {
           return _buildActionButton(
             'START TASK',
-            textSize,
             color: AppColors.emerald,
             onTap: onStartTask,
           );
         } else {
-          return _buildActionLabel('ASSIGNED TO SOMEONE ELSE', textSize);
+          return _buildActionLabel('ASSIGNED TO SOMEONE ELSE');
         }
       } else if (tStatus == TaskStatus.inProgress) {
         if (isAssignedToMe) {
           return _buildActionButton(
             'MARK AS COMPLETED',
-            textSize,
             color: AppColors.emerald,
             onTap: onShowComplete,
           );
         } else {
-          return _buildActionLabel('IN PROGRESS BY ANOTHER WORKER', textSize);
+          return _buildActionLabel('IN PROGRESS BY ANOTHER WORKER');
         }
       } else if (tStatus == TaskStatus.completed) {
         if (isAssignedToMe) {
           return _buildActionLabel(
             'WAITING FOR REVIEW...',
-            textSize,
             borderColor: Colors.white.withOpacity(0.1),
           );
         } else {
-          return _buildActionLabel('COMPLETED', textSize);
+          return _buildActionLabel('COMPLETED');
         }
       } else if (tStatus == TaskStatus.finished) {
         if (isAssignedToMe) {
           return _buildActionLabel(
             'PAYMENT RECEIVED',
-            textSize,
             color: AppColors.emerald,
             icon: PhosphorIconsRegular.checkCircle,
           );
         } else {
-          return _buildActionLabel('TASK FINISHED', textSize);
+          return _buildActionLabel('TASK FINISHED');
         }
       }
     }
@@ -266,8 +249,7 @@ class TaskActionFooter extends ConsumerWidget {
   }
 
   Widget _buildActionLabel(
-    String text,
-    TextSize textSize, {
+    String text, {
     Color? color,
     IconData? icon,
     Color? borderColor,
@@ -299,7 +281,6 @@ class TaskActionFooter extends ConsumerWidget {
           Text(
             text,
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m1sm,
               color: labelColor,
               weight: FontWeight.w900,
@@ -312,8 +293,7 @@ class TaskActionFooter extends ConsumerWidget {
   }
 
   Widget _buildActionButton(
-    String text,
-    TextSize textSize, {
+    String text, {
     required Color color,
     Color? textColor,
     Color? borderColor,
@@ -340,7 +320,6 @@ class TaskActionFooter extends ConsumerWidget {
               child: Text(
                 text,
                 style: AppTheme.scaled(
-                  textSize: textSize,
                   multiplier: AppTheme.m13,
                   weight: FontWeight.w900,
                   letterSpacing: 1.5,
@@ -363,7 +342,6 @@ class TaskActionFooter extends ConsumerWidget {
               child: Text(
                 text,
                 style: AppTheme.scaled(
-                  textSize: textSize,
                   multiplier: AppTheme.m13,
                   color: textColor ?? AppColors.onSurface,
                   weight: FontWeight.w900,

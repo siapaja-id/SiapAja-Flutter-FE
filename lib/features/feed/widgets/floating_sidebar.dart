@@ -5,7 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../providers.dart';
 
@@ -22,7 +21,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.read(uiStateProvider).currentUser;
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
 
     final navItems = [
       const NavItem(
@@ -112,7 +110,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                   child: Column(
                     children: navItems.map((item) {
                       return _NavButton(
-                        textSize: textSize,
                         item: item,
                         expanded: _expanded,
                         onTap: () {
@@ -177,7 +174,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                                   Text(
                                     currentUser?.name ?? 'You',
                                     style: AppTheme.scaled(
-                                      textSize: textSize,
                                       multiplier: AppTheme.mxs,
                                       weight: FontWeight.bold,
                                       color: AppColors.onSurface,
@@ -187,7 +183,6 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                                   Text(
                                     '${currentUser?.karma ?? 98} karma',
                                     style: AppTheme.scaled(
-                                      textSize: textSize,
                                       multiplier: AppTheme.m2sm,
                                       weight: FontWeight.w900,
                                       color: Color(0xFF34D399),
@@ -213,13 +208,11 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
 }
 
 class _NavButton extends StatelessWidget {
-  final TextSize textSize;
   final NavItem item;
   final bool expanded;
   final VoidCallback onTap;
 
   const _NavButton({
-    required this.textSize,
     required this.item,
     required this.expanded,
     required this.onTap,
@@ -278,7 +271,6 @@ class _NavButton extends StatelessWidget {
                       child: Text(
                         item.label,
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.mbase,
                           weight: FontWeight.bold,
                           letterSpacing: 0.5,

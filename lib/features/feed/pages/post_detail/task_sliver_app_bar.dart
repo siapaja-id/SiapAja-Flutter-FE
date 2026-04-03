@@ -1,17 +1,15 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
-import '../../../../shared/settings_provider.dart';
 import '../../../../shared/utils/task_icons.dart';
 import '../../../../shared/widgets/tag_pill.dart';
 import '../../../../shared/widgets/view_stats_badge.dart';
 
-class TaskSliverAppBar extends ConsumerWidget {
+class TaskSliverAppBar extends StatelessWidget {
   final TaskData task;
   final VoidCallback onBack;
   final int viewCount;
@@ -26,8 +24,7 @@ class TaskSliverAppBar extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return SliverAppBar(
       pinned: true,
       floating: false,
@@ -41,9 +38,7 @@ class TaskSliverAppBar extends ConsumerWidget {
             Flexible(
               child: Text(
                 task.title,
-                style: AppTheme.scaled(
-                  textSize: textSize,
-                  multiplier: AppTheme.m2xs,
+                style: AppTheme.scaled(multiplier: AppTheme.m2xs,
                   weight: FontWeight.w900,
                   color: AppColors.onSurfaceVariant,
                   letterSpacing: 1.5,
@@ -95,9 +90,7 @@ class TaskSliverAppBar extends ConsumerWidget {
                 children: [
                   Text(
                     task.title,
-                    style: AppTheme.scaled(
-                      textSize: textSize,
-                      multiplier: AppTheme.m15,
+                    style: AppTheme.scaled(multiplier: AppTheme.m15,
                       weight: FontWeight.w700,
                       color: AppColors.onSurface,
                     ),
@@ -128,9 +121,7 @@ class TaskSliverAppBar extends ConsumerWidget {
                             const SizedBox(width: 6),
                             Text(
                               task.category.toUpperCase(),
-                              style: AppTheme.scaled(
-                                textSize: textSize,
-                                multiplier: AppTheme.m2xl,
+                              style: AppTheme.scaled(multiplier: AppTheme.m2xl,
                                 weight: FontWeight.w900,
                                 color: AppColors.onSurface,
                                 letterSpacing: -0.5,
@@ -142,9 +133,7 @@ class TaskSliverAppBar extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Text(
                         task.price,
-                        style: AppTheme.scaled(
-                          textSize: textSize,
-                          multiplier: AppTheme.m2xl,
+                        style: AppTheme.scaled(multiplier: AppTheme.m2xl,
                           weight: FontWeight.w900,
                           color: AppColors.onSurface,
                           letterSpacing: -0.5,

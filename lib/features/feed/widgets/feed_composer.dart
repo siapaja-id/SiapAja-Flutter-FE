@@ -1,11 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 
 // ---------------------------------------------------------------------------
@@ -60,7 +58,6 @@ Widget _buildAttachmentPreview(_Attachment attachment) {
   }
 }
 
-/// Shared icon-button style for attachment toolbar actions
 IconButton _attachmentIconButton({
   required VoidCallback onPressed,
   required IconData icon,
@@ -80,14 +77,14 @@ IconButton _attachmentIconButton({
 // FeedComposer
 // ---------------------------------------------------------------------------
 
-class FeedComposer extends ConsumerStatefulWidget {
+class FeedComposer extends StatefulWidget {
   const FeedComposer({super.key});
 
   @override
-  ConsumerState<FeedComposer> createState() => _FeedComposerState();
+  State<FeedComposer> createState() => _FeedComposerState();
 }
 
-class _FeedComposerState extends ConsumerState<FeedComposer> {
+class _FeedComposerState extends State<FeedComposer> {
   final TextEditingController _textController = TextEditingController();
   bool _isFocused = false;
   final List<_Attachment> _attachments = [];
@@ -158,7 +155,6 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
 
   @override
   Widget build(BuildContext context) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final hasContent =
         _isFocused ||
         _textController.text.isNotEmpty ||
@@ -210,7 +206,6 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
                               contentPadding: EdgeInsets.zero,
                             ),
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2xl,
                               color: AppColors.onSurface,
                               height: 1.8,
@@ -418,7 +413,6 @@ class _FeedComposerState extends ConsumerState<FeedComposer> {
 // ---------------------------------------------------------------------------
 // Fullscreen Composer Bottom Sheet
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 class _FullscreenComposerSheet extends StatefulWidget {
   final TextEditingController textController;
@@ -443,15 +437,10 @@ class _FullscreenComposerSheet extends StatefulWidget {
 class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-        return _buildContent(context, textSize);
-      },
-    );
+    return _buildContent(context);
   }
 
-  Widget _buildContent(BuildContext context, TextSize textSize) {
+  Widget _buildContent(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: BackdropFilter(
@@ -543,7 +532,6 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                               hintText:
                                   'What do you need help with? Describe your task in detail...',
                               hintStyle: AppTheme.scaled(
-                                textSize: textSize,
                                 multiplier: AppTheme.m2xl,
                                 color: AppColors.onSurfaceVariant.withOpacity(
                                   0.4,
@@ -553,7 +541,6 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                               contentPadding: EdgeInsets.zero,
                             ),
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2xl,
                               color: AppColors.onSurface,
                               height: 1.8,

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app_theme.dart';
-import '../settings_provider.dart';
 
-class VoiceNotePlayer extends ConsumerWidget {
+class VoiceNotePlayer extends StatelessWidget {
   final String duration;
   final double progress;
 
@@ -16,8 +14,7 @@ class VoiceNotePlayer extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -99,7 +96,6 @@ class VoiceNotePlayer extends ConsumerWidget {
                     Text(
                       '0:12',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m2sm,
                         color: AppColors.onSurfaceVariant,
                         weight: FontWeight.w700,
@@ -109,7 +105,6 @@ class VoiceNotePlayer extends ConsumerWidget {
                     Text(
                       duration,
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m2sm,
                         color: AppColors.onSurfaceVariant,
                         weight: FontWeight.w700,

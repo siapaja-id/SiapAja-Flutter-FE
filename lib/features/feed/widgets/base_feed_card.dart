@@ -5,7 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/post_actions.dart';
 import '../providers.dart';
@@ -189,7 +188,6 @@ class BaseFeedCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final currentUserHandle = ref.watch(
       uiStateProvider.select((s) => s.currentUser?.handle),
     );
@@ -286,7 +284,6 @@ class BaseFeedCard extends ConsumerWidget {
                                         ? data.author.name
                                         : data.author.handle,
                                     style: AppTheme.scaled(
-                                      textSize: textSize,
                                       multiplier: isParent || isQuote
                                           ? AppTheme.mxs
                                           : isMain
@@ -307,7 +304,6 @@ class BaseFeedCard extends ConsumerWidget {
                                     Text(
                                       '@${data.author.handle}',
                                       style: AppTheme.scaled(
-                                        textSize: textSize,
                                         multiplier: AppTheme.mxs,
                                         color: AppColors.onSurfaceVariant,
                                       ),
@@ -333,7 +329,6 @@ class BaseFeedCard extends ConsumerWidget {
                                       child: Text(
                                         'You',
                                         style: AppTheme.scaled(
-                                          textSize: textSize,
                                           multiplier: AppTheme.m3xs,
                                           color: AppColors.primary,
                                           weight: FontWeight.w900,
@@ -351,14 +346,10 @@ class BaseFeedCard extends ConsumerWidget {
                                     !isAuthor &&
                                     !isParent &&
                                     !isQuote)
-                                  FollowButton(
-                                    handle: data.author.handle,
-                                    textSize: textSize,
-                                  ),
+                                  FollowButton(handle: data.author.handle),
                                 Text(
                                   data.timestamp,
                                   style: AppTheme.scaled(
-                                    textSize: textSize,
                                     multiplier: AppTheme.mxs,
                                     color: AppColors.onSurfaceVariant
                                         .withOpacity(0.6),
@@ -385,7 +376,6 @@ class BaseFeedCard extends ConsumerWidget {
                             !isQuote &&
                             !isParent)
                           FirstItemBadge(
-                            textSize: textSize,
                             label: 'First Post',
                             bgColor: Color(0xFF10B981),
                             fgColor: Colors.black,
@@ -396,7 +386,6 @@ class BaseFeedCard extends ConsumerWidget {
                             !isQuote &&
                             !isParent)
                           FirstItemBadge(
-                            textSize: textSize,
                             label: 'First Task',
                             bgColor: AppColors.primary,
                             fgColor: AppColors.primaryForeground,
@@ -426,7 +415,6 @@ class BaseFeedCard extends ConsumerWidget {
                                   Text(
                                     '${data.replies} ${data.replies == 1 ? "reply" : "replies"}',
                                     style: AppTheme.scaled(
-                                      textSize: textSize,
                                       multiplier: AppTheme.m1sm,
                                       color: AppColors.primary.withOpacity(0.8),
                                       weight: FontWeight.bold,
@@ -461,8 +449,7 @@ class BaseFeedCard extends ConsumerWidget {
 
 class FollowButton extends ConsumerWidget {
   final String handle;
-  final TextSize textSize;
-  const FollowButton({super.key, required this.handle, required this.textSize});
+  const FollowButton({super.key, required this.handle});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -498,7 +485,6 @@ class FollowButton extends ConsumerWidget {
             Text(
               isFollowing ? 'Following' : 'Follow',
               style: AppTheme.scaled(
-                textSize: textSize,
                 multiplier: AppTheme.m2sm,
                 color: isFollowing
                     ? AppColors.onSurfaceVariant
@@ -519,7 +505,6 @@ class FollowButton extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 
 class FirstItemBadge extends StatelessWidget {
-  final TextSize textSize;
   final String label;
   final Color bgColor;
   final Color fgColor;
@@ -527,7 +512,6 @@ class FirstItemBadge extends StatelessWidget {
 
   const FirstItemBadge({
     super.key,
-    required this.textSize,
     required this.label,
     required this.bgColor,
     required this.fgColor,
@@ -541,7 +525,6 @@ class FirstItemBadge extends StatelessWidget {
       backgroundColor: bgColor,
       textColor: fgColor,
       textStyle: AppTheme.scaled(
-        textSize: textSize,
         multiplier: AppTheme.m2xs,
         weight: FontWeight.w900,
         letterSpacing: 2,

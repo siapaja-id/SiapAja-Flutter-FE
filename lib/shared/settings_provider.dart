@@ -1,9 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ThemeColor { red, blue, emerald, violet, amber }
-
-enum TextSize { sm, md, lg }
+import '../app_theme.dart';
 
 const _keyThemeColor = 'siapaja-theme-color';
 const _keyTextSize = 'siapaja-text-size';

@@ -6,7 +6,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../shared/utils/scroll_helpers.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/tag_pill.dart';
 import '../../../shared/widgets/view_stats_badge.dart';
 
@@ -242,7 +241,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
     final feedState = ref.watch(feedNotifierProvider);
     final currentUser = ref.watch(uiStateProvider).currentUser;
 
@@ -282,7 +280,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
             subtitle: headerSubtitle,
             contentType: 'Post',
             onBack: _handleBack,
-            textSize: textSize,
           ),
         Expanded(
           child: CustomScrollView(
@@ -351,7 +348,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     child: Text(
                       currentItem is TaskData ? 'DISCUSSION & BIDS' : 'REPLIES',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.mlg,
                         weight: FontWeight.w900,
                         color: AppColors.onSurfaceVariant,
@@ -468,14 +464,12 @@ class _DetailHeader extends StatelessWidget {
   final String? subtitle;
   final String contentType;
   final VoidCallback onBack;
-  final TextSize textSize;
 
   const _DetailHeader({
     required this.title,
     this.subtitle,
     required this.contentType,
     required this.onBack,
-    required this.textSize,
   });
 
   @override
@@ -512,7 +506,6 @@ class _DetailHeader extends StatelessWidget {
                       child: Text(
                         title,
                         style: AppTheme.scaled(
-                          textSize: textSize,
                           multiplier: AppTheme.m15,
                           weight: FontWeight.w700,
                           color: AppColors.onSurface,
@@ -536,7 +529,6 @@ class _DetailHeader extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: AppTheme.scaled(
-                      textSize: textSize,
                       multiplier: AppTheme.mlg,
                       weight: FontWeight.w500,
                       color: AppColors.onSurfaceVariant,

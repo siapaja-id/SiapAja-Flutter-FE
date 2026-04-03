@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_theme.dart';
-import '../settings_provider.dart';
 
-/// Rich text widget — matches React `RichText` + `SpoilerText` + `RichLinkAnchor` + `LinkPreviewNode`
-class RichTextWidget extends ConsumerWidget {
+class RichTextWidget extends StatelessWidget {
   final String text;
   final TextStyle? baseStyle;
 
   const RichTextWidget({super.key, required this.text, this.baseStyle});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-    final cachedSpans = _parseText(text, textSize);
+  Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
         style:
@@ -23,15 +18,12 @@ class RichTextWidget extends ConsumerWidget {
               color: AppColors.onSurface,
               height: 1.5,
             ),
-        children: cachedSpans,
+        children: _parseText(text),
       ),
     );
   }
 
-  /// Sequential regex parsing — same order as React `applyRegex`.
-  /// Each regex only processes remaining string nodes, so already-parsed
-  /// WidgetSpans are left untouched.
-  List<InlineSpan> _parseText(String text, TextSize textSize) {
+  List<InlineSpan> _parseText(String text) {
     List<InlineSpan> nodes = [TextSpan(text: text)];
 
     List<InlineSpan> _applyRegex(
@@ -50,22 +42,17 @@ class RichTextWidget extends ConsumerWidget {
       }).toList();
     }
 
-    // 1. Spoilers: ||text||
     nodes = _applyRegex(
       RegExp(r'(\|\|.*?\|\|)'),
       (m) => _buildSpoiler(m.substring(2, m.length - 2)),
     );
 
-    // 2. URLs
-    nodes = _applyRegex(RegExp(r'(https?://[^\s]+)'), (url) => _buildLink(url, textSize));
+    nodes = _applyRegex(RegExp(r'(https?://[^\s]+)'), (url) => _buildLink(url));
 
-    // 3. @mentions
     nodes = _applyRegex(RegExp(r'(@[a-zA-Z0-9_]+)'), _buildMention);
 
-    // 4. #hashtags
     nodes = _applyRegex(RegExp(r'(#[a-zA-Z0-9_]+)'), _buildHashtag);
 
-    // 5. Phone numbers → redacted
     nodes = _applyRegex(
       RegExp(r'((?:\+?\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})'),
       _buildPhoneRedacted,
@@ -73,12 +60,6 @@ class RichTextWidget extends ConsumerWidget {
 
     return nodes;
   }
-
-  // -----------------------------------------------------------------------
-  // Spoiler — matches React `SpoilerText`: blur-[5px] hover:blur-[3px]
-  // bg-white/5 cursor-pointer select-none rounded px-1.5 py-0.5
-  // transition-all duration-700 → revealed: text-on-surface
-  // -----------------------------------------------------------------------
 
   InlineSpan _buildSpoiler(String content) {
     return WidgetSpan(
@@ -88,11 +69,7 @@ class RichTextWidget extends ConsumerWidget {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Link — matches React `RichLinkAnchor` pill styling
-  // -----------------------------------------------------------------------
-
-  InlineSpan _buildLink(String url, TextSize textSize) {
+  InlineSpan _buildLink(String url) {
     final displayUrl = url.replaceFirst(RegExp(r'^https?://'), '');
     return WidgetSpan(
       alignment: PlaceholderAlignment.baseline,
@@ -114,7 +91,6 @@ class RichTextWidget extends ConsumerWidget {
               Text(
                 displayUrl,
                 style: AppTheme.scaled(
-                  textSize: textSize,
                   multiplier: AppTheme.mxs,
                   weight: FontWeight.w500,
                   color: AppColors.primary,
@@ -127,10 +103,6 @@ class RichTextWidget extends ConsumerWidget {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Mention — matches React `text-primary/90 font-black`
-  // -----------------------------------------------------------------------
-
   InlineSpan _buildMention(String handle) {
     return TextSpan(
       text: handle,
@@ -141,23 +113,15 @@ class RichTextWidget extends ConsumerWidget {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Hashtag — matches React `text-emerald-400/90 font-bold`
-  // -----------------------------------------------------------------------
-
   InlineSpan _buildHashtag(String hashtag) {
     return TextSpan(
       text: hashtag,
       style: const TextStyle(
-        color: Color(0xFF34D399), // emerald-400
+        color: Color(0xFF34D399),
         fontWeight: FontWeight.bold,
       ),
     );
   }
-
-  // -----------------------------------------------------------------------
-  // Phone redaction — matches React `bg-red-500/10 text-red-500` pill
-  // -----------------------------------------------------------------------
 
   InlineSpan _buildPhoneRedacted(String phone) {
     return WidgetSpan(
@@ -190,10 +154,6 @@ class RichTextWidget extends ConsumerWidget {
   }
 }
 
-// ===========================================================================
-// _SpoilerText — matches React `SpoilerText`
-// ===========================================================================
-
 class _SpoilerText extends StatefulWidget {
   final String text;
   const _SpoilerText({required this.text});
@@ -223,10 +183,7 @@ class _SpoilerTextState extends State<_SpoilerText> {
           duration: const Duration(milliseconds: 700),
           curve: Curves.easeInOut,
           style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-            color: _revealed
-                ? AppColors
-                      .onSurface // revealed → text-on-surface
-                : AppColors.onSurfaceVariant, // hidden → muted
+            color: _revealed ? AppColors.onSurface : AppColors.onSurfaceVariant,
             letterSpacing: _revealed ? 0 : 1.5,
           ),
           child: Text(

@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/user_avatar.dart';
 import '../../../shared/widgets/expandable_text.dart';
 import '../../../shared/widgets/media_carousel.dart';
-import '../providers.dart';
 import 'feed_item_card.dart';
 import 'base_feed_card.dart';
-import 'kanban_column_widget.dart';
-
-// ---------------------------------------------------------------------------
 // SocialPostCard
 // ---------------------------------------------------------------------------
 
-class SocialPostCard extends ConsumerWidget {
+class SocialPostCard extends StatelessWidget {
   final SocialPostData data;
   final bool isMain, isParent, isQuote, hasLineBelow;
   final VoidCallback? onClick;
@@ -33,15 +27,8 @@ class SocialPostCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final textSize = ref.watch(settingsProvider.select((s) => s.textSize));
-    final currentUserHandle = ref.watch(
-      uiStateProvider.select((s) => s.currentUser?.handle),
-    );
-    final isAuthor = currentUserHandle == data.author.handle;
+  Widget build(BuildContext context) {
     final isThreadContext = isMain || isParent || hasLineBelow;
-    final canAcceptBid =
-        data.isBid == true && data.bidStatus != BidStatus.accepted && !isAuthor;
 
     return BaseFeedCard(
       data: data,
@@ -102,13 +89,11 @@ class SocialPostCard extends ConsumerWidget {
             )
           : null,
       children: [
-        if (data.isBid == true)
-          _BidCard(data: data, canAcceptBid: canAcceptBid),
+        if (data.isBid == true) _BidCard(data: data),
         if (isParent)
           Text(
             data.content,
             style: AppTheme.scaled(
-              textSize: textSize,
               multiplier: AppTheme.m13,
               color: AppColors.onSurface,
               height: 1.5,
@@ -122,13 +107,11 @@ class SocialPostCard extends ConsumerWidget {
             limit: isMain ? 280 : 160,
             style: isMain
                 ? AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.mlg,
                     color: AppColors.onSurface.withOpacity(0.9),
                     height: 1.5,
                   )
                 : AppTheme.scaled(
-                    textSize: textSize,
                     multiplier: AppTheme.m13,
                     color: AppColors.onSurface.withOpacity(0.9),
                     height: 1.5,
@@ -149,7 +132,6 @@ class SocialPostCard extends ConsumerWidget {
                     child: Text(
                       '${data.threadIndex}/${data.threadCount}',
                       style: AppTheme.scaled(
-                        textSize: textSize,
                         multiplier: AppTheme.m2xs,
                         color: AppColors.primary,
                         weight: FontWeight.w800,
@@ -245,7 +227,6 @@ class SocialPostCard extends ConsumerWidget {
                           Text(
                             '0:12',
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2sm,
                               color: AppColors.onSurfaceVariant,
                               weight: FontWeight.w500,
@@ -254,7 +235,6 @@ class SocialPostCard extends ConsumerWidget {
                           Text(
                             data.voiceNote!,
                             style: AppTheme.scaled(
-                              textSize: textSize,
                               multiplier: AppTheme.m2sm,
                               color: AppColors.onSurfaceVariant,
                               weight: FontWeight.w500,
@@ -271,22 +251,7 @@ class SocialPostCard extends ConsumerWidget {
         ],
         if (!isParent && data.quote != null) ...[
           const SizedBox(height: 8),
-          GestureDetector(
-            onTap: isMain
-                ? () {
-                    final kanbanCtx = KanbanColumnContext.of(context);
-                    if (kanbanCtx != null) {
-                      ref
-                          .read(kanbanProvider.notifier)
-                          .openColumn(
-                            '/post/${data.quote!.id}',
-                            sourceId: kanbanCtx.columnId,
-                          );
-                    }
-                  }
-                : null,
-            child: FeedItemCard(item: data.quote!, isQuote: true),
-          ),
+          FeedItemCard(item: data.quote!, isQuote: true),
         ],
       ],
     );
@@ -299,8 +264,7 @@ class SocialPostCard extends ConsumerWidget {
 
 class _BidCard extends StatelessWidget {
   final SocialPostData data;
-  final bool canAcceptBid;
-  const _BidCard({required this.data, required this.canAcceptBid});
+  const _BidCard({required this.data});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -370,35 +334,6 @@ class _BidCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (canAcceptBid)
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF10B981).withOpacity(0.3),
-                        blurRadius: 15,
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    'Accept Bid',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-              ),
           ],
         ),
       ],
