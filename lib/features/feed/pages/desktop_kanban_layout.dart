@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/settings_provider.dart';
+import '../../../shared/widgets/themed_background.dart';
 import '../providers.dart';
 import '../widgets/floating_sidebar.dart';
 import '../widgets/kanban_column_widget.dart';
@@ -49,21 +50,12 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
   @override
   Widget build(BuildContext context) {
     final columns = ref.watch(kanbanProvider.select((s) => s.columns));
-    final themeColor = ref.watch(settingsProvider.select((s) => s.themeColor));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: AppTheme.backgroundGradient(themeColor),
-                ),
-              ),
-            ),
-          ),
+          const ThemedBackground(),
           // Main layout
           Row(
             children: [

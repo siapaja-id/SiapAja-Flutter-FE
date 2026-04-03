@@ -1,6 +1,7 @@
 import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/utils/decorations.dart';
 import '../../../shared/widgets/ring_animation.dart';
+import '../../../shared/widgets/themed_background.dart';
 import '../../../shared/utils/task_icons.dart';
 import 'dart:async';
 import 'dart:math';
@@ -147,21 +148,12 @@ class _RadarPageState extends ConsumerState<RadarPage>
     final activeGig = uiState.activeGig;
     final queuedGigs = uiState.queuedGigs;
     final isAutoPilot = uiState.isAutoPilot;
-    final themeColor = ref.watch(settingsProvider.select((s) => s.themeColor));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: AppTheme.backgroundGradient(themeColor),
-                ),
-              ),
-            ),
-          ),
+          const ThemedBackground(),
           Column(
             children: [
               if (activeGig != null) _buildEstafetBanner(activeGig, queuedGigs),
