@@ -9,6 +9,84 @@ import '../widgets/feed_composer.dart';
 import '../widgets/feed_item_card.dart';
 import '../providers.dart';
 
+/// Mixin that manages a 2-tab [TabController] lifecycle for ConsumerStatefulWidgets.
+///
+/// Subclasses provide [initialTabIndex], [targetTabIndex], and [onTabIndexChanged].
+/// The mixin handles creation, listening, sync on didUpdateWidget, and disposal.
+mixin ManagedTabController<T extends ConsumerStatefulWidget>
+    on SingleTickerProviderStateMixin, ConsumerState<T> {
+  late TabController tabController;
+
+  /// Tab index used when the controller is first created in [initState].
+  int get initialTabIndex;
+
+  /// Tab index the controller should sync to in [didUpdateWidget].
+  int get targetTabIndex;
+
+  /// Called when the user finishes swiping to a new tab (indexIsChanging is false).
+  void onTabIndexChanged(int index);
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: initialTabIndex,
+    );
+    tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (!tabController.indexIsChanging) {
+      onTabIndexChanged(tabController.index);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant T oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (tabController.index != targetTabIndex &&
+        !tabController.indexIsChanging) {
+      tabController.index = targetTabIndex;
+    }
+  }
+
+  @override
+  void dispose() {
+    tabController.removeListener(_handleTabChange);
+    tabController.dispose();
+    super.dispose();
+  }
+}
+
+/// Shared feed header layout: GlassHeader > Row > [left, tabBar, right]
+class _FeedHeaderContent extends StatelessWidget {
+  final Widget left;
+  final Widget right;
+  final Widget tabBar;
+
+  const _FeedHeaderContent({
+    required this.left,
+    required this.right,
+    required this.tabBar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassHeader(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          left,
+          Flexible(child: tabBar),
+          right,
+        ],
+      ),
+    );
+  }
+}
+
 /// Feed page with header, composer, and feed list
 class FeedPage extends ConsumerStatefulWidget {
   final String tab;
@@ -58,6 +136,33 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     _lastScrollOffset = offset;
   }
 
+  Future<void> _handleRefresh() async {
+    ref.read(feedNotifierProvider.notifier).refreshFeed();
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
+  /// Shared RefreshIndicator + ListView.builder used by both kanban and mobile.
+  Widget _buildFeedList({
+    required int itemCount,
+    required EdgeInsetsGeometry padding,
+    required Widget Function(BuildContext context, int index) itemBuilder,
+  }) {
+    return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: AppColors.surfaceContainerHigh,
+      onRefresh: _handleRefresh,
+      child: ListView.builder(
+        controller: _scrollController,
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        padding: padding,
+        itemCount: itemCount,
+        itemBuilder: itemBuilder,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -84,34 +189,19 @@ class _FeedPageState extends ConsumerState<FeedPage> {
         }),
       );
 
-      return RefreshIndicator(
-        color: AppColors.primary,
-        backgroundColor: AppColors.surfaceContainerHigh,
-        onRefresh: () async {
-          ref.read(feedNotifierProvider.notifier).refreshFeed();
-          await Future.delayed(const Duration(milliseconds: 500));
+      return _buildFeedList(
+        itemCount: feedState.feedItems.length + 2,
+        padding: const EdgeInsets.only(bottom: 24),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _KanbanFeedHeader(
+              columnId: widget.columnId!,
+              activeTab: activeTab,
+            );
+          }
+          if (index == 1) return const FeedComposer();
+          return FeedItemCard(item: feedState.feedItems[index - 2]);
         },
-        child: ListView.builder(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          padding: const EdgeInsets.only(bottom: 24),
-          itemCount: feedState.feedItems.length + 2,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return _KanbanFeedHeader(
-                columnId: widget.columnId!,
-                activeTab: activeTab,
-              );
-            }
-            if (index == 1) {
-              return const FeedComposer();
-            }
-            final item = feedState.feedItems[index - 2];
-            return FeedItemCard(item: item);
-          },
-        ),
       );
     }
 
@@ -119,28 +209,13 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     return Stack(
       children: [
         Positioned.fill(
-          child: RefreshIndicator(
-            color: AppColors.primary,
-            backgroundColor: AppColors.surfaceContainerHigh,
-            onRefresh: () async {
-              ref.read(feedNotifierProvider.notifier).refreshFeed();
-              await Future.delayed(const Duration(milliseconds: 500));
+          child: _buildFeedList(
+            itemCount: feedState.feedItems.length + 1,
+            padding: const EdgeInsets.only(top: 64, bottom: 24),
+            itemBuilder: (context, index) {
+              if (index == 0) return const FeedComposer();
+              return FeedItemCard(item: feedState.feedItems[index - 1]);
             },
-            child: ListView.builder(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              padding: const EdgeInsets.only(top: 64, bottom: 24),
-              itemCount: feedState.feedItems.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const FeedComposer();
-                }
-                final item = feedState.feedItems[index - 1];
-                return FeedItemCard(item: item);
-              },
-            ),
           ),
         ),
         Positioned(
@@ -171,48 +246,23 @@ class _KanbanFeedHeader extends ConsumerStatefulWidget {
 }
 
 class _KanbanFeedHeaderState extends ConsumerState<_KanbanFeedHeader>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+    with SingleTickerProviderStateMixin, ManagedTabController<_KanbanFeedHeader> {
+  @override
+  int get initialTabIndex => widget.activeTab;
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: widget.activeTab,
-    );
-    _tabController.addListener(_onTabChanged);
-  }
-
-  void _onTabChanged() {
-    if (!_tabController.indexIsChanging && mounted) {
-      final index = _tabController.index;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ref
-              .read(kanbanProvider.notifier)
-              .setColumnActiveTab(widget.columnId, index);
-        }
-      });
-    }
-  }
+  int get targetTabIndex => widget.activeTab;
 
   @override
-  void didUpdateWidget(_KanbanFeedHeader oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.activeTab != widget.activeTab &&
-        _tabController.index != widget.activeTab &&
-        !_tabController.indexIsChanging) {
-      _tabController.index = widget.activeTab;
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
-    super.dispose();
+  void onTabIndexChanged(int index) {
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref
+            .read(kanbanProvider.notifier)
+            .setColumnActiveTab(widget.columnId, index);
+      }
+    });
   }
 
   @override
@@ -220,64 +270,33 @@ class _KanbanFeedHeaderState extends ConsumerState<_KanbanFeedHeader>
     final currentUser = ref.read(uiStateProvider).currentUser;
     final karma = currentUser?.karma ?? 98;
 
-    return GlassHeader(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => ref
-                .read(kanbanProvider.notifier)
-                .openColumn(
-                  '/profile',
-                  sourceId: widget.columnId,
-                  routeState: {
-                    'user': {
-                      'name': currentUser?.name ?? 'You',
-                      'handle': currentUser?.handle ?? 'currentuser',
-                      'avatar':
-                          currentUser?.avatar ??
-                          'https://picsum.photos/seed/currentuser/100/100',
-                      'karma': karma,
-                      'isOnline': currentUser?.isOnline ?? true,
-                    },
-                  },
-                ),
-            child: UserAvatar(
-              src:
-                  currentUser?.avatar ??
-                  'https://picsum.photos/seed/user/100/100',
-              size: AvatarSize.md,
-              isOnline: true,
-            ),
-          ),
-          Flexible(
-            child: _TabBar(
-              activeIndex: widget.activeTab,
-              onIndexChanged: (i) => _tabController.animateTo(i),
-            ),
-          ),
-          GestureDetector(
-            onTap: () => ref
-                .read(kanbanProvider.notifier)
-                .openColumn(
-                  '/profile',
-                  sourceId: widget.columnId,
-                  routeState: {
-                    'user': {
-                      'name': currentUser?.name ?? 'You',
-                      'handle': currentUser?.handle ?? 'currentuser',
-                      'avatar':
-                          currentUser?.avatar ??
-                          'https://picsum.photos/seed/currentuser/100/100',
-                      'karma': karma,
-                      'isOnline': currentUser?.isOnline ?? true,
-                    },
-                  },
-                ),
-            child: KarmaBadge(karma: karma),
-          ),
-        ],
+    final avatar = UserAvatar(
+      src: currentUser?.avatar ?? 'https://picsum.photos/seed/user/100/100',
+      size: AvatarSize.md,
+      isOnline: true,
+    );
+
+    final profileRouteState = {
+      'user': {
+        'name': currentUser?.name ?? 'You',
+        'handle': currentUser?.handle ?? 'currentuser',
+        'avatar': currentUser?.avatar ?? 'https://picsum.photos/seed/currentuser/100/100',
+        'karma': karma,
+        'isOnline': currentUser?.isOnline ?? true,
+      },
+    };
+
+    final openProfile = () => ref
+        .read(kanbanProvider.notifier)
+        .openColumn('/profile', sourceId: widget.columnId, routeState: profileRouteState);
+
+    return _FeedHeaderContent(
+      left: GestureDetector(onTap: openProfile, child: avatar),
+      tabBar: _TabBar(
+        activeIndex: widget.activeTab,
+        onIndexChanged: (i) => tabController.animateTo(i),
       ),
+      right: GestureDetector(onTap: openProfile, child: KarmaBadge(karma: karma)),
     );
   }
 }
@@ -291,41 +310,16 @@ class FeedHeader extends ConsumerStatefulWidget {
 }
 
 class _FeedHeaderState extends ConsumerState<FeedHeader>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+    with SingleTickerProviderStateMixin, ManagedTabController<FeedHeader> {
+  @override
+  int get initialTabIndex => ref.read(uiStateProvider).activeTab;
 
   @override
-  void initState() {
-    super.initState();
-    final activeTab = ref.read(uiStateProvider).activeTab;
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: activeTab,
-    );
-    _tabController.addListener(_onTabChanged);
-  }
-
-  void _onTabChanged() {
-    if (!_tabController.indexIsChanging) {
-      ref.read(uiStateProvider.notifier).setActiveTab(_tabController.index);
-    }
-  }
+  int get targetTabIndex => ref.read(uiStateProvider).activeTab;
 
   @override
-  void didUpdateWidget(FeedHeader oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final activeTab = ref.read(uiStateProvider).activeTab;
-    if (_tabController.index != activeTab) {
-      _tabController.index = activeTab;
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
-    super.dispose();
+  void onTabIndexChanged(int index) {
+    ref.read(uiStateProvider.notifier).setActiveTab(index);
   }
 
   @override
@@ -335,27 +329,20 @@ class _FeedHeaderState extends ConsumerState<FeedHeader>
       uiStateProvider.select((s) => s.currentUser?.karma),
     );
 
-    return GlassHeader(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () {},
-            child: const UserAvatar(
-              src: 'https://picsum.photos/seed/user/100/100',
-              size: AvatarSize.md,
-              isOnline: true,
-            ),
-          ),
-          Flexible(
-            child: _TabBar(
-              activeIndex: activeTab,
-              onIndexChanged: (i) => _tabController.animateTo(i),
-            ),
-          ),
-          KarmaBadge(karma: karma ?? 98),
-        ],
+    return _FeedHeaderContent(
+      left: GestureDetector(
+        onTap: () {},
+        child: const UserAvatar(
+          src: 'https://picsum.photos/seed/user/100/100',
+          size: AvatarSize.md,
+          isOnline: true,
+        ),
       ),
+      tabBar: _TabBar(
+        activeIndex: activeTab,
+        onIndexChanged: (i) => tabController.animateTo(i),
+      ),
+      right: KarmaBadge(karma: karma ?? 98),
     );
   }
 }

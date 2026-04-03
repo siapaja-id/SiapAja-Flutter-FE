@@ -294,7 +294,7 @@ plan:
           - lib/shared/widgets/bottom_sheet_container.dart
 
     - uuid: 'f1a2b3c4-5d6e-4f7a-8b9c-0d1e2f3a4b5c'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 6: FeedPage TabController Mixin Extraction'
       reason: |
         Both `_KanbanFeedHeaderState` and `_FeedHeaderState` in feed_page.dart implement identical TabController lifecycle boilerplate (~40 lines each):
@@ -306,7 +306,7 @@ plan:
         Additionally, both build methods share the same GlassHeader > Row > [UserAvatar, _TabBar, KarmaBadge] structure.
       steps:
         - uuid: 'a2b3c4d5-6e7f-4a8b-9c0d-1e2f3a4b5c6d'
-          status: 'pending'
+          status: 'completed'
           name: 'Create ManagedTabController Mixin and Shared Feed Header'
           reason: 'Extract TabController lifecycle into a mixin and shared header builder'
           files:
@@ -318,7 +318,7 @@ plan:
             - 'Refactor `_FeedHeaderState` to use the mixin — eliminates ~30 lines of TabController boilerplate'
             - 'Share the GlassHeader > Row > [avatar, tabBar, karmaBadge] structure between both headers'
         - uuid: 'b3c4d5e6-7f8a-4b9c-0d1e-2f3a4b5c6d7e'
-          status: 'pending'
+          status: 'completed'
           name: 'Simplify FeedPage Build Methods'
           reason: 'Reduce duplication between kanban and mobile feed rendering'
           files:
