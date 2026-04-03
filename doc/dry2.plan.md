@@ -418,7 +418,7 @@ plan:
           - lib/features/feed/widgets/social_post_card.dart
 
     - uuid: 'c4d5e6f7-8a9b-4c0d-1e2f-3a4b5c6d7e8f'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 9: ToggleSetNotifier Base Class for ViewModels'
       reason: |
         In `app_viewmodel.dart`, `UserRepostsNotifier` and `FollowedHandlesNotifier` share an identical `toggle(String)` method pattern:
@@ -433,7 +433,7 @@ plan:
         Both also have a `bool contains(String id)` pattern. Extracting a base class eliminates ~30 lines.
       steps:
         - uuid: 'd5e6f7a8-9b0c-4d1e-2f3a-4b5c6d7e8f9a'
-          status: 'pending'
+          status: 'completed'
           name: 'Create ToggleSetNotifier Base Class'
           reason: 'Eliminate duplicated toggle logic between two Notifier classes'
           files:
@@ -453,13 +453,13 @@ plan:
           - lib/features/feed/viewmodels/app_viewmodel.dart
 
     - uuid: 'd5e6f7a8-9b0c-4d1e-2f3a-4b5c6d7e8f9a'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 10: AnimatedSlide Presets & Repeated Animation Patterns'
       reason: |
         `AnimatedSlide(offset: ..., duration: Duration(milliseconds: 250), curve: Curves.easeOutCubic)` repeats identically in main_shell.dart, feed_page.dart, and desktop_kanban_layout.dart. Other repeated animation patterns include `AnimatedContainer(duration: Duration(milliseconds: 300), curve: Curves.easeOutCubic)` (6+ occurrences) and `AnimatedSize(duration: Duration(milliseconds: 250), curve: Curves.easeOutCubic)` (3+ occurrences).
       steps:
         - uuid: 'e6f7a8b9-0c1d-4e2f-3a4b-5c6d7e8f9a0b'
-          status: 'pending'
+          status: 'completed'
           name: 'Create Animation Constants in AppTheme'
           reason: 'Standardize repeated duration and curve values'
           files:
@@ -473,7 +473,7 @@ plan:
             - 'Add `static const Curve curveOutQuart = Curves.easeOut`'
             - 'Add `static const Curve curveIn = Curves.easeIn`'
         - uuid: 'f7a8b9c0-1d2e-4f3a-4b5c-6d7e8f9a0b1c'
-          status: 'pending'
+          status: 'completed'
           name: 'Apply Animation Constants Across Codebase'
           reason: 'Replace inline Duration/Curve with named constants'
           files:

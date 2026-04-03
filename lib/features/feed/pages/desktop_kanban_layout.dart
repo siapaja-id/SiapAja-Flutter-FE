@@ -33,7 +33,7 @@ class _DesktopKanbanLayoutState extends ConsumerState<DesktopKanbanLayout> {
             _scrollController.animateTo(
               _scrollController.position.maxScrollExtent,
               duration: const Duration(milliseconds: 350),
-              curve: Curves.easeOutCubic,
+              curve: AppTheme.curveOut,
             );
           }
         });
@@ -145,8 +145,8 @@ class _AddColumnButtonState extends State<_AddColumnButton> {
             ),
             child: AnimatedRotation(
               turns: _isHovering ? 0.25 : 0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
+              duration: AppTheme.animSlide,
+              curve: AppTheme.curveOut,
               child: Icon(
                 PhosphorIconsRegular.plus,
                 size: 24,

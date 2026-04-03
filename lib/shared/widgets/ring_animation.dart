@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../app_theme.dart';
+
 /// A pulsing ring animation, extracted from radar_page.dart.
 ///
 /// Consolidates `_RadarRingAnimation` and `_MatchRadarRing` into a single
@@ -50,11 +52,11 @@ class _PulsingRingState extends State<PulsingRing>
     _scaleAnimation = Tween<double>(
       begin: widget.beginScale,
       end: widget.endScale,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOutQuart));
     _opacityAnimation = Tween<double>(
       begin: widget.beginOpacity,
       end: widget.endOpacity,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOutQuart));
     Future.delayed(Duration(milliseconds: widget.delay), () {
       if (mounted) {
         _controller.repeat();

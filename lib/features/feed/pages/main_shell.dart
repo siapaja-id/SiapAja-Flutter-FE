@@ -76,8 +76,8 @@ class _MainShellState extends ConsumerState<MainShell> {
             bottom: 0,
             child: AnimatedSlide(
               offset: bottomNavVisible ? Offset.zero : const Offset(0, 1),
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
+              duration: AppTheme.animNormal,
+              curve: AppTheme.curveOut,
               child: GlassCard.bar(
                 child: NavigationBar(
                   selectedIndex: selectedIndex,

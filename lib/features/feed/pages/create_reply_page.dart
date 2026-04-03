@@ -44,7 +44,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
+          duration: AppTheme.animFast,
           curve: AppTheme.curveOutQuart,
         );
       }
@@ -213,7 +213,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     return GestureDetector(
       onTap: hasText ? _handlePost : null,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppTheme.animFast,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: hasText ? AppColors.primary : AppColors.surfaceContainerHigh,

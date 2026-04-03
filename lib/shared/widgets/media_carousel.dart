@@ -108,7 +108,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                           onTap: () {
                             _pageController.animateToPage(
                               index,
-                              duration: const Duration(milliseconds: 300),
+                              duration: AppTheme.animSlide,
                               curve: Curves.easeInOut,
                             );
                           },
@@ -136,12 +136,12 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     child: Center(
                       child: AnimatedOpacity(
                         opacity: _isHovering ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
+                        duration: AppTheme.animFast,
                         child: _ArrowButton(
                           icon: PhosphorIconsRegular.caretLeft,
                           onTap: () {
                             _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
+                              duration: AppTheme.animSlide,
                               curve: Curves.easeInOut,
                             );
                           },
@@ -159,12 +159,12 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     child: Center(
                       child: AnimatedOpacity(
                         opacity: _isHovering ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
+                        duration: AppTheme.animFast,
                         child: _ArrowButton(
                           icon: PhosphorIconsRegular.caretRight,
                           onTap: () {
                             _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
+                              duration: AppTheme.animSlide,
                               curve: Curves.easeInOut,
                             );
                           },

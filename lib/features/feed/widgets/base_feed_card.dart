@@ -74,7 +74,7 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
           duration: const Duration(milliseconds: 180),
           curve: AppTheme.curveOut,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: AppTheme.animFast,
             curve: AppTheme.curveOut,
             decoration: BoxDecoration(
               color: active ? widget.hoverColor : Colors.transparent,
@@ -434,7 +434,7 @@ class FollowButton extends ConsumerWidget {
     return GestureDetector(
       onTap: () => ref.read(followedHandlesProvider.notifier).toggle(handle),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppTheme.animFast,
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(

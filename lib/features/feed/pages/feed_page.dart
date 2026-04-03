@@ -224,8 +224,8 @@ class _FeedPageState extends ConsumerState<FeedPage> {
           top: 0,
           child: AnimatedSlide(
             offset: headerVisible ? Offset.zero : const Offset(0, -1),
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
+            duration: AppTheme.animNormal,
+            curve: AppTheme.curveOut,
             child: const FeedHeader(),
           ),
         ),
@@ -366,7 +366,7 @@ class _TabBarState extends State<_TabBar> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 250),
+      duration: AppTheme.animNormal,
       vsync: this,
     );
     if (widget.activeIndex == 1) {
@@ -381,7 +381,7 @@ class _TabBarState extends State<_TabBar> with SingleTickerProviderStateMixin {
     if (widget.activeIndex != oldWidget.activeIndex) {
       _controller.animateTo(
         widget.activeIndex.toDouble(),
-        curve: Curves.easeOutCubic,
+        curve: AppTheme.curveOut,
       );
     }
   }
@@ -421,8 +421,8 @@ class _TabBarState extends State<_TabBar> with SingleTickerProviderStateMixin {
                 onTap: () => widget.onIndexChanged(i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
+                  duration: AppTheme.animFast,
+                  curve: AppTheme.curveOutQuart,
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: isActive
                         ? AppColors.onSurface

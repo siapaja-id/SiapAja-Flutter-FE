@@ -227,8 +227,8 @@ class _ColorCircle extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
+        duration: AppTheme.animFast,
+        curve: AppTheme.curveOut,
         width: 48,
         height: 48,
         decoration: BoxDecoration(
@@ -245,7 +245,7 @@ class _ColorCircle extends StatelessWidget {
               : null,
         ),
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
+          duration: AppTheme.animFast,
           transitionBuilder: (child, animation) {
             return ScaleTransition(scale: animation, child: child);
           },
@@ -319,8 +319,8 @@ class _SegmentedControl<T extends Object> extends StatelessWidget {
               ),
             ),
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
+              duration: AppTheme.animSlide,
+              curve: AppTheme.curveOut,
               left: options.indexWhere((o) => o.$1 == selected) * itemWidth + 4,
               top: 4,
               bottom: 4,

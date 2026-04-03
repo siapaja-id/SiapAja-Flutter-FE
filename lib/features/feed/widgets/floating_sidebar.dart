@@ -214,7 +214,7 @@ class _NavButton extends StatelessWidget {
             onTap: onTap,
             borderRadius: BorderRadius.circular(16),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: AppTheme.animFast,
               curve: AppTheme.curveOut,
               width: double.infinity,
               padding: EdgeInsets.symmetric(
@@ -251,7 +251,7 @@ class _NavButton extends StatelessWidget {
                     const SizedBox(width: 12),
                     AnimatedOpacity(
                       opacity: expanded ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
+                      duration: AppTheme.animFast,
                       child: Text(
                         item.label,
                         style: AppTheme.bodyBold.copyWith(letterSpacing: 0.5, color: item.isPrimary ? AppColors.primaryForeground : AppColors.onSurfaceVariant),

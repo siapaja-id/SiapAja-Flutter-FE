@@ -44,14 +44,14 @@ class _RadarPageState extends ConsumerState<RadarPage>
   void initState() {
     super.initState();
     _bidSheetController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: AppTheme.animSheet,
       vsync: this,
     );
     _bidSheetY = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _bidSheetController, curve: Curves.easeOutCubic),
+      CurvedAnimation(parent: _bidSheetController, curve: AppTheme.curveOut),
     );
     _bidSheetOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _bidSheetController, curve: Curves.easeOut),
+      CurvedAnimation(parent: _bidSheetController, curve: AppTheme.curveOutQuart),
     );
   }
 
@@ -70,7 +70,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
     final currentGig = _getCurrentGig();
     if (currentGig == null) return;
 
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(AppTheme.animSlide, () {
       if (!mounted) return;
 
       if (direction == 'up') {
@@ -230,8 +230,8 @@ class _RadarPageState extends ConsumerState<RadarPage>
                 GestureDetector(
                   onTap: () => _toggleAutoPilot(!isAutoPilot),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
+                    duration: AppTheme.animSlide,
+                    curve: AppTheme.curveOut,
                     width: 40,
                     height: 20,
                     decoration: BoxDecoration(
@@ -248,8 +248,8 @@ class _RadarPageState extends ConsumerState<RadarPage>
                     child: Stack(
                       children: [
                         AnimatedPositioned(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOutCubic,
+                          duration: AppTheme.animSlide,
+                          curve: AppTheme.curveOut,
                           left: isAutoPilot ? 22 : 2,
                           top: 2,
                           child: Container(
@@ -281,8 +281,8 @@ class _RadarPageState extends ConsumerState<RadarPage>
 
   Widget _buildEstafetBanner(Gig activeGig, List<Gig> queuedGigs) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
+      duration: AppTheme.animSlide,
+      curve: AppTheme.curveOut,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0x1A10B981),
@@ -670,7 +670,7 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
 
   void _setupExitAnimations() {
     _exitController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: AppTheme.animSheet,
       vsync: this,
     );
     _exitOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(_exitController);
@@ -685,14 +685,14 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
       vsync: this,
     );
     _enterScale = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _enterController, curve: Curves.easeOutCubic),
+      CurvedAnimation(parent: _enterController, curve: AppTheme.curveOut),
     );
     _enterOpacity = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _enterController, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _enterController, curve: AppTheme.curveOutQuart));
     _enterY = Tween<double>(begin: 40, end: 0).animate(
-      CurvedAnimation(parent: _enterController, curve: Curves.easeOutCubic),
+      CurvedAnimation(parent: _enterController, curve: AppTheme.curveOut),
     );
     _enterController.forward();
   }
@@ -710,20 +710,20 @@ class _GigCardState extends State<_GigCard> with TickerProviderStateMixin {
       _exitY = Tween<double>(
         begin: 0.0,
         end: -500,
-      ).animate(CurvedAnimation(parent: _exitController, curve: Curves.easeIn));
+      ).animate(CurvedAnimation(parent: _exitController, curve: AppTheme.curveIn));
       _exitRotate = Tween<double>(
         begin: 0.0,
         end: 0.0,
       ).animate(_exitController);
     } else if (direction == 'right') {
       _exitX = Tween<double>(begin: 0.0, end: 400).animate(
-        CurvedAnimation(parent: _exitController, curve: Curves.easeOutCubic),
+        CurvedAnimation(parent: _exitController, curve: AppTheme.curveOut),
       );
       _exitY = Tween<double>(begin: 0.0, end: 50).animate(_exitController);
       _exitRotate = Tween<double>(begin: 0.0, end: 15).animate(_exitController);
     } else if (direction == 'left') {
       _exitX = Tween<double>(begin: 0.0, end: -400).animate(
-        CurvedAnimation(parent: _exitController, curve: Curves.easeOutCubic),
+        CurvedAnimation(parent: _exitController, curve: AppTheme.curveOut),
       );
       _exitY = Tween<double>(begin: 0.0, end: 50).animate(_exitController);
       _exitRotate = Tween<double>(
@@ -1330,19 +1330,19 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
     _opacityAnim = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOutQuart));
     _scaleAnim = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOut));
     _yAnim = Tween<double>(
       begin: 30.0,
       end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOut));
     _exitOpacity = Tween<double>(
       begin: 1.0,
       end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOutQuart));
     _controller.forward();
   }
 

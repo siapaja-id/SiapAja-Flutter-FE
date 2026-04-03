@@ -125,7 +125,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
         );
     _hoverController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: AppTheme.animFast,
     );
     _hoverAnimation = CurvedAnimation(
       parent: _hoverController,
@@ -306,7 +306,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                           onPanEnd: _endResize,
                           child: Center(
                             child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
+                              duration: AppTheme.animFast,
                               width: 4,
                               height: 64,
                               decoration: BoxDecoration(
