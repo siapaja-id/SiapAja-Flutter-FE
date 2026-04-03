@@ -669,7 +669,7 @@ plan:
           - lib/shared/constants/mock_gigs.dart
 
     - uuid: 'c0d1e2f3-4a5b-5c6d-8f9a-0b1c2d3e4f5a'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 15: TaskMainContent Sub-Widget Extraction & Radar Widget Split'
       reason: |
         task_main_content.dart (890 LOC) is the second-largest file after radar_page.dart. It contains two large inline sub-builders:
@@ -731,7 +731,7 @@ plan:
           - lib/features/feed/pages/radar_page.dart
 
     - uuid: 'd1e2f3a4-5b6c-4d7e-8f9a-0b1c2d3e4f5a6'
-      status: 'pending'
+      status: 'completed'
       name: 'Part 16: ElevatedButton.styleFrom Consolidation & EmptyState Widget'
       reason: |
         ElevatedButton.styleFrom is called with identical parameters in multiple locations:

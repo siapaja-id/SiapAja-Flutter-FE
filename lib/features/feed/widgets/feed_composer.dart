@@ -1,5 +1,6 @@
 import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/utils/decorations.dart';
+import '../../../shared/utils/app_buttons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -349,18 +350,7 @@ class _FeedComposerState extends State<FeedComposer> {
                               onPressed: _textController.text.isEmpty
                                   ? null
                                   : _handleSubmit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: AppColors.primaryForeground,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                elevation: 0,
-                              ),
+                              style: primaryButtonStyle,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -460,17 +450,7 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                   onPressed: widget.textController.text.isEmpty
                       ? null
                       : widget.onSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.primaryForeground,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
+                  style: primaryButtonStyle,
                   child: Text(
                     'Continue',
                     style: Theme.of(context).textTheme.titleMedium
