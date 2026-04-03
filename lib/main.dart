@@ -8,15 +8,20 @@ import 'shared/zoom_provider.dart';
 import 'shared/settings_provider.dart';
 import 'features/feed/pages/desktop_kanban_layout.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final container = ProviderContainer();
-  await container.read(settingsProvider.notifier).init();
-  await container.read(zoomProvider.notifier).init();
-
   runApp(
-    UncontrolledProviderScope(container: container, child: const SiapAjaApp()),
+    ProviderScope(
+      child: Builder(
+        builder: (context) {
+          final container = ProviderScope.containerOf(context);
+          // Lazy init — don't block runApp
+          container.read(settingsProvider.notifier).init();
+          container.read(zoomProvider.notifier).init();
+          return const SiapAjaApp();
+        },
+      ),
+    ),
   );
 }
 
@@ -26,21 +31,28 @@ class SiapAjaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final scaleFactor = AppTheme.textScaleFactor(settings.textSize);
 
     return MaterialApp.router(
       title: 'SiapAja',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme(
-        themeColor: settings.themeColor,
-        textSize: settings.textSize,
-      ),
+      theme: AppTheme.darkTheme(themeColor: settings.themeColor),
       builder: (context, child) {
-        if (MediaQuery.sizeOf(context).width >= 768) {
-          return const ZoomWrapper(
-            child: HeroControllerScope.none(child: DesktopKanbanLayout()),
-          );
-        }
-        return ZoomWrapper(child: child!);
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(scaleFactor)),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= 768) {
+                return const ZoomWrapper(
+                  child: HeroControllerScope.none(child: DesktopKanbanLayout()),
+                );
+              }
+              return ZoomWrapper(child: child!);
+            },
+          ),
+        );
       },
       routerConfig: AppRouter.router,
     );

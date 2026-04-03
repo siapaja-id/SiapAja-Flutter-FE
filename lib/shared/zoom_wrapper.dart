@@ -74,13 +74,7 @@ class _ZoomWrapperState extends ConsumerState<ZoomWrapper> {
               child: SizedBox(
                 width: childWidth,
                 height: childHeight,
-                child: MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    size: Size(childWidth, childHeight),
-                    textScaler: const TextScaler.linear(1.0),
-                  ),
-                  child: widget.child,
-                ),
+                child: widget.child,
               ),
             ),
           ),
