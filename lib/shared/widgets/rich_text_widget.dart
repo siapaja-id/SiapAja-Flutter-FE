@@ -26,7 +26,7 @@ class RichTextWidget extends StatelessWidget {
   List<InlineSpan> _parseText(String text) {
     List<InlineSpan> nodes = [TextSpan(text: text)];
 
-    List<InlineSpan> _applyRegex(
+    List<InlineSpan> applyRegex(
       RegExp regex,
       InlineSpan Function(String) builder,
     ) {
@@ -42,18 +42,18 @@ class RichTextWidget extends StatelessWidget {
       }).toList();
     }
 
-    nodes = _applyRegex(
+    nodes = applyRegex(
       RegExp(r'(\|\|.*?\|\|)'),
       (m) => _buildSpoiler(m.substring(2, m.length - 2)),
     );
 
-    nodes = _applyRegex(RegExp(r'(https?://[^\s]+)'), (url) => _buildLink(url));
+    nodes = applyRegex(RegExp(r'(https?://[^\s]+)'), (url) => _buildLink(url));
 
-    nodes = _applyRegex(RegExp(r'(@[a-zA-Z0-9_]+)'), _buildMention);
+    nodes = applyRegex(RegExp(r'(@[a-zA-Z0-9_]+)'), _buildMention);
 
-    nodes = _applyRegex(RegExp(r'(#[a-zA-Z0-9_]+)'), _buildHashtag);
+    nodes = applyRegex(RegExp(r'(#[a-zA-Z0-9_]+)'), _buildHashtag);
 
-    nodes = _applyRegex(
+    nodes = applyRegex(
       RegExp(r'((?:\+?\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})'),
       _buildPhoneRedacted,
     );

@@ -173,7 +173,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
                               Text(
                                 '${currentUser?.karma ?? 98} karma',
                                 style: AppTheme.smallLabel.copyWith(color: Color(0xFF34D399)),
-                            
+                              ),
                             ],
                           ),
                         ),

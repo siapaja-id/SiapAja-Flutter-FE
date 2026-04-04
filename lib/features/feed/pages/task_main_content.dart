@@ -319,30 +319,30 @@ class _TaskMainContentState extends State<TaskMainContent> {
                   children: [
                     Text(
                       _isDescExpanded ? 'Show Less' : 'Show Full Description',
-                    style: AppTheme.scaled(
-                      multiplier: AppTheme.m2sm,
+                      style: AppTheme.scaled(
+                        multiplier: AppTheme.m2sm,
+                        color: _isDescExpanded
+                            ? AppColors.onSurfaceVariant
+                            : AppColors.primary,
+                        weight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isDescExpanded
+                          ? PhosphorIconsRegular.caretUp
+                          : PhosphorIconsRegular.caretDown,
+                      size: 12,
                       color: _isDescExpanded
                           ? AppColors.onSurfaceVariant
                           : AppColors.primary,
-                      weight: FontWeight.w900,
-                      letterSpacing: 1.5,
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    _isDescExpanded
-                        ? PhosphorIconsRegular.caretUp
-                        : PhosphorIconsRegular.caretDown,
-                    size: 12,
-                    color: _isDescExpanded
-                        ? AppColors.onSurfaceVariant
-                        : AppColors.primary,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-      ],
     );
   }
 
