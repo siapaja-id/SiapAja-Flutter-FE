@@ -379,8 +379,7 @@ class _FeedComposerState extends State<FeedComposer> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

@@ -343,6 +343,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
               ),
             ),
           ),
+      ],
     );
   }
 

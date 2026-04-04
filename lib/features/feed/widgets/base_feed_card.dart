@@ -182,7 +182,7 @@ class BaseFeedCard extends ConsumerWidget {
               ),
             ),
           ),
-        if (bottomWidget != null) bottomWidget!,
+        if (bottomWidget != null) bottomWidget!, // ignore: use_null_aware_elements
       ],
     );
   }
@@ -319,7 +319,7 @@ class BaseFeedCard extends ConsumerWidget {
                                         style: AppTheme.sectionLabel.copyWith(fontSize: 14 * AppTheme.m3xs, color: AppColors.primary),
                                       ),
                                     ),
-                                  if (headerMeta != null) headerMeta!,
+                                  if (headerMeta != null) headerMeta!, // ignore: use_null_aware_elements
                                 ],
                               ),
                             ),

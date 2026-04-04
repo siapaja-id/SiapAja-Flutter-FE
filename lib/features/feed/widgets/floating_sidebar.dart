@@ -69,6 +69,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
       curve: AppTheme.curveOut,
       width: _expanded ? 240 : 80,
       child: GlassCard.slab(
+        padding: EdgeInsets.zero,
         border: const Border(
           right: BorderSide(color: AppColors.glassBorder),
         ),
@@ -100,7 +101,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
             ),
             const SizedBox(height: 32),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: navItems.map((item) {
                   return _NavButton(
@@ -121,7 +122,7 @@ class _FloatingSidebarState extends ConsumerState<FloatingSidebar> {
             ),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: GestureDetector(
                 onTap: () => ref
                     .read(kanbanProvider.notifier)
@@ -249,12 +250,16 @@ class _NavButton extends StatelessWidget {
                   ),
                   if (expanded) ...[
                     const SizedBox(width: 12),
-                    AnimatedOpacity(
-                      opacity: expanded ? 1.0 : 0.0,
-                      duration: AppTheme.animFast,
-                      child: Text(
-                        item.label,
-                        style: AppTheme.bodyBold.copyWith(letterSpacing: 0.5, color: item.isPrimary ? AppColors.primaryForeground : AppColors.onSurfaceVariant),
+                    Flexible(
+                      child: AnimatedOpacity(
+                        opacity: expanded ? 1.0 : 0.0,
+                        duration: AppTheme.animFast,
+                        child: Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.bodyBold.copyWith(letterSpacing: 0.5, color: item.isPrimary ? AppColors.primaryForeground : AppColors.onSurfaceVariant),
+                        ),
                       ),
                     ),
                   ],
