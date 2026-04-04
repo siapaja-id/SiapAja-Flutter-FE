@@ -127,7 +127,7 @@ class QuickBidRow extends StatelessWidget {
             color: AppColors.onSurface,
           ),
           label: const Text('Down Bid'),
-          backgroundColor: const Color(0xFFDC2626).withOpacity(0.1),
+          backgroundColor: const Color(0xFFDC2626).withValues(alpha: 0.1),
           labelStyle: AppTheme.meta,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -152,7 +152,7 @@ class QuickBidRow extends StatelessWidget {
             color: AppColors.onSurface,
           ),
           label: const Text('Up Bid'),
-          backgroundColor: const Color(0xFF10B981).withOpacity(0.1),
+          backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.1),
           labelStyle: AppTheme.meta,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

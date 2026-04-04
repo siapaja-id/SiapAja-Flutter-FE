@@ -80,7 +80,7 @@ class TaskActionFooter extends StatelessWidget {
                         style: AppTheme.bodyBold,
                         decoration: borderlessInput.copyWith(
                           hintText: 'Message or ask a question...',
-                          hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.5)),
+                          hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withValues(alpha: 0.5)),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
@@ -249,14 +249,14 @@ class TaskActionFooter extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: color != null
-            ? color.withOpacity(0.1)
+            ? color.withValues(alpha: 0.1)
             : Colors.white.w05,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color:
               borderColor ??
               (color != null
-                  ? color.withOpacity(0.2)
+                  ? color.withValues(alpha: 0.2)
                   : Colors.white.w10),
         ),
       ),
@@ -299,7 +299,7 @@ class TaskActionFooter extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 4,
-                shadowColor: color.withOpacity(0.3),
+                shadowColor: color.withValues(alpha: 0.3),
               ),
               child: Text(
                 text,

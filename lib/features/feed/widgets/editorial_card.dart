@@ -42,7 +42,7 @@ class EditorialCard extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerHigh.withOpacity(0.9),
+                color: AppColors.surfaceContainerHigh.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),

@@ -32,7 +32,7 @@ class PrimaryActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 4,
-          shadowColor: backgroundColor.withOpacity(0.2),
+          shadowColor: backgroundColor.withValues(alpha: 0.2),
           disabledBackgroundColor: AppColors.surfaceContainerHigh,
           disabledForegroundColor: AppColors.onSurfaceVariant,
         ),

@@ -47,8 +47,9 @@ class _MainShellState extends ConsumerState<MainShell> {
     if (path == '/' ||
         path.startsWith('/feed') ||
         path.startsWith('/post') ||
-        path.startsWith('/task'))
+        path.startsWith('/task')) {
       return 0;
+    }
     for (var i = 1; i < _navItems.length; i++) {
       if (path == _navItems[i].route) return i;
     }

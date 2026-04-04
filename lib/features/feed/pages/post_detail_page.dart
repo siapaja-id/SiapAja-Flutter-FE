@@ -338,9 +338,9 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                     padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
                     decoration: BoxDecoration(
                       border: Border(
-                        top: BorderSide(color: Colors.white.withOpacity(0.05)),
+                        top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                         bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                     ),
@@ -396,8 +396,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
       body: Container(
         decoration: BoxDecoration(
           border: Border(
-            left: BorderSide(color: Colors.white.withOpacity(0.05)),
-            right: BorderSide(color: Colors.white.withOpacity(0.05)),
+            left: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+            right: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           ),
         ),
         child: SafeArea(child: content),
@@ -471,9 +471,9 @@ class _DetailHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh.withOpacity(0.95),
+        color: AppColors.surfaceContainerHigh.withValues(alpha: 0.95),
         border: Border(
-          bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
       ),
       child: Row(
@@ -481,7 +481,7 @@ class _DetailHeader extends StatelessWidget {
           IconButton(
             onPressed: onBack,
             style: IconButton.styleFrom(
-              backgroundColor: Colors.black.withOpacity(0.2),
+              backgroundColor: Colors.black.withValues(alpha: 0.2),
             ),
             icon: const Icon(
               PhosphorIconsRegular.arrowLeft,

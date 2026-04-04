@@ -488,7 +488,7 @@ class _FullscreenComposerSheetState extends State<_FullscreenComposerSheet> {
                         decoration: borderlessInput.copyWith(
                           hintText:
                               'What do you need help with? Describe your task in detail...',
-                          hintStyle: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurfaceVariant.withOpacity(0.4)),
+                          hintStyle: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurfaceVariant.withValues(alpha: 0.4)),
                         ),
                         style: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurface, height: 1.8),
                         autofocus: true,

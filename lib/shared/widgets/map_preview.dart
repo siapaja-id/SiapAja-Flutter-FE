@@ -34,7 +34,7 @@ class MapPreview extends StatelessWidget {
                   CachedNetworkImage(
                     imageUrl: mapUrl,
                     fit: BoxFit.cover,
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     colorBlendMode: BlendMode.saturation,
                   ),
                   Container(
@@ -45,7 +45,7 @@ class MapPreview extends StatelessWidget {
                         colors: [
                           Colors.transparent,
                           Colors.transparent,
-                          AppColors.surfaceContainerHigh.withOpacity(1),
+                          AppColors.surfaceContainerHigh.withValues(alpha: 1),
                         ],
                       ),
                     ),
@@ -197,7 +197,7 @@ class _RoutePoint extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTheme.sectionLabel.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.7)),
+          style: AppTheme.sectionLabel.copyWith(color: AppColors.onSurfaceVariant.withValues(alpha: 0.7)),
         ),
         const SizedBox(height: 2),
         Text(

@@ -346,9 +346,9 @@ class AppTheme {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        primary.withOpacity(0.04),
-        AppColors.indigo.withOpacity(0.03),
-        AppColors.emerald.withOpacity(0.02),
+        primary.withValues(alpha: 0.04),
+        AppColors.indigo.withValues(alpha: 0.03),
+        AppColors.emerald.withValues(alpha: 0.02),
         Colors.transparent,
       ],
       stops: const [0.0, 0.3, 0.6, 1.0],

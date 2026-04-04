@@ -47,7 +47,7 @@ BoxDecoration subtleBorderDecor({
 }) {
   return BoxDecoration(
     borderRadius: BorderRadius.circular(radius),
-    border: Border.all(color: borderColor.withOpacity(opacity)),
+    border: Border.all(color: borderColor.withValues(alpha: opacity)),
   );
 }
 
@@ -60,9 +60,9 @@ BoxDecoration tintedDecor({
   double tintOpacity = 0.2,
 }) {
   return BoxDecoration(
-    color: color.withOpacity(tintOpacity),
+    color: color.withValues(alpha: tintOpacity),
     borderRadius: BorderRadius.circular(radius),
-    border: Border.all(color: color.withOpacity(tintOpacity)),
+    border: Border.all(color: color.withValues(alpha: tintOpacity)),
   );
 }
 
@@ -77,9 +77,9 @@ BoxDecoration tintedDecorHalf({
   double tintOpacity = 0.2,
 }) {
   return BoxDecoration(
-    color: color.withOpacity(tintOpacity * 0.5),
+    color: color.withValues(alpha: tintOpacity * 0.5),
     borderRadius: BorderRadius.circular(radius),
-    border: Border.all(color: color.withOpacity(tintOpacity)),
+    border: Border.all(color: color.withValues(alpha: tintOpacity)),
   );
 }
 
@@ -89,7 +89,7 @@ BoxDecoration tintedDecorHalf({
 /// used across bottom-sheets, cards, and the sidebar.
 BoxShadow shadowBlack({double blur = 20, double yOffset = 8, double opacity = 0.22}) {
   return BoxShadow(
-    color: Colors.black.withOpacity(opacity),
+    color: Colors.black.withValues(alpha: opacity),
     blurRadius: blur,
     offset: Offset(0, yOffset),
   );
@@ -98,7 +98,7 @@ BoxShadow shadowBlack({double blur = 20, double yOffset = 8, double opacity = 0.
 /// Small ambient shadow for compact containers (input fields, chips).
 BoxShadow shadowSm({double blur = 10, double opacity = 0.2}) {
   return BoxShadow(
-    color: Colors.black.withOpacity(opacity),
+    color: Colors.black.withValues(alpha: opacity),
     blurRadius: blur,
   );
 }
@@ -106,7 +106,7 @@ BoxShadow shadowSm({double blur = 10, double opacity = 0.2}) {
 /// Coloured glow shadow for active / selected / glowing elements.
 BoxShadow shadowGlow({required Color color, double blur = 20, double opacity = 0.3}) {
   return BoxShadow(
-    color: color.withOpacity(opacity),
+    color: color.withValues(alpha: opacity),
     blurRadius: blur,
   );
 }

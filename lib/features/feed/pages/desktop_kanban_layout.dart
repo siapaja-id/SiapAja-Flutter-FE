@@ -133,7 +133,7 @@ class _AddColumnButtonState extends State<_AddColumnButton> {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black54,
@@ -149,7 +149,7 @@ class _AddColumnButtonState extends State<_AddColumnButton> {
               child: Icon(
                 PhosphorIconsRegular.plus,
                 size: 24,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
           ),

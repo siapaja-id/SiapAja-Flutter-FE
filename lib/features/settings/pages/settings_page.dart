@@ -64,7 +64,7 @@ class SettingsPage extends ConsumerWidget {
                     icon: PhosphorIconsRegular.palette,
                     title: 'Theme Color',
                     subtitle: 'Choose your primary accent color',
-                    iconBgColor: AppColors.primary.withOpacity(0.1),
+                    iconBgColor: AppColors.primary.withValues(alpha: 0.1),
                     iconColor: AppColors.primary,
                     child: Wrap(
                       spacing: 16,
@@ -151,9 +151,9 @@ class SettingsSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 16),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 16),
         ],
       ),
       child: Column(
@@ -165,7 +165,7 @@ class SettingsSection extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: iconBgColor ?? Colors.white.withOpacity(0.05),
+                  color: iconBgColor ?? Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -237,7 +237,7 @@ class _ColorCircle extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.4),
+                    color: color.withValues(alpha: 0.4),
                     blurRadius: 12,
                     spreadRadius: 2,
                   ),
@@ -287,7 +287,7 @@ class _SegmentedControl<T extends Object> extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: Row(
                 children: [
@@ -329,10 +329,10 @@ class _SegmentedControl<T extends Object> extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 8,
                     ),
                   ],

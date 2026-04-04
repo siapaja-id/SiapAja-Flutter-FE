@@ -104,7 +104,7 @@ class _ActionButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-      hoverColor: (hoverColor ?? activeColor ?? AppColors.primary).withOpacity(
+      hoverColor: (hoverColor ?? activeColor ?? AppColors.primary).withValues(alpha: 
         0.1,
       ),
       child: Padding(
@@ -165,7 +165,7 @@ class _VotePill extends StatelessWidget {
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(20),
             ),
-            hoverColor: const Color(0xFFF97316).withOpacity(0.1),
+            hoverColor: const Color(0xFFF97316).withValues(alpha: 0.1),
             child: Container(
               padding: const EdgeInsets.only(
                 left: 8,
@@ -175,7 +175,7 @@ class _VotePill extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: voteValue == 1
-                    ? const Color(0xFFF97316).withOpacity(0.1)
+                    ? const Color(0xFFF97316).withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(20),
@@ -207,7 +207,7 @@ class _VotePill extends StatelessWidget {
             borderRadius: const BorderRadius.horizontal(
               right: Radius.circular(20),
             ),
-            hoverColor: const Color(0xFF6366F1).withOpacity(0.1),
+            hoverColor: const Color(0xFF6366F1).withValues(alpha: 0.1),
             child: Container(
               padding: const EdgeInsets.only(
                 left: 6,
@@ -217,7 +217,7 @@ class _VotePill extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: voteValue == -1
-                    ? const Color(0xFF6366F1).withOpacity(0.1)
+                    ? const Color(0xFF6366F1).withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: const BorderRadius.horizontal(
                   right: Radius.circular(20),

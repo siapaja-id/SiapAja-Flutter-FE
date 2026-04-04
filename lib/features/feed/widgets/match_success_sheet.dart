@@ -88,7 +88,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                         center: const Alignment(0, -0.2),
                         radius: 0.6,
                         colors: [
-                          const Color(0xFF10B981).withOpacity(0.15),
+                          const Color(0xFF10B981).withValues(alpha: 0.15),
                           Colors.transparent,
                         ],
                       ),
@@ -98,7 +98,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                 Positioned.fill(
                   child: IgnorePointer(
                     child: FloatingParticles(
-                      color: const Color(0xFF10B981).withOpacity(0.4),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.4),
                     ),
                   ),
                 ),
@@ -145,7 +145,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                           BoxShadow(
                                             color: const Color(
                                               0xFF10B981,
-                                            ).withOpacity(0.5),
+                                            ).withValues(alpha: 0.5),
                                             blurRadius: 80,
                                           ),
                                         ],
@@ -256,7 +256,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                               Colors.transparent,
                                               const Color(
                                                 0xFF34D399,
-                                              ).withOpacity(0.5),
+                                              ).withValues(alpha: 0.5),
                                               Colors.transparent,
                                             ],
                                           ),
@@ -375,7 +375,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                           BoxShadow(
                                             color: const Color(
                                               0xFF10B981,
-                                            ).withOpacity(0.3),
+                                            ).withValues(alpha: 0.3),
                                             blurRadius: 40,
                                           ),
                                         ],
@@ -432,7 +432,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
                                           Icon(
                                             PhosphorIconsRegular.chatCircle,
                                             size: 18,
-                                            color: Colors.white.withOpacity(
+                                            color: Colors.white.withValues(alpha: 
                                               0.7,
                                             ),
                                           ),
@@ -537,7 +537,7 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
       duration: const Duration(milliseconds: 2500),
       beginScale: 0.8,
       beginOpacity: 0.3,
-      color: const Color(0xFF34D399).withOpacity(0.5),
+      color: const Color(0xFF34D399).withValues(alpha: 0.5),
       borderWidth: 1,
       borderRadius: 64,
     ));

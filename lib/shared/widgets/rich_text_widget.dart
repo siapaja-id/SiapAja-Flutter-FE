@@ -80,7 +80,7 @@ class RichTextWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           margin: const EdgeInsets.symmetric(horizontal: 2),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -127,9 +127,9 @@ class RichTextWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: const Color(0xFFEF4444).withOpacity(0.1),
+          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.2)),
+          border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -187,7 +187,7 @@ class _SpoilerTextState extends State<_SpoilerText> {
             style: _revealed
                 ? null
                 : TextStyle(
-                    color: AppColors.onSurfaceVariant.withOpacity(0.25),
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.25),
                   ),
           ),
         ),

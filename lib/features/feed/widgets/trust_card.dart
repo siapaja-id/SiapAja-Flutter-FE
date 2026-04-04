@@ -49,7 +49,7 @@ class TrustCard extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: [
                         AppColors.glassGlow,
-                        AppColors.glassGlow.withOpacity(0),
+                        AppColors.glassGlow.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -81,9 +81,9 @@ class TrustCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.emerald.withOpacity(0),
+                        AppColors.emerald.withValues(alpha: 0),
                         AppColors.emerald.e15,
-                        AppColors.emerald.withOpacity(0),
+                        AppColors.emerald.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -127,7 +127,7 @@ class TrustCard extends StatelessWidget {
                               '($reviewCount)',
                               style: AppTheme.scaled(
                                 multiplier: AppTheme.m1sm,
-                                color: AppColors.onSurfaceVariant.withOpacity(
+                                color: AppColors.onSurfaceVariant.withValues(alpha: 
                                   0.6,
                                 ),
                                 weight: FontWeight.w700,
@@ -152,7 +152,7 @@ class TrustCard extends StatelessWidget {
                           'PAYMENT',
                           style: AppTheme.scaled(
                             multiplier: AppTheme.m2sm,
-                            color: AppColors.onSurfaceVariant.withOpacity(0.6),
+                            color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
                             weight: FontWeight.w900,
                             letterSpacing: 2,
                           ),

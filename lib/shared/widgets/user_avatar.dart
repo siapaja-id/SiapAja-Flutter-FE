@@ -96,7 +96,7 @@ class UserAvatar extends StatelessWidget {
                   border: Border.all(color: AppColors.background, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF10B981).withOpacity(0.4),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.4),
                       blurRadius: 8,
                     ),
                   ],

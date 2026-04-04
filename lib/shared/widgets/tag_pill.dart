@@ -29,7 +29,7 @@ class TagPill extends StatelessWidget {
 
   Color get _borderColor => color == Colors.transparent
       ? Colors.white.w10
-      : color.withOpacity(0.2);
+      : color.withValues(alpha: 0.2);
 
   Color get _textColor =>
       color == Colors.transparent ? AppColors.onSurfaceVariant : color;
@@ -42,7 +42,7 @@ class TagPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: color == Colors.transparent
             ? Colors.white.w05
-            : color.withOpacity(0.2),
+            : color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: _borderColor),
       ),

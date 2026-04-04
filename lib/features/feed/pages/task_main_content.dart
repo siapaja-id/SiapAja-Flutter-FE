@@ -303,7 +303,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
               : data.description,
           style: AppTheme.scaled(
             multiplier: AppTheme.mbase,
-            color: AppColors.onSurfaceVariant.withOpacity(0.9),
+            color: AppColors.onSurfaceVariant.withValues(alpha: 0.9),
             height: 1.5,
           ),
         ),
@@ -417,7 +417,7 @@ class _TaskMainContentState extends State<TaskMainContent> {
         data.meta!,
         style: AppTheme.scaled(
           multiplier: AppTheme.m1sm,
-          color: AppColors.onSurfaceVariant.withOpacity(0.6),
+          color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
           weight: FontWeight.w700,
           letterSpacing: 2,
         ),

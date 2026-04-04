@@ -53,7 +53,7 @@ class TaskCard extends StatelessWidget {
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerHigh.withOpacity(0.9),
+                color: AppColors.surfaceContainerHigh.withValues(alpha: 0.9),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.border),
               ),
@@ -172,7 +172,7 @@ class TaskCard extends StatelessWidget {
           CachedNetworkImage(
             imageUrl: data.mapUrl!,
             fit: BoxFit.cover,
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             colorBlendMode: BlendMode.saturation,
           ),
           Container(
@@ -181,8 +181,8 @@ class TaskCard extends StatelessWidget {
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
                 colors: [
-                  AppColors.background.withOpacity(0.9),
-                  AppColors.background.withOpacity(0.2),
+                  AppColors.background.withValues(alpha: 0.9),
+                  AppColors.background.withValues(alpha: 0.2),
                   Colors.transparent,
                 ],
               ),

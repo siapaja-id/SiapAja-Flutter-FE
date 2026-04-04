@@ -104,7 +104,7 @@ class GlassCard extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   AppColors.glassGlow,
-                  AppColors.glassGlow.withOpacity(0),
+                  AppColors.glassGlow.withValues(alpha: 0),
                 ],
               ),
             ),

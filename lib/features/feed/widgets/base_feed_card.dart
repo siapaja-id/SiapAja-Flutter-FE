@@ -112,7 +112,7 @@ class _InteractiveFeedCardState extends State<InteractiveFeedCard> {
                           colors: [
                             Colors.transparent,
                             AppColors.primary.p60,
-                            AppColors.primary.withOpacity(0.0),
+                            AppColors.primary.withValues(alpha: 0.0),
                           ],
                           stops: const [0.0, 0.5, 1.0],
                         ),
@@ -182,7 +182,7 @@ class BaseFeedCard extends ConsumerWidget {
               ),
             ),
           ),
-        if (bottomWidget != null) bottomWidget!,
+        if (bottomWidget != null) bottomWidget,
       ],
     );
   }
@@ -319,7 +319,7 @@ class BaseFeedCard extends ConsumerWidget {
                                         style: AppTheme.sectionLabel.copyWith(fontSize: 14 * AppTheme.m3xs, color: AppColors.primary),
                                       ),
                                     ),
-                                  if (headerMeta != null) headerMeta!,
+                                  if (headerMeta != null) headerMeta,
                                 ],
                               ),
                             ),
@@ -332,7 +332,7 @@ class BaseFeedCard extends ConsumerWidget {
                                   FollowButton(handle: data.author.handle),
                                 Text(
                                   data.timestamp,
-                                  style: TextStyle(fontSize: 14 * AppTheme.mxs, color: AppColors.onSurfaceVariant.withOpacity(0.6)),
+                                  style: TextStyle(fontSize: 14 * AppTheme.mxs, color: AppColors.onSurfaceVariant.withValues(alpha: 0.6)),
                                 ),
                                 if (!isParent && !isQuote) ...[
                                   const SizedBox(width: 4),

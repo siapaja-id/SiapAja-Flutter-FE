@@ -286,9 +286,11 @@ class _KanbanFeedHeaderState extends ConsumerState<_KanbanFeedHeader>
       },
     };
 
-    final openProfile = () => ref
-        .read(kanbanProvider.notifier)
-        .openColumn('/profile', sourceId: widget.columnId, routeState: profileRouteState);
+    void openProfile() {
+      ref
+          .read(kanbanProvider.notifier)
+          .openColumn('/profile', sourceId: widget.columnId, routeState: profileRouteState);
+    }
 
     return _FeedHeaderContent(
       left: GestureDetector(onTap: openProfile, child: avatar),
@@ -476,7 +478,7 @@ class _TabBarState extends State<_TabBar> with SingleTickerProviderStateMixin {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.4),
+                            color: AppColors.primary.withValues(alpha: 0.4),
                             blurRadius: 6,
                           ),
                         ],

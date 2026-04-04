@@ -491,7 +491,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
               animation: _bidSheetController,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withOpacity(0.8 * _bidSheetOpacity.value),
+                  color: Colors.black.withValues(alpha: 0.8 * _bidSheetOpacity.value),
                 );
               },
             ),

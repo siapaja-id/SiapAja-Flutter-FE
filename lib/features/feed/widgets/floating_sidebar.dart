@@ -227,7 +227,7 @@ class _NavButton extends StatelessWidget {
                 boxShadow: item.isPrimary
                     ? [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: AppColors.primary.withValues(alpha: 0.2),
                           blurRadius: 20,
                         ),
                       ]

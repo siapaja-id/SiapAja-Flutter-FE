@@ -278,7 +278,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                   width: 2,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
@@ -323,7 +323,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                         color: AppColors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Column(
@@ -392,8 +392,8 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.white.withOpacity(0.2),
-                          Colors.white.withOpacity(0.05),
+                          Colors.white.withValues(alpha: 0.2),
+                          Colors.white.withValues(alpha: 0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(1),
@@ -429,7 +429,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                             child: Icon(
                               PhosphorIconsRegular.trash,
                               size: 16,
-                              color: AppColors.onSurfaceVariant.withOpacity(
+                              color: AppColors.onSurfaceVariant.withValues(alpha: 
                                 0.4,
                               ),
                             ),
@@ -448,7 +448,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                       hintText: index == 0
                           ? "What's happening?"
                           : 'Add another thought...',
-                      hintStyle: AppTheme.bodyLarge.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.4)),
+                      hintStyle: AppTheme.bodyLarge.copyWith(color: AppColors.onSurfaceVariant.withValues(alpha: 0.4)),
                     ),
                     maxLines: null,
                     minLines: 1,
@@ -521,7 +521,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 12),
                   width: 1,
                   height: 24,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
                 if (canAddThread)
                   GestureDetector(
@@ -530,7 +530,7 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -561,10 +561,10 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       style: BorderStyle.solid,
                       width: 1,
                     ),
@@ -592,9 +592,9 @@ class _CreateReplyPageState extends State<CreateReplyPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh.withOpacity(0.9),
+        color: AppColors.surfaceContainerHigh.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         boxShadow: [
           shadowBlack(opacity: 0.4, blur: 24),
         ],
@@ -637,7 +637,7 @@ class _CharProgressPainter extends CustomPainter {
     const strokeWidth = 2.0;
 
     final bgPaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius, bgPaint);
