@@ -263,7 +263,7 @@ class _KanbanColumnWidgetState extends ConsumerState<KanbanColumnWidget>
                             borderRadius: 36,
                             blurSigma: 40,
                             tint: Colors.transparent,
-                            border: Border.none,
+                            border: const Border(),
                             boxShadow: const [],
                             padding: EdgeInsets.zero,
                             showGlow: false,

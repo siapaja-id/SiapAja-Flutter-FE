@@ -81,7 +81,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     if (post is TaskData) {
       final priceStr = post.price;
       final parsed = parsePrice(priceStr);
-      _defaultBid = parsed ?? 50;
+      _defaultBid = parsed;
       _isNegotiable = priceStr.contains('-');
     }
   }

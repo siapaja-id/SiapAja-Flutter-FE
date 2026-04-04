@@ -32,7 +32,6 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
   late Animation<double> _opacityAnim;
   late Animation<double> _scaleAnim;
   late Animation<double> _yAnim;
-  late Animation<double> _exitOpacity;
 
   @override
   void initState() {
@@ -53,10 +52,6 @@ class _MatchSuccessSheetState extends State<MatchSuccessSheet>
       begin: 30.0,
       end: 0.0,
     ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOut));
-    _exitOpacity = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: AppTheme.curveOutQuart));
     _controller.forward();
   }
 

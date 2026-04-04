@@ -4,7 +4,7 @@ import '../../../shared/widgets/themed_background.dart';
 import '../../../shared/widgets/bid_controls.dart';
 import '../../../shared/utils/task_icons.dart';
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide CloseButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +34,6 @@ class _RadarPageState extends ConsumerState<RadarPage>
   bool _showMatchedGig = false;
   bool _showBidSheet = false;
   int _bidAmount = 50;
-  String _replyText = '';
   Timer? _autoPilotTimer;
 
   late AnimationController _bidSheetController;
@@ -75,7 +74,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
       if (!mounted) return;
 
       if (direction == 'up') {
-        _bidAmount = parsePrice(currentGig.price) ?? 50;
+        _bidAmount = parsePrice(currentGig.price);
         setState(() {
           _showBidSheet = true;
         });
@@ -97,8 +96,8 @@ class _RadarPageState extends ConsumerState<RadarPage>
   }
 
   Gig? _getCurrentGig() {
-    if (_currentIndex >= GIGS.length) return null;
-    return GIGS[_currentIndex];
+    if (_currentIndex >= gigs.length) return null;
+    return gigs[_currentIndex];
   }
 
   void _advanceNext() {
@@ -108,7 +107,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
           setState(() {
             _swipeDirection = null;
             _showBidSheet = false;
-            if (_currentIndex < GIGS.length - 1) {
+            if (_currentIndex < gigs.length - 1) {
               _currentIndex++;
             }
           });
@@ -118,7 +117,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
       setState(() {
         _swipeDirection = null;
         _showBidSheet = false;
-        if (_currentIndex < GIGS.length - 1) {
+        if (_currentIndex < gigs.length - 1) {
           _currentIndex++;
         }
       });
@@ -372,10 +371,10 @@ class _RadarPageState extends ConsumerState<RadarPage>
       padding: const EdgeInsets.only(bottom: 96),
       child: Stack(
         children: [
-          if (_currentIndex + 1 < GIGS.length)
+          if (_currentIndex + 1 < gigs.length)
             Positioned.fill(
               child: GigCard(
-                gig: GIGS[_currentIndex + 1],
+                gig: gigs[_currentIndex + 1],
                 onSwipe: _handleSwipe,
                 isTop: false,
                 index: 1,
@@ -473,9 +472,9 @@ class _RadarPageState extends ConsumerState<RadarPage>
 
   Widget _buildBidSheetOverlay() {
     final gig = _getCurrentGig()!;
-    final defaultBid = parsePrice(gig.price) ?? 50;
+    final defaultBid = parsePrice(gig.price);
 
-    void _closeBidSheet() {
+    void closeBidSheet() {
       _bidSheetController.reverse().then((_) {
         if (mounted) {
           setState(() => _showBidSheet = false);
@@ -484,7 +483,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
     }
 
     return GestureDetector(
-      onTap: _closeBidSheet,
+      onTap: closeBidSheet,
       child: Stack(
         children: [
           Positioned.fill(
@@ -537,7 +536,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                                 ),
                               ),
                               CloseButton(
-                                onTap: _closeBidSheet,
+                                onTap: closeBidSheet,
                               ),
                             ],
                           ),
@@ -555,7 +554,7 @@ class _RadarPageState extends ConsumerState<RadarPage>
                           ),
                           const SizedBox(height: 16),
                           BidPitchField(
-                            onChanged: (v) => _replyText = v,
+                            onChanged: (_) {},
                           ),
                           const SizedBox(height: 16),
                           BidSubmitButton(

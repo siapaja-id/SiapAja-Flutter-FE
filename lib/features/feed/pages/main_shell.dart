@@ -5,7 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
 import '../../../shared/models/nav_item.dart';
-import '../../../shared/settings_provider.dart';
+import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/widgets/themed_background.dart';
 import '../providers.dart';
 import '../widgets/glass_card.dart';

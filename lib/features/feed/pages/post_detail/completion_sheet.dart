@@ -50,7 +50,7 @@ class CompletionSheet extends StatelessWidget {
             style: AppTheme.bodyBold,
             decoration: glassInputField(
               hintText: 'Add completion notes or proof of work...',
-              hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withOpacity(0.3)),
+              hintStyle: AppTheme.bodyBold.copyWith(color: AppColors.onSurfaceVariant.withValues(alpha:0.3)),
               radius: 16,
             ),
             maxLines: 5,
@@ -72,7 +72,7 @@ class CompletionSheet extends StatelessWidget {
                 Icon(
                   PhosphorIconsRegular.camera,
                   size: 24,
-                  color: AppColors.onSurfaceVariant.withOpacity(0.5),
+                  color: AppColors.onSurfaceVariant.withValues(alpha:0.5),
                 ),
                 const SizedBox(height: 8),
                 Text(

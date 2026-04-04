@@ -303,7 +303,7 @@ class _FeedComposerState extends State<FeedComposer> {
                           TextField(
                             controller: _textController,
                             maxLines: null,
-                            decoration: borderlessInput(),
+                            decoration: borderlessInput,
                             style: TextStyle(fontSize: 14 * AppTheme.m2xl, color: AppColors.onSurface, height: 1.8),
                             onTap: () => setState(() => _isFocused = true),
                           ),

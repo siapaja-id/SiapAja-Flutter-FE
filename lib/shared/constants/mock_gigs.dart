@@ -1,7 +1,7 @@
 import 'package:siapaja_flutter_fe/models/gig.dart';
 import 'package:siapaja_flutter_fe/models/feed_item.dart';
 
-const GIGS = [
+const gigs = [
   Gig(
     id: 'g1',
     title: 'Minimalist Brand Identity',

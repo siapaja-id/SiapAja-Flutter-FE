@@ -21,7 +21,7 @@ class SectionLabel extends StatelessWidget {
       label,
       style: AppTheme.scaled(
         multiplier: AppTheme.m2xs,
-        color: color ?? AppColors.onSurfaceVariant.withOpacity(0.4),
+        color: color ?? AppColors.onSurfaceVariant.withValues(alpha:0.4),
         weight: FontWeight.w900,
         letterSpacing: 2.5,
       ),

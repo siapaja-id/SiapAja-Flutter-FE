@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../app_theme.dart';
-import '../../../shared/settings_provider.dart';
 import '../../../shared/widgets/themed_background.dart';
 import '../providers.dart';
 import '../widgets/floating_sidebar.dart';

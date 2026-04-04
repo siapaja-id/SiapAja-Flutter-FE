@@ -1,8 +1,6 @@
 import '../../../shared/utils/color_extensions.dart';
 import '../../../shared/utils/decorations.dart';
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-
 import '../../../app_theme.dart';
 import '../../../models/feed_item.dart';
 import '../../../models/author.dart';
@@ -160,7 +158,7 @@ class StatusTracker extends StatelessWidget {
                                   multiplier: AppTheme.m2xs,
                                   color: isActive
                                       ? AppColors.emerald
-                                      : AppColors.onSurfaceVariant.withOpacity(
+                                      : AppColors.onSurfaceVariant.withValues(alpha:
                                           0.4,
                                         ),
                                   weight: FontWeight.w900,
@@ -202,7 +200,7 @@ class StatusTracker extends StatelessWidget {
                                 'ASSIGNED TO',
                                 style: AppTheme.scaled(
                                   multiplier: AppTheme.m2xs,
-                                  color: AppColors.onSurfaceVariant.withOpacity(
+                                  color: AppColors.onSurfaceVariant.withValues(alpha:
                                     0.6,
                                   ),
                                   weight: FontWeight.w900,
@@ -229,7 +227,7 @@ class StatusTracker extends StatelessWidget {
                             'AGREED PRICE',
                             style: AppTheme.scaled(
                               multiplier: AppTheme.m2xs,
-                              color: AppColors.onSurfaceVariant.withOpacity(
+                              color: AppColors.onSurfaceVariant.withValues(alpha:
                                 0.6,
                               ),
                               weight: FontWeight.w900,

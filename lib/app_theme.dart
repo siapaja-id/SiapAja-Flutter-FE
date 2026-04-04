@@ -111,8 +111,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.dark(
-        background: AppColors.background,
-        surface: AppColors.surface,
+        surface: AppColors.background,
         primary: primary,
         onPrimary: AppColors.primaryForeground,
         secondary: AppColors.emerald,

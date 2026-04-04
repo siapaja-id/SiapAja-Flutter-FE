@@ -16,24 +16,8 @@ import '../../../shared/widgets/glass_pill.dart';
 import '../../../shared/widgets/section_label.dart';
 import '../../../shared/widgets/gradient_divider.dart';
 import '../widgets/base_feed_card.dart';
-.dart';
-import '../../../shared/utils/decorations.dart';
-import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-
-import '../../../app_theme.dart';
-import '../../../models/feed_item.dart';
-import '../../../shared/utils/task_icons.dart';
-import '../../../shared/widgets/user_avatar.dart';
-import '../../../shared/widgets/media_carousel.dart';
-import '../../../shared/widgets/post_actions.dart';
-import '../../../shared/widgets/tag_pill.dart';
-import '../../../shared/widgets/voice_note_player.dart';
-import '../../../shared/widgets/map_preview.dart';
-import '../../../shared/widgets/glass_pill.dart';
-import '../../../shared/widgets/section_label.dart';
-import '../../../shared/widgets/gradient_divider.dart';
-import '../widgets/base_feed_card.dart';
+import '../widgets/trust_card.dart';
+import '../widgets/status_tracker.dart';
 
 class TaskMainContent extends StatefulWidget {
   final TaskData data;

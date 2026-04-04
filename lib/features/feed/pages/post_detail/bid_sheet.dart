@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app_theme.dart';
 import '../../../../models/feed_item.dart';
 import '../../../../shared/widgets/base_sheet.dart';
 import '../../../../shared/widgets/bid_controls.dart';

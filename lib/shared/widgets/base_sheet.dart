@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide CloseButton;
 
 import '../../app_theme.dart';
 import '../utils/color_extensions.dart';

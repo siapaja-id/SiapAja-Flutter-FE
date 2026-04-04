@@ -105,8 +105,8 @@ class SocialPostCard extends StatelessWidget {
             text: data.content,
             limit: isMain ? 280 : 160,
             style: isMain
-                ? AppTheme.subtitle.copyWith(color: AppColors.onSurface.withOpacity(0.9))
-                : AppTheme.bodyCardWhite.copyWith(color: AppColors.onSurface.withOpacity(0.9)),
+                ? AppTheme.subtitle.copyWith(color: AppColors.onSurface.withValues(alpha:0.9))
+                : AppTheme.bodyCardWhite.copyWith(color: AppColors.onSurface.withValues(alpha:0.9)),
             suffix: data.threadCount != null && data.threadCount! > 1
                 ? Container(
                     padding: const EdgeInsets.symmetric(

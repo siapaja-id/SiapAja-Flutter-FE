@@ -14,7 +14,7 @@ import '../providers.dart';
 /// Subclasses provide [initialTabIndex], [targetTabIndex], and [onTabIndexChanged].
 /// The mixin handles creation, listening, sync on didUpdateWidget, and disposal.
 mixin ManagedTabController<T extends ConsumerStatefulWidget>
-    on SingleTickerProviderStateMixin, ConsumerState<T> {
+    on SingleTickerProviderStateMixin<T>, ConsumerState<T> {
   late TabController tabController;
 
   /// Tab index used when the controller is first created in [initState].
